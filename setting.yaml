@@ -1,0 +1,6 @@
+Port: 50505
+IdlePeriod: 1000
+WhiteList:
+  - https://www.yukiyukivirtual.net
+  - https://booth.pm
+
