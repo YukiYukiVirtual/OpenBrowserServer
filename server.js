@@ -135,7 +135,7 @@ app.get("/openURL/*", function(req, res)
 	if(uri.indexOf("http") === 0)
 	{
 		// ブラウザを開く
-		const r = start(uri);
+		start(uri);
 	}
 	else
 	{
