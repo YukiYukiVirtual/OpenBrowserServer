@@ -34,7 +34,6 @@ function loadSetting()
 	}
 }
 
-// init
 console.group("初期化");
 +function()
 {
@@ -71,7 +70,7 @@ function start(uri)
 	if(!s)
 	{
 		console.error("設定の読み込みに失敗しました。設定を確認してください。");
-		return -1;
+		return "loadSetting Failure";
 	}
 	
 	// 休止間隔
@@ -79,19 +78,19 @@ function start(uri)
 	if(isNaN(idlePeriod))
 	{
 		console.error("IdlePeriodが不正です。");
-		return -1;
+		return "Invalid IdlePeriod";
 	}
 	if(idlePeriod <= 0)
 	{
 		console.info("IdlePeriodが0以下のため休止します。");
 		console.log({idlePeriod});
-		return 1;
+		return "IdlePeriod <= 0";
 	}	
 	if(interval <= idlePeriod)
 	{
 		console.info("リクエスト間隔が設定値以下のため休止します。");
 		console.log({interval,idlePeriod});
-		return 1;
+		return "IdlePeriod";
 	}
 	
 	// ホワイトリスト
@@ -99,26 +98,35 @@ function start(uri)
 	if(wl == undefined)
 	{
 		console.error("ホワイトリストが正しく定義されていません。設定ファイルに[WhiteList:]の記述がありますか？");
-		return -1;
+		return "WhiteList Undefined";
 	}
 	// ホワイトリストマッチのフラグ
 	let matched = false;
 	for( const w of wl)
 	{
-		if(uri.indexOf(w) === 0)
+		let u = w; // ホワイトリスト要素を変数uに退避
+		// 末尾に/を補完する
+		if(u.slice(-1) != "/")
 		{
-			matched = w;
+			u += "/";
+		}
+		// ホワイトリストに前方一致するか
+		if(uri.indexOf(u) === 0)
+		{
+			matched = w; // ホワイトリストの要素にマッチしたことを表すため、退避前のwを設定する。
 			break;
 		}
 	}
 	if(!matched)
 	{
 		console.info("ホワイトリストにマッチしませんでした。");
-		return 1;
+		return "WhiteList Unmatch";
 	}
 	console.info("ホワイトリストにマッチしました。: " + matched);
 	
+	// ブラウザでページを開く
 	openBrowser(uri);
+	return "WhiteList Match";
 }
 
 // HTTP GETリクエストを処理する
@@ -131,20 +139,25 @@ app.get("/openURL/*", function(req, res)
 	
 	console.log({now, uri});
 	
+	let message = `Time: ${now}`;
+	message += `\nURL: ${uri}`;
+	
 	// URIがhttpから始まっているか確認
 	if(uri.indexOf("http") === 0)
 	{
 		// ブラウザを開く
-		start(uri);
+		const rc = start(uri);
+		message += `\nReturnCode: ${rc}`;
 	}
 	else
 	{
 		console.warn("httpから始まらない不正なパラメータが渡されました。");
+		message += "\nInvalid Parameter.";
 	}
 	
 	res.header('Content-Type', 'text/plain;charset=utf-8');
 	res.writeHead(404);
-	res.end(uri);
+	res.end(message);
 	
 	console.groupEnd();
 });
