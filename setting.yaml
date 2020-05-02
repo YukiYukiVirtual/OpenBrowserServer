@@ -1,6 +1,17 @@
 Port: 50505
 IdlePeriod: 1000
-WhiteList:
-  - https://www.yukiyukivirtual.net
-  - https://booth.pm
-
+Protocol:
+  - https
+Domain:
+  - yukiyukivirtual.net
+  - yukiyukivirtual.github.io
+  - booth.pm
+  - discord.gg
+  - twitter.com
+  - vrchat.com
+  - vrchat.net
+  - youtu.be
+  - youtube.com
+  - amazon.co.jp
+  - fanbox.cc
+  - github.com

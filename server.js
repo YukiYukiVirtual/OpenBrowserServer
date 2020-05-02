@@ -58,23 +58,12 @@ console.group("初期化");
 }();
 console.groupEnd();
 
-// 設定を読み込んで各種判定後、ブラウザを開く
-function start(uri)
+function intervalCheck(ip)
 {
 	// リクエスト間隔
 	const interval = now - lastTime;
 	lastTime = now;
-	
-	// 設定読み込み
-	const s = loadSetting();
-	if(!s)
-	{
-		console.error("設定の読み込みに失敗しました。設定を確認してください。");
-		return "loadSetting Failure";
-	}
-	
-	// 休止間隔
-	const idlePeriod = parseInt(s.IdlePeriod);
+	const idlePeriod = parseInt(ip);
 	if(isNaN(idlePeriod))
 	{
 		console.error("IdlePeriodが不正です。");
@@ -92,69 +81,113 @@ function start(uri)
 		console.log({interval,idlePeriod});
 		return "IdlePeriod";
 	}
-	
-	// ホワイトリスト
-	const wl = s.WhiteList;
-	if(wl == undefined)
+	console.log({interval,idlePeriod});
+	return true;
+}
+function protocolCheck(url, protocols)
+{
+	for( const protocol of protocols)
 	{
-		console.error("ホワイトリストが正しく定義されていません。設定ファイルに[WhiteList:]の記述がありますか？");
-		return "WhiteList Undefined";
-	}
-	// ホワイトリストマッチのフラグ
-	let matched = false;
-	for( const w of wl)
-	{
-		let u = w; // ホワイトリスト要素を変数uに退避
-		// 末尾に/を補完する
-		if(u.slice(-1) != "/")
+		if(url.protocol == (protocol+":"))
 		{
-			u += "/";
-		}
-		// ホワイトリストに前方一致するか
-		if(uri.indexOf(u) === 0)
-		{
-			matched = w; // ホワイトリストの要素にマッチしたことを表すため、退避前のwを設定する。
-			break;
+			console.log({protocol});
+			return true;
 		}
 	}
-	if(!matched)
+	return "Protocol Unmatch";
+}
+function domainCheck(url, domains)
+{
+	// ホスト名にホワイトリストドメインがあるかチェック
+	for( const domain of domains)
 	{
-		console.info("ホワイトリストにマッチしませんでした。");
-		return "WhiteList Unmatch";
+		if(url.hostname.endsWith(domain))
+		{
+			console.log({domain});
+			return true;
+		}
 	}
-	console.info("ホワイトリストにマッチしました。: " + matched);
+	return "Domain Unmatch";
+}
+function check(url)
+{
+	// 設定読み込み
+	const s = loadSetting();
+	if(!s)
+	{
+		console.error("設定の読み込みに失敗しました。設定を確認してください。");
+		return "loadSetting Failure";
+	}
 	
-	// ブラウザでページを開く
-	openBrowser(uri);
-	return "WhiteList Match";
+	// 休止間隔
+	const interval_ret = intervalCheck(s.IdlePeriod);
+	if(interval_ret !== true)
+	{
+		return interval_ret;
+	}
+	
+	// プロトコルチェック
+	const protocol_ret = protocolCheck(url, s.Protocol);
+	if(protocol_ret !== true)
+	{
+		return protocol_ret;
+	}
+	
+	// ドメインチェック
+	const domain_ret = domainCheck(url, s.Domain);
+	if(domain_ret !== true)
+	{
+		return domain_ret;
+	}
+	
+	return true;
 }
 
 // HTTP GETリクエストを処理する
 app.get("/openURL/*", function(req, res)
 {
 	console.group("openURL");
-	
+	// ログ
 	now = new Date();
-	const uri = decodeURIComponent(req.url.substr("/openURL/".length));
+	let url;
 	
-	console.log({now, uri});
+	try{
+		url = new URL(decodeURIComponent(req.url.substr("/openURL/".length)));
+	}catch(e)
+	{
+		url = null;
+	}
+	
+	console.log({now, url});
 	
 	let message = `Time: ${now}`;
-	message += `\nURL: ${uri}`;
+	message += `\nURL: ${url}`;
+	// ログ終わり
 	
-	// URIがhttpから始まっているか確認
-	if(uri.indexOf("http") === 0)
+	if(url !== null)
 	{
-		// ブラウザを開く
-		const rc = start(uri);
-		message += `\nReturnCode: ${rc}`;
+		// メイン処理
+		console.group("Check");
+		const check_ret = check(url);
+		console.groupEnd();
+		if(check_ret === true)
+		{
+			// ブラウザでページを開く
+			openBrowser(url);
+		}
+		else
+		{
+			console.info("要求されたURLはブロックされました。");
+			console.log({check_ret});
+		}
+		
+		message += `\nReturnCode: ${check_ret}`;
 	}
 	else
 	{
-		console.warn("httpから始まらない不正なパラメータが渡されました。");
-		message += "\nInvalid Parameter.";
+		message += "\nURL == null";
+		console.info("URLではありません。");
 	}
-	
 	res.header('Content-Type', 'text/plain;charset=utf-8');
 	res.writeHead(404);
 	res.end(message);
