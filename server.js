@@ -54,7 +54,7 @@ console.group("初期化");
 		console.error("ポート設定に失敗しました。有効なポート番号を設定してください。設定されているポート番号: " + s.Port);
 		return;
 	}
-	console.info("サーバー起動");
+	console.info("サーバー起動完了");
 }();
 console.groupEnd();
 
@@ -86,6 +86,7 @@ function intervalCheck(ip)
 }
 function protocolCheck(url, protocols)
 {
+	// 許可されているプロトコルかチェック
 	for( const protocol of protocols)
 	{
 		if(url.protocol == (protocol+":"))
@@ -98,10 +99,15 @@ function protocolCheck(url, protocols)
 }
 function domainCheck(url, domains)
 {
+	const hostname = url.hostname;
 	// ホスト名にホワイトリストドメインがあるかチェック
 	for( const domain of domains)
 	{
-		if(url.hostname.endsWith(domain))
+		if(
+		 hostname == domain             	// ドメイン
+		 ||                             	// または
+		 hostname.endsWith("." + domain)	// hoge.ドメインで終わっている
+		)
 		{
 			console.log({domain});
 			return true;
@@ -147,18 +153,20 @@ function check(url)
 app.get("/openURL/*", function(req, res)
 {
 	console.group("openURL");
-	// ログ
 	now = new Date();
+	
+	// URL
+	const requrl = decodeURIComponent(req.url.substr("/openURL/".length));
 	let url;
 	
 	try{
-		url = new URL(decodeURIComponent(req.url.substr("/openURL/".length)));
+		url = new URL(requrl);
 	}catch(e)
 	{
 		url = null;
 	}
 	
-	console.log({now, url});
+	console.log({now, requrl, url});
 	
 	let message = `Time: ${now}`;
 	message += `\nURL: ${url}`;
@@ -168,7 +176,12 @@ app.get("/openURL/*", function(req, res)
 	{
 		// メイン処理
 		console.group("Check");
+		
 		const check_ret = check(url);
+		
+		message += `\nReturnCode: ${check_ret}`;
+		console.log({check_ret});
+		
 		console.groupEnd();
 		if(check_ret === true)
 		{
@@ -178,14 +191,11 @@ app.get("/openURL/*", function(req, res)
 		else
 		{
 			console.info("要求されたURLはブロックされました。");
-			console.log({check_ret});
 		}
-		
-		message += `\nReturnCode: ${check_ret}`;
 	}
 	else
 	{
-		message += "\nURL == null";
+		message += `\nURL: ${requrl}`;
 		console.info("URLではありません。");
 	}
 	res.header('Content-Type', 'text/plain;charset=utf-8');
