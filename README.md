@@ -21,13 +21,6 @@ http://localhost:50505/openURL/https://www.yukiyukivirtual.net/
 - 引数のURLのドメイン部分は必ず/で終わる必要があります。
 - 引数の#以降は無視されます。#を使いたい場合は、#を%23に置き換えてください。
 
-### BoothのURLを設定する場合
-ユーザーリンクだとホワイトリストの関係で不都合が生じるので、Boothのリンクを使用してください。
-× https://yukiyukivirtual.booth.pm/items/2019942
-○ https://booth.pm/ja/items/2019942
-
-※今後のアップデートでドメイン単位でのホワイトリストに変更するかも知れません。
-
 ## 起動
 exeを実行します。
 
