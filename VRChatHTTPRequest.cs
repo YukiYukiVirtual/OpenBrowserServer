@@ -114,19 +114,6 @@ class VRChatHTTPRequest : Form
 	// 指定されたURLを開けるかチェックする
 	static bool CheckURL(string queryURL)
 	{
-		Uri uri;
-		
-		// Uriオブジェクトを生成する
-		try{
-			uri = new Uri(queryURL);
-		}
-		catch(UriFormatException e)
-		{
-			WriteLog("指定されたURLが有効ではありません。[" + queryURL + "]");
-			if(e==null){}
-			return false;
-		}
-		
 		// 設定読み込み
 		if(!settings.GetSettings())
 		{
@@ -139,6 +126,20 @@ class VRChatHTTPRequest : Form
 		if(ts.TotalMilliseconds < settings.IdlePeriod)
 		{
 			WriteLog("呼び出し間隔が設定値未満です。[" + ts.TotalMilliseconds + "]");
+			return false;
+		}
+		// 呼び出し間隔の基準時刻を更新する
+		lastTime = DateTime.Now;
+		
+		// Uriオブジェクトを生成する
+		Uri uri;
+		try{
+			uri = new Uri(queryURL);
+		}
+		catch(UriFormatException e)
+		{
+			WriteLog("指定されたURLが有効ではありません。[" + queryURL + "]");
+			if(e==null){}
 			return false;
 		}
 		
@@ -182,7 +183,6 @@ class VRChatHTTPRequest : Form
 		return true;
 	}
 	// 既定のブラウザでURLを開く
-	// 呼び出し間隔の基準時刻を更新する
 	static void OpenBrowser(string queryURL)
 	{
 		WriteLog("ブラウザを開きます。[" + queryURL + "]");
@@ -192,8 +192,6 @@ class VRChatHTTPRequest : Form
 		psi.UseShellExecute = false;
 		
 		Process.Start(psi);
-		
-		lastTime = DateTime.Now;
 	}
 	// ログを書く
 	static void WriteLog(string str)
