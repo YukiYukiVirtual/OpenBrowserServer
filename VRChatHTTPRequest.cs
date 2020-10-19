@@ -4,28 +4,53 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
+using System.Windows.Forms;
 
-class VRChatHTTPRequest
+class VRChatHTTPRequest : Form
 {
-	const string SETTING_FILE_NAME = "setting.yaml";
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
+	
+	// アイコンロード
+	private System.Drawing.Icon LoadIcon()
+	{
+		// Assembly Reference
+		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+
+		System.IO.Stream stream;
+		System.IO.StreamReader reader;
+
+		stream = assembly.GetManifestResourceStream("ice.ico");
+		reader = new System.IO.StreamReader(stream);
+		return new System.Drawing.Icon(reader.BaseStream);
+	}
+	// タスクトレイにアイコンを表示する
+	// 将来的には右クリックでログファイル表示や更新ページの確認や設定ファイル表示や終了ができるようにしたい
+	// 分らんかった
+	public VRChatHTTPRequest()
+	{
+		NotifyIcon ni = new NotifyIcon();
+		ni.Icon = LoadIcon();
+		ni.Text = "VRChatHTTPRequest";
+		ni.Visible = true;
+	}
+	// Application.Run()ってあるけど、よくわからんかった
+	[STAThread]
 	public static void Main()
 	{
 		// 多重起動抑止処理
-		Mutex mutex = new Mutex(false, "VRChatHTTPRequest");
+		System.Threading.Mutex mutex = new System.Threading.Mutex(false, "VRChatHTTPRequest");
 		if(!mutex.WaitOne(0, false))
 		{
-			System.Windows.Forms.MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "多重起動禁止");
+			MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "多重起動禁止");
 			return;
 		}
 		
-		// 設定をインスタンス化
-		settings = new Settings(SETTING_FILE_NAME);
-		
-		// メイン処理
 		try{
+			// 設定をインスタンス化
+			settings = new Settings("setting.yaml");
+			
+			new VRChatHTTPRequest();
 			WriteLog("Start");
 			
 			// CheckUpdateが有効なら更新をチェックさせる
@@ -34,15 +59,17 @@ class VRChatHTTPRequest
 				WriteLog("CheckUpdateが有効です。");
 				OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
 			}
+			// サーバーメイン処理
 			ServerMain();
 		}
 		catch(Exception e)
 		{
 			WriteLog(e.ToString());
-			System.Windows.Forms.MessageBox.Show("予期しない例外が発生しました。logを参照してください。", "例外");
+			MessageBox.Show("予期しない例外が発生しました。logを参照してください。", "例外");
 			return;
 		}
 	}
+	// サーバーメイン処理
 	static void ServerMain()
 	{
 		// サーバーを建てる
