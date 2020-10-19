@@ -1,5 +1,6 @@
 Port: 50505
 IdlePeriod: 500
+CheckUpdate: true
 Protocol:
   - https
 Domain:
