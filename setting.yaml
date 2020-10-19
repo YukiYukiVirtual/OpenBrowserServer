@@ -1,5 +1,5 @@
 Port: 50505
-IdlePeriod: 1000
+IdlePeriod: 500
 Protocol:
   - https
 Domain:
