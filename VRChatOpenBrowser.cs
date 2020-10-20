@@ -4,14 +4,38 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+
+/*
+Main
+-> 多重起動抑止処理
+->StartServer起動
+->Formの何かを起動
+ ->コンストラクタ
+  ->NotifyIconの設定
+   ->アイコンロード
+ ->Application.Run()
+
+StartServer
+->設定ファイル初期化
+->更新確認を促す
+->サーバーメイン処理
+ ->HTTPサーバーを建てる
+ ->起動URLを解釈する
+  ->チェックする
+ ->ブラウザを開く
+ ->HTTPレスポンス
+*/
 
 class VRChatOpenBrowser : Form
 {
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
+	static Thread thread;
 	
 	// アイコンロード
+	// アイコンをリソースからロードする
 	private System.Drawing.Icon LoadIcon()
 	{
 		// Assembly Reference
@@ -33,8 +57,18 @@ class VRChatOpenBrowser : Form
 		ni.Icon = LoadIcon();
 		ni.Text = "VRChatOpenBrowser";
 		ni.Visible = true;
+		var menu = new ContextMenuStrip();
+
+		menu.Items.AddRange(new ToolStripMenuItem[]{
+			new ToolStripMenuItem("&Open Folder", null, (s,e)=>{cmdstart(".");}, "Open"),
+			new ToolStripMenuItem("E&xit", null, (s,e)=>{MessageBox.Show("未実装です。タスクマネージャーから終了させてください。", "未実装機能");}, "Exit")
+		});
+
+		ni.DoubleClick += (s,e)=>{OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");};
+		ni.ContextMenuStrip = menu;
 	}
-	// Application.Run()ってあるけど、よくわからんかった
+	// エントリーポイント
+	// やることはコード内コメントの通り
 	[STAThread]
 	public static void Main()
 	{
@@ -45,18 +79,26 @@ class VRChatOpenBrowser : Form
 			MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "多重起動禁止");
 			return;
 		}
+			
+		// HTTPサーバースレッドを起動する
+		thread = new Thread(StartServer);
+		thread.Start();
 		
+		// Formをなんかする
+		new VRChatOpenBrowser();
+		Application.Run();
+	}
+	static void StartServer()
+	{
 		try{
 			// 設定をインスタンス化
 			settings = new Settings("setting.yaml");
 			
-			new VRChatOpenBrowser();
 			WriteLog("Start");
 			
 			// CheckUpdateが有効なら更新をチェックさせる
 			if(settings.GetSettings() && settings.CheckUpdate)
 			{
-				WriteLog("CheckUpdateが有効です。");
 				OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
 			}
 			// サーバーメイン処理
@@ -186,8 +228,13 @@ class VRChatOpenBrowser : Form
 	static void OpenBrowser(string queryURL)
 	{
 		WriteLog("ブラウザを開きます。[" + queryURL + "]");
-		
-		ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/k start \"\" \"" + queryURL + "\"");
+		// "" "query"
+		cmdstart("\"\" \"" + queryURL + "\"");
+	}
+	// start arg
+	static void cmdstart(string arg)
+	{
+		ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/k start " + arg);
 		psi.CreateNoWindow = true;
 		psi.UseShellExecute = false;
 		
