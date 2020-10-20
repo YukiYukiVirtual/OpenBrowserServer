@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Windows.Forms;
 
-class VRChatHTTPRequest : Form
+class VRChatOpenBrowser : Form
 {
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
@@ -27,11 +27,11 @@ class VRChatHTTPRequest : Form
 	// タスクトレイにアイコンを表示する
 	// 将来的には右クリックでログファイル表示や更新ページの確認や設定ファイル表示や終了ができるようにしたい
 	// 分らんかった
-	public VRChatHTTPRequest()
+	public VRChatOpenBrowser()
 	{
 		NotifyIcon ni = new NotifyIcon();
 		ni.Icon = LoadIcon();
-		ni.Text = "VRChatHTTPRequest";
+		ni.Text = "VRChatOpenBrowser";
 		ni.Visible = true;
 	}
 	// Application.Run()ってあるけど、よくわからんかった
@@ -39,7 +39,7 @@ class VRChatHTTPRequest : Form
 	public static void Main()
 	{
 		// 多重起動抑止処理
-		System.Threading.Mutex mutex = new System.Threading.Mutex(false, "VRChatHTTPRequest");
+		System.Threading.Mutex mutex = new System.Threading.Mutex(false, "VRChatOpenBrowser");
 		if(!mutex.WaitOne(0, false))
 		{
 			MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "多重起動禁止");
@@ -50,7 +50,7 @@ class VRChatHTTPRequest : Form
 			// 設定をインスタンス化
 			settings = new Settings("setting.yaml");
 			
-			new VRChatHTTPRequest();
+			new VRChatOpenBrowser();
 			WriteLog("Start");
 			
 			// CheckUpdateが有効なら更新をチェックさせる
@@ -197,7 +197,7 @@ class VRChatHTTPRequest : Form
 	static void WriteLog(string str)
 	{
 		Console.WriteLine(str);
-		using (var writer = new StreamWriter("VRChatHTTPRequest.log", true))
+		using (var writer = new StreamWriter("VRChatOpenBrowser.log", true))
 		{
 			writer.WriteLine(str + " at " + DateTime.Now.ToString());
 		}

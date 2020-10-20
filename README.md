@@ -24,7 +24,7 @@ http://localhost/Temporary_Listen_Addresses/openURL/https://www.yukiyukivirtual.
 exeを実行します。  
 パソコン起動時に、このアプリを常に起動しておくことをおすすめします。ショートカットをスタートアップに登録しておきましょう。
 
-1. VRChatHTTPRequest.exeのショートカットを作成する。
+1. VRChatOpenBrowser.exeのショートカットを作成する。
 2. Win+Rに「shell:startup」と打ち込む。
 3. 開いたフォルダにショートカットを置く。
 
@@ -88,7 +88,7 @@ Domain:
 ```
 
 ## ログ
-ファイル名：*VRChatHTTPRequest.log*  
+ファイル名：*VRChatOpenBrowser.log*  
 プログラムの実行状態や、エラーの原因を知るために出力されます。
 
 ## 免責
@@ -100,4 +100,4 @@ https://github.com/YukiYukiVirtual/OpenBrowserServer/issues
 不具合報告、デフォルトで許可してほしいドメイン名はここに報告お願いします。ツールが動作を停止した場合は、ツールに表示されているログもください。ツイッターでも一応受け付けます。
 
 ## 開発向け
-コンパイルオプション `csc -t:winexe VRChatHTTPRequest.cs /win32icon:ice.ico /res:ice.ico`
+コンパイルオプション `csc -t:winexe VRChatOpenBrowser.cs /win32icon:ice.ico /res:ice.ico`
