@@ -67,7 +67,6 @@ class VRChatOpenBrowser : Form
 		menu.Items.AddRange(new ToolStripMenuItem[]{
 			new ToolStripMenuItem("終了", null, (s,e)=>{
 				ni.Dispose();
-				MessageBox.Show("さようなら・・・", "終了します");
 				StopServer();
 				Application.Exit();
 				return;
