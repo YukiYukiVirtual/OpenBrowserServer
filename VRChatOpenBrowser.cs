@@ -234,7 +234,7 @@ class VRChatOpenBrowser : Form
 	// start arg
 	static void cmdstart(string arg)
 	{
-		ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/k start " + arg);
+		ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/c start " + arg);
 		psi.CreateNoWindow = true;
 		psi.UseShellExecute = false;
 		
