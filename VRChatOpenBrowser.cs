@@ -10,22 +10,28 @@ using System.Windows.Forms;
 /*
 Main
 -> 多重起動抑止処理
+->設定ファイル初期化
 ->StartServer起動
 ->Formの何かを起動
  ->コンストラクタ
   ->NotifyIconの設定
    ->アイコンロード
+   ->終了、更新、フォルダ
  ->Application.Run()
 
+StopServer
+->サーバーを止める
+->サーバーを閉じる
+->スレッドを終了する
+
 StartServer
-->設定ファイル初期化
 ->更新確認を促す
 ->サーバーメイン処理
  ->HTTPサーバーを建てる
- ->起動URLを解釈する
-  ->チェックする
- ->ブラウザを開く
- ->HTTPレスポンス
+  ->リクエストを解釈する
+   ->チェックする
+   ->ブラウザを開く
+   ->HTTPレスポンス
 */
 
 class VRChatOpenBrowser : Form
