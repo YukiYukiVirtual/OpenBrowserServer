@@ -33,6 +33,7 @@ class VRChatOpenBrowser : Form
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
 	static Thread thread;
+	static HttpListener listener;
 	
 	// アイコンロード
 	// アイコンをリソースからロードする
@@ -79,7 +80,20 @@ class VRChatOpenBrowser : Form
 			MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "多重起動禁止");
 			return;
 		}
-			
+		
+		// 設定をインスタンス化
+		settings = new Settings("setting.yaml");
+		
+		// CheckUpdateが有効なら更新をチェックさせる
+		if(settings.GetSettings() && settings.CheckUpdate)
+		{
+			OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
+		}
+		else
+		{
+			WriteLog("設定を読み込めませんでした。");
+		}
+		
 		// HTTPサーバースレッドを起動する
 		thread = new Thread(StartServer);
 		thread.Start();
@@ -88,21 +102,26 @@ class VRChatOpenBrowser : Form
 		new VRChatOpenBrowser();
 		Application.Run();
 	}
+	// サーバーを終了させる
+	static void StopServer()
+	{
+		listener.Stop();
+		listener.Close();
+		thread.Abort();
+	}
+	// サーバーを起動する
 	static void StartServer()
 	{
 		try{
-			// 設定をインスタンス化
-			settings = new Settings("setting.yaml");
-			
 			WriteLog("Start");
 			
-			// CheckUpdateが有効なら更新をチェックさせる
-			if(settings.GetSettings() && settings.CheckUpdate)
-			{
-				OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
-			}
-			// サーバーメイン処理
-			ServerMain();
+			// サーバーを建てる
+			listener = new HttpListener();
+			
+			// http://localhost/Temporary_Listen_Addresses/openURL/
+			listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
+			listener.Start();
+			listener.BeginGetContext(OnRequested, null);
 		}
 		catch(Exception e)
 		{
@@ -111,47 +130,41 @@ class VRChatOpenBrowser : Form
 			return;
 		}
 	}
-	// サーバーメイン処理
-	static void ServerMain()
+	// HTTPリクエスト処理
+	static void OnRequested(IAsyncResult ar)
 	{
-		// サーバーを建てる
-		HttpListener listener = new HttpListener();
-		
-		// http://localhost/Temporary_Listen_Addresses/openURL/
-		listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
-		listener.Start();
-		
-		while(true)
+		if(!listener.IsListening)
 		{
-			// リクエスト待ち
-			HttpListenerContext context = listener.GetContext();
-			// リクエストとレスポンス
-			HttpListenerRequest req = context.Request;
-			HttpListenerResponse res = context.Response;
-			
-			// QueryURLを取得する
-			string queryURL = req.RawUrl.Substring("/Temporary_Listen_Addresses/openURL/".Length);
-			
-				
-			// ブラウザを起動するかチェックする
-			// 起動する場合：起動するURLをログ出力する
-			// 起動しない場合：起動しない理由をログ出力する
-			bool canOpen = CheckURL(queryURL);
-			if(canOpen)
-			{
-				OpenBrowser(queryURL);
-			}
-			
-			// HTTPレスポンス
-			string outputString = "> " + queryURL + "\n" + canOpen;
-			byte[] content = Encoding.UTF8.GetBytes(outputString);
-			
-			res.OutputStream.Write(content, 0, content.Length);
-			
-			res.StatusCode = 200;
-			
-			res.Close();
+			WriteLog("OnRequested return");
+			return;
 		}
+		
+		HttpListenerContext context = listener.EndGetContext(ar);
+		listener.BeginGetContext(OnRequested, null);
+		
+		// リクエストとレスポンス
+		HttpListenerRequest req = context.Request;
+		HttpListenerResponse res = context.Response;
+		
+		// QueryURLを取得する
+		string queryURL = req.RawUrl.Substring("/Temporary_Listen_Addresses/openURL/".Length);
+		
+		// ブラウザを起動するかチェックする
+		// 起動する場合：起動するURLをログ出力する
+		// 起動しない場合：起動しない理由をログ出力する
+		bool canOpen = CheckURL(queryURL);
+		if(canOpen)
+		{
+			OpenBrowser(queryURL);
+		}
+		
+		// HTTPレスポンス
+		string outputString = "> " + queryURL + "\n" + canOpen;
+		byte[] content = Encoding.UTF8.GetBytes(outputString);
+		
+		res.OutputStream.Write(content, 0, content.Length);
+		res.StatusCode = 200;
+		res.Close();
 	}
 	// 指定されたURLを開けるかチェックする
 	static bool CheckURL(string queryURL)
