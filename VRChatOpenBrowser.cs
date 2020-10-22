@@ -50,8 +50,6 @@ class VRChatOpenBrowser : Form
 		return new System.Drawing.Icon(reader.BaseStream);
 	}
 	// タスクトレイにアイコンを表示する
-	// 将来的には右クリックでログファイル表示や更新ページの確認や設定ファイル表示や終了ができるようにしたい
-	// 分らんかった
 	public VRChatOpenBrowser()
 	{
 		NotifyIcon ni = new NotifyIcon();
@@ -61,11 +59,18 @@ class VRChatOpenBrowser : Form
 		var menu = new ContextMenuStrip();
 
 		menu.Items.AddRange(new ToolStripMenuItem[]{
-			new ToolStripMenuItem("&Open Folder", null, (s,e)=>{cmdstart(".");}, "Open"),
-			new ToolStripMenuItem("E&xit", null, (s,e)=>{MessageBox.Show("未実装です。タスクマネージャーから終了させてください。", "未実装機能");}, "Exit")
+			new ToolStripMenuItem("終了", null, (s,e)=>{
+				ni.Dispose();
+				MessageBox.Show("さようなら・・・", "終了します");
+				StopServer();
+				Application.Exit();
+				return;
+			}, "Exit"),
+			new ToolStripMenuItem("更新をチェックしに行く", null, (s,e)=>{OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");}, "Check Update"),
+			new ToolStripMenuItem("フォルダを開く", null, (s,e)=>{cmdstart(".");}, "Open Folder"),
 		});
 
-		ni.DoubleClick += (s,e)=>{OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");};
+		ni.DoubleClick += (s,e)=>{cmdstart(".");};
 		ni.ContextMenuStrip = menu;
 	}
 	// エントリーポイント
