@@ -64,14 +64,14 @@ class VRChatOpenBrowser : Form
 		var menu = new ContextMenuStrip();
 
 		menu.Items.AddRange(new ToolStripMenuItem[]{
+			new ToolStripMenuItem("更新をチェックしに行く", null, (s,e)=>{OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");}, "Check Update"),
+			new ToolStripMenuItem("フォルダを開く", null, (s,e)=>{cmdstart(".");}, "Open Folder"),
 			new ToolStripMenuItem("終了", null, (s,e)=>{
 				ni.Dispose();
 				StopServer();
 				Application.Exit();
 				return;
 			}, "Exit"),
-			new ToolStripMenuItem("更新をチェックしに行く", null, (s,e)=>{OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");}, "Check Update"),
-			new ToolStripMenuItem("フォルダを開く", null, (s,e)=>{cmdstart(".");}, "Open Folder"),
 		});
 
 		ni.DoubleClick += (s,e)=>{cmdstart(".");};
