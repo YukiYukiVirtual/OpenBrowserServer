@@ -38,7 +38,6 @@ class VRChatOpenBrowser : Form
 {
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
-	static Thread thread;
 	static HttpListener listener;
 	
 	// アイコンロード
@@ -104,9 +103,8 @@ class VRChatOpenBrowser : Form
 			WriteLog("設定を読み込めませんでした。");
 		}
 		
-		// HTTPサーバースレッドを起動する
-		thread = new Thread(StartServer);
-		thread.Start();
+		// サーバーを起動する
+		StartServer();
 		
 		// Formをなんかする
 		new VRChatOpenBrowser();
@@ -117,7 +115,6 @@ class VRChatOpenBrowser : Form
 	{
 		listener.Stop();
 		listener.Close();
-		thread.Abort();
 	}
 	// サーバーを起動する
 	static void StartServer()
@@ -251,7 +248,6 @@ class VRChatOpenBrowser : Form
 	static void OpenBrowser(string queryURL)
 	{
 		WriteLog("ブラウザを開きます。[" + queryURL + "]");
-		// "" "query"
 		cmdstart(queryURL);
 	}
 	// argを開くのに適切なプログラムで開く
