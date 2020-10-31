@@ -100,7 +100,7 @@ class VRChatOpenBrowser : Form
 		}
 		else
 		{
-			WriteLog("設定を読み込めませんでした。");
+			WriteLog("Could not load the settings");
 		}
 		
 		// サーバーを起動する
@@ -145,33 +145,41 @@ class VRChatOpenBrowser : Form
 			WriteLog("OnRequested return");
 			return;
 		}
-		
-		HttpListenerContext context = listener.EndGetContext(ar);
-		listener.BeginGetContext(OnRequested, null);
-		
-		// リクエストとレスポンス
-		HttpListenerRequest req = context.Request;
-		HttpListenerResponse res = context.Response;
-		
-		// QueryURLを取得する
-		string queryURL = req.RawUrl.Substring("/Temporary_Listen_Addresses/openURL/".Length);
-		
-		// ブラウザを起動するかチェックする
-		// 起動する場合：起動するURLをログ出力する
-		// 起動しない場合：起動しない理由をログ出力する
-		bool canOpen = CheckURL(queryURL);
-		if(canOpen)
+		try
 		{
-			OpenBrowser(queryURL);
+			HttpListenerContext context = listener.EndGetContext(ar);
+			listener.BeginGetContext(OnRequested, null);
+			
+			// リクエストとレスポンス
+			HttpListenerRequest req = context.Request;
+			HttpListenerResponse res = context.Response;
+			
+			// QueryURLを取得する
+			string queryURL = req.RawUrl.Substring("/Temporary_Listen_Addresses/openURL/".Length);
+			
+			// ブラウザを起動するかチェックする
+			// 起動する場合：起動するURLをログ出力する
+			// 起動しない場合：起動しない理由をログ出力する
+			bool canOpen = CheckURL(queryURL);
+			if(canOpen)
+			{
+				OpenBrowser(queryURL);
+			}
+			
+			// HTTPレスポンス
+			string outputString = "> " + queryURL + "\n" + canOpen;
+			byte[] content = Encoding.UTF8.GetBytes(outputString);
+			
+			res.OutputStream.Write(content, 0, content.Length);
+			res.StatusCode = 200;
+			res.Close();
 		}
-		
-		// HTTPレスポンス
-		string outputString = "> " + queryURL + "\n" + canOpen;
-		byte[] content = Encoding.UTF8.GetBytes(outputString);
-		
-		res.OutputStream.Write(content, 0, content.Length);
-		res.StatusCode = 200;
-		res.Close();
+		catch(Exception e)
+		{
+			WriteLog(e.ToString());
+			MessageBox.Show("予期しない例外が発生しました。logを参照してください。", "例外");
+			return;
+		}
 	}
 	// 指定されたURLを開けるかチェックする
 	static bool CheckURL(string queryURL)
@@ -179,7 +187,7 @@ class VRChatOpenBrowser : Form
 		// 設定読み込み
 		if(!settings.GetSettings())
 		{
-			WriteLog("設定を読み込めませんでした。");
+			WriteLog("Could not load the settings");
 			return false;
 		}
 		
@@ -187,7 +195,7 @@ class VRChatOpenBrowser : Form
 		TimeSpan ts = DateTime.Now - lastTime;
 		if(ts.TotalMilliseconds < settings.IdlePeriod)
 		{
-			WriteLog("呼び出し間隔が設定値未満です。[" + ts.TotalMilliseconds + "]");
+			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + settings.IdlePeriod);
 			return false;
 		}
 		// 呼び出し間隔の基準時刻を更新する
@@ -200,7 +208,7 @@ class VRChatOpenBrowser : Form
 		}
 		catch(UriFormatException e)
 		{
-			WriteLog("指定されたURLが有効ではありません。[" + queryURL + "]");
+			WriteLog("Invalid URL", queryURL);
 			if(e==null){}
 			return false;
 		}
@@ -217,7 +225,7 @@ class VRChatOpenBrowser : Form
 			}
 			if(!p)
 			{
-				WriteLog("許可されたプロトコルではありません。[" + queryURL　+ "]");
+				WriteLog("Not an authorized Protocol", queryURL);
 				return false;
 			}
 		}
@@ -237,7 +245,7 @@ class VRChatOpenBrowser : Form
 			}
 			if(!p)
 			{
-				WriteLog("許可されたドメインではありません。[" + queryURL + "]");
+				WriteLog("Not an authorized Domain", queryURL);
 				return false;
 			}
 		}
@@ -247,7 +255,7 @@ class VRChatOpenBrowser : Form
 	// 既定のブラウザでURLを開く
 	static void OpenBrowser(string queryURL)
 	{
-		WriteLog("ブラウザを開きます。[" + queryURL + "]");
+		WriteLog("Open URL", queryURL);
 		cmdstart(queryURL);
 	}
 	// argを開くのに適切なプログラムで開く
@@ -260,12 +268,14 @@ class VRChatOpenBrowser : Form
 		Process.Start(psi);
 	}
 	// ログを書く
-	static void WriteLog(string str)
+	static void WriteLog(params string[] str)
 	{
-		Console.WriteLine(str);
+		string joined = String.Join(", ", str);
+		
+		Console.WriteLine(joined);
 		using (var writer = new StreamWriter("VRChatOpenBrowser.log", true))
 		{
-			writer.WriteLine(str + " at " + DateTime.Now.ToString());
+			writer.WriteLine(joined + " at " + DateTime.Now.ToString());
 		}
 	}
 }
