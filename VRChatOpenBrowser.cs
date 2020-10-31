@@ -121,20 +121,20 @@ class VRChatOpenBrowser : Form
 			HttpListenerRequest req = context.Request;
 			HttpListenerResponse res = context.Response;
 			
-			// QueryURLを取得する
-			string queryURL = req.RawUrl.Substring("/Temporary_Listen_Addresses/openURL/".Length);
-			
+			// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
+			string str_url = req.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
+		
 			// ブラウザを起動するかチェックする
 			// 起動する場合：起動するURLをログ出力する
 			// 起動しない場合：起動しない理由をログ出力する
-			bool canOpen = CheckURL(queryURL);
+			bool canOpen = CheckURL(str_url);
 			if(canOpen)
 			{
-				OpenBrowser(queryURL);
+				OpenBrowser(str_url);
 			}
 			
 			// HTTPレスポンス
-			string outputString = "> " + queryURL + "\n" + canOpen;
+			string outputString = "> " + str_url + "\n" + canOpen;
 			byte[] content = Encoding.UTF8.GetBytes(outputString);
 			
 			res.OutputStream.Write(content, 0, content.Length);
@@ -149,7 +149,7 @@ class VRChatOpenBrowser : Form
 		}
 	}
 	// 指定されたURLを開けるかチェックする
-	static bool CheckURL(string queryURL)
+	static bool CheckURL(string str_url)
 	{
 		// 設定読み込み
 		if(!settings.GetSettings())
@@ -171,11 +171,11 @@ class VRChatOpenBrowser : Form
 		// Uriオブジェクトを生成する
 		Uri uri;
 		try{
-			uri = new Uri(queryURL);
+			uri = new Uri(str_url);
 		}
 		catch(UriFormatException e)
 		{
-			WriteLog("Invalid URL", queryURL);
+			WriteLog("Invalid URL", str_url);
 			if(e==null){}
 			return false;
 		}
@@ -192,7 +192,7 @@ class VRChatOpenBrowser : Form
 			}
 			if(!p)
 			{
-				WriteLog("Not an authorized Protocol", queryURL);
+				WriteLog("Not an authorized Protocol", str_url);
 				return false;
 			}
 		}
@@ -212,7 +212,7 @@ class VRChatOpenBrowser : Form
 			}
 			if(!p)
 			{
-				WriteLog("Not an authorized Domain", queryURL);
+				WriteLog("Not an authorized Domain", str_url);
 				return false;
 			}
 		}
@@ -220,10 +220,10 @@ class VRChatOpenBrowser : Form
 		return true;
 	}
 	// 既定のブラウザでURLを開く
-	static void OpenBrowser(string queryURL)
+	static void OpenBrowser(string str_url)
 	{
-		WriteLog("Open URL", queryURL);
-		cmdstart(queryURL);
+		WriteLog("Open URL", str_url);
+		cmdstart(str_url);
 	}
 	// argを開くのに適切なプログラムで開く
 	static void cmdstart(string arg)
