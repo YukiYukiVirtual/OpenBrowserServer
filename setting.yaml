@@ -3,15 +3,27 @@ CheckUpdate: true
 Protocol:
   - https
 Domain:
-  - yukiyukivirtual.net
-  - yukiyukivirtual.github.io
+  - amazon.co.jp
+  - avatarmuseum.jp
   - booth.pm
+  - camp-fire.jp
   - discord.gg
+  - fanbox.cc
+  - fantia.jp
+  - github.com
+  - nico.ms
+  - nicovideo.jp
+  - pixiv.net
+  - seed.online
+  - sketchfab.com
+  - steamcommunity.com
+  - steampowered.com
+  - techbookfest.org
   - twitter.com
+  - unity.com
   - vrchat.com
   - vrchat.net
   - youtu.be
   - youtube.com
-  - amazon.co.jp
-  - fanbox.cc
-  - github.com
+  - yukiyukivirtual.github.io
+  - yukiyukivirtual.net
