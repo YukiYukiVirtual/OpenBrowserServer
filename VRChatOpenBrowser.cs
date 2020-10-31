@@ -252,14 +252,14 @@ class VRChatOpenBrowser : Form
 	{
 		WriteLog("ブラウザを開きます。[" + queryURL + "]");
 		// "" "query"
-		cmdstart("\"\" \"" + queryURL + "\"");
+		cmdstart(queryURL);
 	}
-	// start arg
+	// argを開くのに適切なプログラムで開く
 	static void cmdstart(string arg)
 	{
-		ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/c start " + arg);
+		ProcessStartInfo psi = new ProcessStartInfo(arg);
 		psi.CreateNoWindow = true;
-		psi.UseShellExecute = false;
+		psi.UseShellExecute = true;
 		
 		Process.Start(psi);
 	}
