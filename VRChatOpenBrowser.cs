@@ -4,35 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
-
-/*
-Main
--> 多重起動抑止処理
-->設定ファイル初期化
-->StartServer起動
-->Formの何かを起動
- ->コンストラクタ
-  ->NotifyIconの設定
-   ->アイコンロード
-   ->終了、更新、フォルダ
- ->Application.Run()
-
-StopServer
-->サーバーを止める
-->サーバーを閉じる
-->スレッドを終了する
-
-StartServer
-->更新確認を促す
-->サーバーメイン処理
- ->HTTPサーバーを建てる
-  ->リクエストを解釈する
-   ->チェックする
-   ->ブラウザを開く
-   ->HTTPレスポンス
-*/
 
 class VRChatOpenBrowser : Form
 {
@@ -44,14 +16,9 @@ class VRChatOpenBrowser : Form
 	// アイコンをリソースからロードする
 	private System.Drawing.Icon LoadIcon()
 	{
-		// Assembly Reference
 		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-
-		System.IO.Stream stream;
-		System.IO.StreamReader reader;
-
-		stream = assembly.GetManifestResourceStream("ice.ico");
-		reader = new System.IO.StreamReader(stream);
+		Stream stream = assembly.GetManifestResourceStream("ice.ico");
+		StreamReader reader = new System.IO.StreamReader(stream);
 		return new System.Drawing.Icon(reader.BaseStream);
 	}
 	// タスクトレイにアイコンを表示する
