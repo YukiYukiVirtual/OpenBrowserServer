@@ -2,6 +2,24 @@
 ## これは何？
 VRChat内でのトリガーで、既定のブラウザからWEBページを開くことを想定したアプリです。
 
+## 動作説明
+開きたいURLを引数にした起動用URLを、VRChat内からHTTP GETします。
+
+```
+http://localhost/Temporary_Listen_Addresses/openURL/
+```
+
+上記を起動用URLと呼びます。
+
+起動用URLの後ろに開きたいURLを指定します。引数と呼びます。  
+例:
+
+```
+http://localhost/Temporary_Listen_Addresses/openURL/https://www.yukiyukivirtual.net/?query=hoge  
+```
+
+- 引数の#以降は無視されます。未サポートです。
+
 ## 起動
 パソコン起動時に、このアプリを常に起動しておくことをおすすめします。ショートカットをスタートアップに登録しておきましょう。  
 初めて使うときのみ、下記の手順を実施してから、exeを実行します。次回以降は、パソコンを起動したときに自動的に起動されるようになります。
