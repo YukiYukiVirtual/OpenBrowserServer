@@ -3,4 +3,5 @@ package-lock.json
 *.log
 *.exe
 *.zip
+user_setting.yaml
 VRChatOpenBrowser/

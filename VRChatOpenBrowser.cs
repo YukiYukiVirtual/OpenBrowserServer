@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Windows.Forms;
 
@@ -10,7 +11,27 @@ class VRChatOpenBrowser : Form
 {
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
+	static Settings userSettings;
 	static HttpListener listener;
+	
+	// 設定ファイルを更新する
+	private static readonly HttpClient client = new HttpClient();
+	private static async void UpdateSettingFile()
+	{
+		// Call asynchronous network methods in a try/catch block to handle exceptions.
+		try	
+		{
+			string uri = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml" + "#" + DateTime.Now.ToString();
+			System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+			string responseBody = await client.GetStringAsync(uri);
+
+			File.WriteAllText("setting.yaml", responseBody);
+		}
+		catch(HttpRequestException e)
+		{
+			WriteLog(e.ToString());
+		}
+	}
 	
 	// アイコンロード
 	// アイコンをリソースからロードする
@@ -31,7 +52,17 @@ class VRChatOpenBrowser : Form
 		var menu = new ContextMenuStrip();
 
 		menu.Items.AddRange(new ToolStripMenuItem[]{
-			new ToolStripMenuItem("更新をチェックしに行く", null, (s,e)=>{OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");}, "Check Update"),
+			new ToolStripMenuItem("更新をチェックしに行く", null, (s,e)=>{
+				#if BOOTH
+				{
+					OpenBrowser("https://yukiyukivirtual.booth.pm/items/2539784");
+				}
+				#else
+				{
+					OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
+				}
+				#endif
+			}, "Check Update"),
 			new ToolStripMenuItem("フォルダを開く", null, (s,e)=>{cmdstart(".");}, "Open Folder"),
 			new ToolStripMenuItem("終了", null, (s,e)=>{
 				ni.Dispose();
@@ -57,18 +88,28 @@ class VRChatOpenBrowser : Form
 			return;
 		}
 		
+		WriteLog("Start");
+		
+		// 設定ファイル更新
+		UpdateSettingFile();
+		
 		// 設定をインスタンス化
 		settings = new Settings("setting.yaml");
+		userSettings = new Settings("user_setting.yaml");
+		if(userSettings.GetSettings() == false)
+		{
+			WriteLog("\"user_setting.yaml\" is not exist");
+		}
 		
-		// CheckUpdateが有効なら更新をチェックさせる
-		if(settings.GetSettings() && settings.CheckUpdate)
+		// Boothで買ってほしい気持ち
+		#if BOOTH
 		{
-			OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
 		}
-		else
+		#else
 		{
-			WriteLog("Could not load the settings");
+			OpenBrowser("https://yukiyukivirtual.booth.pm/items/2539784");
 		}
+		#endif
 		
 		// サーバーを起動する
 		StartServer();
@@ -87,7 +128,6 @@ class VRChatOpenBrowser : Form
 	static void StartServer()
 	{
 		try{
-			WriteLog("Start");
 			
 			// サーバーを建てる
 			listener = new HttpListener();
@@ -151,18 +191,34 @@ class VRChatOpenBrowser : Form
 	// 指定されたURLを開けるかチェックする
 	static bool CheckURL(string str_url)
 	{
+		int IdlePeriod;
+		List<string> Protocol = new List<string>();
+		List<string> Domain = new List<string>();
+
 		// 設定読み込み
 		if(!settings.GetSettings())
 		{
 			WriteLog("Could not load the settings");
 			return false;
 		}
+		IdlePeriod = settings.IdlePeriod;
+		Protocol.AddRange(settings.Protocol);
+		Domain.AddRange(settings.Domain);
+		
+		
+		// ユーザー設定読み込み
+		if(userSettings.GetSettings())
+		{
+			// ユーザー設定を適用する
+			Protocol.AddRange(userSettings.Protocol);
+			Domain.AddRange(userSettings.Domain);
+		}
 		
 		// 呼び出し間隔チェック
 		TimeSpan ts = DateTime.Now - lastTime;
-		if(ts.TotalMilliseconds < settings.IdlePeriod)
+		if(ts.TotalMilliseconds < IdlePeriod)
 		{
-			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + settings.IdlePeriod);
+			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + IdlePeriod);
 			return false;
 		}
 		// 呼び出し間隔の基準時刻を更新する
@@ -183,7 +239,7 @@ class VRChatOpenBrowser : Form
 		// プロトコルチェック
 		{
 			bool p = false;
-			foreach(string s in settings.Protocol)
+			foreach(string s in Protocol)
 			{
 				if(uri.Scheme == s)
 				{
@@ -200,7 +256,7 @@ class VRChatOpenBrowser : Form
 		// ドメインチェック
 		{
 			bool p = false;
-			foreach(string s in settings.Domain)
+			foreach(string s in Domain)
 			{
 				if(uri.Host == s
 					||
@@ -251,7 +307,6 @@ class VRChatOpenBrowser : Form
 // 設定を読み込むクラス
 // パブリックメンバーをReadして使う
 class Settings{
-	public bool CheckUpdate;
 	public int IdlePeriod;
 	public List<string> Protocol;
 	public List<string> Domain;
@@ -261,7 +316,6 @@ class Settings{
 	public Settings(string filename)
 	{
 		this.filename = filename;
-		CheckUpdate = true;
 		IdlePeriod = 1000;
 		Protocol = new List<string>();
 		Domain = new List<string>();
@@ -275,32 +329,27 @@ class Settings{
 			{
 				string data = sr.ReadToEnd();	// 全部取得する
 				// 設定名が始まる行を探す
-				int index_up = data.IndexOf("CheckUpdate:");
 				int index_ip = data.IndexOf("IdlePeriod:");
 				int index_p  = data.IndexOf("Protocol:");
 				int index_d  = data.IndexOf("Domain:");
 				
 				// 設定名を除去したもの
-				string str_up = data.Substring(index_up + "CheckUpdate:".Length);
 				string str_ip = data.Substring(index_ip + "IdlePeriod:".Length);
 				string str_p  = data.Substring(index_p  + "Protocol:".Length);
 				string str_d  = data.Substring(index_d  + "Domain:".Length);
 				
-				// CheckUpdateを取得する
-				{
-					StringReader srr = new StringReader(str_up);	// 1行目を取得する
-					CheckUpdate = srr.ReadLine().IndexOf("true") != -1;	// "true"が含まれているかをCheckUpdateに設定する
-				}
 				// IdlePeriodを取得する
 				{
-					int index_dec = str_ip.IndexOfAny(new char[]{'0','1','2','3','4','5','6','7','8','9'});	// 数字で始まるインデックス
-					str_ip = str_ip.Substring(index_dec);	// 数字で始まる文字列
-					StringReader srr = new StringReader(str_ip);	// 1行目を取得する
-					if(Int32.TryParse(srr.ReadLine(), out IdlePeriod))	// 1行目を取得して、数値に変換してIdlePeriodに入れようとする
+					try
 					{
+						int index_dec = str_ip.IndexOfAny(new char[]{'0','1','2','3','4','5','6','7','8','9'});	// 数字で始まるインデックス
+						str_ip = str_ip.Substring(index_dec);	// 数字で始まる文字列
+						StringReader srr = new StringReader(str_ip);	// 1行目を取得する
+						IdlePeriod = Int32.Parse(srr.ReadLine());	// 1行目を取得して、数値に変換してIdlePeriodに入れようとする
 					}
-					if(IdlePeriod <= 0)	// 数値に変換できなければ、代わりに1000を入れる
+					catch(Exception e)	// 例外発生時は、代わりに1000を入れる
 					{
+						if(e == null){}
 						IdlePeriod = 1000;
 					}
 				}
@@ -312,6 +361,7 @@ class Settings{
 		}
 		catch(Exception e)
 		{
+			Console.WriteLine(e);
 			if(e == null){}
 			return false;
 		}
