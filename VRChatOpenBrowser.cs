@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
+	static string l_version = "v2.2.0";
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
 	static Settings userSettings;
@@ -27,6 +28,17 @@ class VRChatOpenBrowser : Form
 			string responseBody = await client.GetStringAsync(uri);
 
 			File.WriteAllText("setting.yaml", responseBody);
+			
+			int firstLineEnd = responseBody.IndexOf("\r\n");
+			string r_version = responseBody.Substring(2, firstLineEnd-2); // "# v1.2.3".IndexOf("v")
+			
+			if(!r_version.Equals(l_version))
+			{
+				string msg = "更新があります。\n"+
+				             "現在のバージョン: "+l_version+"\n"+
+							 "最新バージョン: " +r_version+"\n";
+				MessageBox.Show(msg, "VRChatOpenBrowser");
+			}
 		}
 		catch(HttpRequestException e)
 		{
