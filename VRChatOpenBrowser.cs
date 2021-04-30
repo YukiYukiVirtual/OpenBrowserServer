@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Media;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -276,10 +277,12 @@ class VRChatOpenBrowser : Form
 		return true;
 	}
 	// 既定のブラウザでURLを開く
+	private static SoundPlayer MySoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
 	static void OpenBrowser(string str_url)
 	{
 		WriteLog("Open URL", str_url);
 		cmdstart(str_url);
+		MySoundPlayer.Play();
 	}
 	// argを開くのに適切なプログラムで開く
 	static void cmdstart(string arg)
