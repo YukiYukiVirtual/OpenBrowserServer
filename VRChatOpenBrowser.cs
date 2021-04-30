@@ -22,7 +22,7 @@ class VRChatOpenBrowser : Form
 		// Call asynchronous network methods in a try/catch block to handle exceptions.
 		try	
 		{
-			string uri = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml" + "#" + DateTime.Now.ToString();
+			string uri = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();
 			System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 			string responseBody = await client.GetStringAsync(uri);
 
