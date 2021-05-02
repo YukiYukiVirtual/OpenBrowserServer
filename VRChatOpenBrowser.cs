@@ -173,6 +173,7 @@ class VRChatOpenBrowser : Form
 			// リクエストとレスポンス
 			HttpListenerRequest req = context.Request;
 			HttpListenerResponse res = context.Response;
+			WriteLog(req.HttpMethod);
 			
 			// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
 			string str_url = req.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
@@ -190,8 +191,15 @@ class VRChatOpenBrowser : Form
 			string outputString = "> " + str_url + "\n" + canOpen;
 			byte[] content = Encoding.UTF8.GetBytes(outputString);
 			
-			res.OutputStream.Write(content, 0, content.Length);
-			res.StatusCode = 200;
+			if(!req.HttpMethod.Equals("HEAD"))
+			{
+				res.OutputStream.Write(content, 0, content.Length);
+			}
+			// HTTPヘッダ
+			res.ContentType = "text/plain";
+			res.KeepAlive = false;
+			res.StatusCode = 204;
+			
 			res.Close();
 		}
 		catch(Exception e)
@@ -231,7 +239,7 @@ class VRChatOpenBrowser : Form
 		TimeSpan ts = DateTime.Now - lastTime;
 		if(ts.TotalMilliseconds < IdlePeriod)
 		{
-			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + IdlePeriod);
+			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + IdlePeriod, str_url);
 			return false;
 		}
 		// 呼び出し間隔の基準時刻を更新する
