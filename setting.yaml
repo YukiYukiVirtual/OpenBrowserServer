@@ -6,6 +6,8 @@ Protocol:
 Domain:
   - amazon.co.jp
   - avatarmuseum.jp
+  - bandcamp.com
+  - bilibili.com
   - booth.pm
   - camp-fire.jp
   - ci-en.net
@@ -18,7 +20,9 @@ Domain:
   - github.com
   - gitlab.com
   - kotobukiya.co.jp
+  - linkco.re
   - melonbooks.co.jp
+  - mixcloud.com
   - nico.ms
   - nicovideo.jp
   - pictsquare.net
@@ -27,11 +31,15 @@ Domain:
   - ske.be
   - skeb.jp
   - sketchfab.com
+  - soundcloud.com
   - steamcommunity.com
   - steampowered.com
+  - streamlabs.com
   - techbookfest.org
   - tinami.com
   - toranoana.jp
+  - tunecore.co.jp
+  - twitch.tv
   - twitter.com
   - unity.com
   - v-market.work
@@ -43,3 +51,4 @@ Domain:
   - youtube.com
   - yukiyukivirtual.github.io
   - yukiyukivirtual.net
+  
