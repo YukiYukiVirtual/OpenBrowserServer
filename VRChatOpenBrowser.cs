@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	static string l_version = "v2.3.0";
+	static string l_version = "v2.3.1";
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
 	static Settings userSettings;
@@ -153,7 +153,7 @@ class VRChatOpenBrowser : Form
 		catch(Exception e)
 		{
 			WriteLog(e.ToString());
-			MessageBox.Show("予期しない例外が発生しました。logを参照してください。", "例外");
+			MessageBox.Show("予期しない例外が発生しました。logを参照してください。\n(アプリは継続して動作します)", "例外");
 			return;
 		}
 	}
@@ -165,6 +165,7 @@ class VRChatOpenBrowser : Form
 			WriteLog("OnRequested return");
 			return;
 		}
+		WriteLog("■Request Start", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
 		try
 		{
 			HttpListenerContext context = listener.EndGetContext(ar);
@@ -173,7 +174,11 @@ class VRChatOpenBrowser : Form
 			// リクエストとレスポンス
 			HttpListenerRequest req = context.Request;
 			HttpListenerResponse res = context.Response;
-			WriteLog(req.HttpMethod);
+			WriteLog("HTTP Method: ", req.HttpMethod);
+			if(req.HttpMethod.Equals("HEAD"))
+			{
+				WriteLog("■");
+			}
 			
 			// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
 			string str_url = req.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
@@ -201,12 +206,14 @@ class VRChatOpenBrowser : Form
 			res.StatusCode = 204;
 			
 			res.Close();
+			
+			// 呼び出し間隔の基準時刻を更新する
+			lastTime = DateTime.Now;
 		}
 		catch(Exception e)
 		{
 			WriteLog(e.ToString());
-			MessageBox.Show("予期しない例外が発生しました。logを参照してください。", "例外");
-			return;
+			MessageBox.Show("予期しない例外が発生しました。logを参照してください。\n(アプリは継続して動作します)", "例外");
 		}
 	}
 	// 指定されたURLを開けるかチェックする
@@ -233,17 +240,17 @@ class VRChatOpenBrowser : Form
 			// ユーザー設定を適用する
 			Protocol.AddRange(userSettings.Protocol);
 			Domain.AddRange(userSettings.Domain);
+			// 呼び出し間隔は更新が入ったらみんなに適用されてほしいので、ユーザー設定は使えません！
 		}
 		
 		// 呼び出し間隔チェック
 		TimeSpan ts = DateTime.Now - lastTime;
+		WriteLog("TimeSpan: ", ts.TotalMilliseconds.ToString());
 		if(ts.TotalMilliseconds < IdlePeriod)
 		{
 			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + IdlePeriod, str_url);
 			return false;
 		}
-		// 呼び出し間隔の基準時刻を更新する
-		lastTime = DateTime.Now;
 		
 		// Uriオブジェクトを生成する
 		Uri uri;
@@ -302,7 +309,10 @@ class VRChatOpenBrowser : Form
 	{
 		WriteLog("Open URL", str_url);
 		cmdstart(str_url);
-		MySoundPlayer.Play();
+		try{
+			MySoundPlayer.Play();
+		}
+		finally{/*ここの例外処理は重要ではない*/}
 	}
 	// argを開くのに適切なプログラムで開く
 	static void cmdstart(string arg)
@@ -321,7 +331,7 @@ class VRChatOpenBrowser : Form
 		Console.WriteLine(joined);
 		using (var writer = new StreamWriter("VRChatOpenBrowser.log", true))
 		{
-			writer.WriteLine(joined + " at " + DateTime.Now.ToString());
+			writer.WriteLine(joined);
 		}
 	}
 }
