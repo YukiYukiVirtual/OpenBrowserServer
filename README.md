@@ -47,7 +47,7 @@ http://localhost/Temporary_Listen_Addresses/openURL/https://www.yukiyukivirtual.
 2. ダウンロードしたファイルを上書き保存してください。
 3. exeを実行してください。ショートカットを登録しなおす必要はありません。
 
-更新のお知らせは、GitHub、Twitter、Booth、Discordなどでお知らせします。
+アプリ起動時（主にパソコン起動時）にバージョン確認があります。*メニュー* から確認してください。ファイルアップ作業中などで、最新版が配布されていない場合がありますが、翌日などに再度ご確認ください。
 
 Boothで購入した場合は、Boothから最新版をダウンロードしてください。
 
@@ -108,9 +108,7 @@ Domain:
 
 
 ## 問い合わせ
-https://github.com/YukiYukiVirtual/OpenBrowserServer/issues
 https://discord.gg/9MwqEGvdTm
-
 不具合報告、デフォルトで許可してほしいドメイン名はここに報告お願いします。ツールが動作を停止した場合は、ツールに表示されているログもください。ツイッターでも一応受け付けます。  
 イベント等で利用する際は、ぜひ教えてください！拡散に協力したいです。
 
