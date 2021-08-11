@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	static string l_version = "v2.3.1";
+	static string l_version = "v2.4.0";
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
 	static Settings userSettings;
@@ -192,18 +192,10 @@ class VRChatOpenBrowser : Form
 				OpenBrowser(str_url);
 			}
 			
-			// HTTPレスポンス
-			string outputString = "> " + str_url + "\n" + canOpen;
-			byte[] content = Encoding.UTF8.GetBytes(outputString);
-			
-			if(!req.HttpMethod.Equals("HEAD"))
-			{
-				res.OutputStream.Write(content, 0, content.Length);
-			}
 			// HTTPヘッダ
-			res.ContentType = "text/plain";
 			res.KeepAlive = false;
 			res.StatusCode = 204;
+			res.ContentLength64 = 0;
 			
 			res.Close();
 			
