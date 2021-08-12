@@ -31,7 +31,7 @@ http://localhost/Temporary_Listen_Addresses/openURL/https://www.yukiyukivirtual.
 1. VRChatOpenBrowser.exeのショートカットを作成する。
 2. Win+Rに「shell:startup」と打ち込む。
 3. 開いたフォルダにショートカットを置く。
-
+4. VRChatを起動して、SettingsからALLOW UNTRUSTED URLSを有効にする。
 
 ## メニュー
 タスクトレイの雪アイコンから各種操作できます。
