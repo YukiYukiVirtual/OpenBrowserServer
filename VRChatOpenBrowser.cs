@@ -152,6 +152,7 @@ class VRChatOpenBrowser : Form
 			
 			// 受け付けるURL
 			listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
+			listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/Auth/");
 			
 			listener.Start();
 			listener.BeginGetContext(OnRequested, null);
@@ -194,6 +195,9 @@ class VRChatOpenBrowser : Form
 			case "openURL" :
 				ProcessOpenURL(context);
 				break;
+			case "Auth" :
+				ProcessAuth(context);
+				break;
 			default :
 				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
 				break;
@@ -215,6 +219,67 @@ class VRChatOpenBrowser : Form
 	static string GetAPIPath(string rawurl)
 	{
 		return rawurl.Split('/')[2]; // /Temporary_Listen_Addresses/API
+	}
+	static void ProcessAuth(HttpListenerContext context)
+	{
+		// リクエストとレスポンス
+		HttpListenerRequest request = context.Request;
+		HttpListenerResponse response = context.Response;
+		
+		string keyname = request.RawUrl.Split(new string[]{"Auth/", "Auth"}, StringSplitOptions.None)[1];
+		
+		// /がファイル名に含まれてはいけない
+		if(keyname.IndexOf('/') != -1)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 403;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(Logger.LogType.Error, "不正なファイル名が指定されました", keyname);
+			return;
+		}
+		string filepath = "keys/" + keyname;
+		
+		try
+		{
+			using (FileStream filestream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+			{
+				int len = (int)filestream.Length;
+				byte[] buf = new Byte[len];
+				
+				filestream.Read(buf, 0, len);
+				
+				response.KeepAlive = false;
+				response.StatusCode = 200;
+				response.ContentType  = "video/mp4";
+				response.ContentLength64 = len;
+				
+				if(request.HttpMethod.Equals("GET"))
+				{
+					response.OutputStream.Write(buf, 0, len);
+				}
+				else if(request.HttpMethod.Equals("HEAD"))
+				{
+					// NOP
+				}
+			}
+		}
+		catch(FileNotFoundException e)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 404;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(e);
+		}
+		catch(Exception e)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 500;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(e);
+		}
 	}
 	static void ProcessOpenURL(HttpListenerContext context)
 	{
