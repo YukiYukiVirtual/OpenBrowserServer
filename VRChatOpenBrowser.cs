@@ -10,14 +10,16 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	static string version_local = "v2.4.0";
+	const string version_local = "v2.4.1";
+	
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
 	static Settings userSettings;
 	static HttpListener listener;
 	
-	// 設定ファイルを更新する
 	private static readonly HttpClient client = new HttpClient();
+	
+	// 設定ファイルを更新する処理
 	private static async void UpdateSettingFile()
 	{
 		// Call asynchronous network methods in a try/catch block to handle exceptions.
@@ -42,12 +44,11 @@ class VRChatOpenBrowser : Form
 		}
 		catch(HttpRequestException e)
 		{
-			WriteLog(e.ToString());
+			Logger.WriteLog(e);
 		}
 	}
 	
-	// アイコンロード
-	// アイコンをリソースからロードする
+	// アイコンをリソースからロードする処理
 	private System.Drawing.Icon LoadIcon()
 	{
 		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
@@ -55,9 +56,11 @@ class VRChatOpenBrowser : Form
 		StreamReader reader = new System.IO.StreamReader(stream);
 		return new System.Drawing.Icon(reader.BaseStream);
 	}
-	// タスクトレイにアイコンを表示する
+	
+	// コンストラクタ
 	public VRChatOpenBrowser()
 	{
+		// タスクトレイを作成する
 		NotifyIcon ni = new NotifyIcon();
 		ni.Icon = LoadIcon();
 		ni.Text = "VRChatOpenBrowser";
@@ -88,6 +91,7 @@ class VRChatOpenBrowser : Form
 		ni.DoubleClick += (s,e)=>{cmdstart(".");};
 		ni.ContextMenuStrip = menu;
 	}
+	
 	// エントリーポイント
 	// やることはコード内コメントの通り
 	[STAThread]
@@ -101,18 +105,19 @@ class VRChatOpenBrowser : Form
 			return;
 		}
 		
-		WriteLog("Start");
+		// ログ開始
+		Logger.StartBlock(Logger.LogType.Session);
+		Logger.TimeLog();
+		Logger.WriteLog(Logger.LogType.Version, "Version: " + version_local);
+		Logger.EndBlock();
+		
 		
 		// 設定ファイル更新
 		UpdateSettingFile();
 		
-		// 設定をインスタンス化
+		// 設定クラスをインスタンス化
 		settings = new Settings("setting.yaml");
 		userSettings = new Settings("user_setting.yaml");
-		if(userSettings.GetSettings() == false)
-		{
-			WriteLog("\"user_setting.yaml\" is not exist");
-		}
 		
 		// Boothで買ってほしい気持ち
 		#if BOOTH
@@ -127,7 +132,7 @@ class VRChatOpenBrowser : Form
 		// サーバーを起動する
 		StartServer();
 		
-		// Formをなんかする
+		// Formアプリとしてインスタンス化
 		new VRChatOpenBrowser();
 		Application.Run();
 	}
@@ -145,15 +150,16 @@ class VRChatOpenBrowser : Form
 			// サーバーを建てる
 			listener = new HttpListener();
 			
-			// http://localhost/Temporary_Listen_Addresses/openURL/
+			// 受け付けるURL
 			listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
+			
 			listener.Start();
 			listener.BeginGetContext(OnRequested, null);
 		}
 		catch(Exception e)
 		{
-			WriteLog(e.ToString());
-			MessageBox.Show("予期しない例外が発生しました。logを参照してください。\n(アプリは継続して動作します)", "例外");
+			Logger.WriteLog(e);
+			MessageBox.Show("起動に失敗しました。", "例外");
 			return;
 		}
 	}
@@ -162,51 +168,79 @@ class VRChatOpenBrowser : Form
 	{
 		if(!listener.IsListening)
 		{
-			WriteLog("OnRequested return");
 			return;
 		}
-		WriteLog("■Request Start", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+		Logger.StartBlock(Logger.LogType.HttpLog);
+		Logger.TimeLog();
+		
 		try
 		{
-			HttpListenerContext context = listener.EndGetContext(ar);
 			listener.BeginGetContext(OnRequested, null);
+			HttpListenerContext context = listener.EndGetContext(ar);
+			HttpListenerRequest request = context.Request;
+			HttpListenerResponse response = context.Response;
 			
-			// リクエストとレスポンス
-			HttpListenerRequest req = context.Request;
-			HttpListenerResponse res = context.Response;
-			WriteLog("HTTP Method: ", req.HttpMethod);
-			if(req.HttpMethod.Equals("HEAD"))
+			string apipath = GetAPIPath(request.RawUrl);
+			
+			Logger.WriteLog(Logger.LogType.Request,
+				"HTTP Method: " + request.HttpMethod,
+				"RawURL: " + request.RawUrl,
+				"ApiPath: " + apipath );
+			
+			Logger.StartBlock(Logger.LogType.Log);
+			
+			switch(apipath)
 			{
-				WriteLog("■");
+			case "openURL" :
+				ProcessOpenURL(context);
+				break;
+			default :
+				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
+				break;
 			}
 			
-			// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
-			string str_url = req.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
-		
-			// ブラウザを起動するかチェックする
-			// 起動する場合：起動するURLをログ出力する
-			// 起動しない場合：起動しない理由をログ出力する
-			bool canOpen = CheckURL(str_url);
-			if(canOpen)
-			{
-				OpenBrowser(str_url);
-			}
+			Logger.EndBlock();
 			
-			// HTTPヘッダ
-			res.KeepAlive = false;
-			res.StatusCode = 204;
-			res.ContentLength64 = 0;
-			
-			res.Close();
-			
-			// 呼び出し間隔の基準時刻を更新する
-			lastTime = DateTime.Now;
+			Logger.WriteLog(Logger.LogType.Response,
+				"StatusCode: " + response.StatusCode);
+				
+			response.Close();
 		}
 		catch(Exception e)
 		{
-			WriteLog(e.ToString());
-			MessageBox.Show("予期しない例外が発生しました。logを参照してください。\n(アプリは継続して動作します)", "例外");
+			Logger.WriteLog(e);
 		}
+		Logger.EndBlock();
+	}
+	static string GetAPIPath(string rawurl)
+	{
+		return rawurl.Split('/')[2]; // /Temporary_Listen_Addresses/API
+	}
+	static void ProcessOpenURL(HttpListenerContext context)
+	{
+		// リクエストとレスポンス
+		HttpListenerRequest request = context.Request;
+		HttpListenerResponse response = context.Response;
+		
+		// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
+		string str_url = request.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
+	
+		// ブラウザを起動するかチェックする
+		// 起動する場合：起動するURLをログ出力する
+		// 起動しない場合：起動しない理由をログ出力する
+		bool canOpen = CheckURL(str_url);
+		if(canOpen)
+		{
+			OpenBrowser(str_url);
+		}
+		
+		// HTTPヘッダ
+		response.KeepAlive = false;
+		response.StatusCode = 200;
+		response.ContentLength64 = 0;
+		
+		// 呼び出し間隔の基準時刻を更新する
+		lastTime = DateTime.Now;
 	}
 	// 指定されたURLを開けるかチェックする
 	static bool CheckURL(string str_url)
@@ -218,7 +252,7 @@ class VRChatOpenBrowser : Form
 		// 設定読み込み
 		if(!settings.GetSettings())
 		{
-			WriteLog("Could not load the settings");
+			Logger.WriteLog(Logger.LogType.Error, "Could not load the settings");
 			return false;
 		}
 		IdlePeriod = settings.IdlePeriod;
@@ -237,10 +271,14 @@ class VRChatOpenBrowser : Form
 		
 		// 呼び出し間隔チェック
 		TimeSpan ts = DateTime.Now - lastTime;
-		WriteLog("TimeSpan: ", ts.TotalMilliseconds.ToString());
+		
+			
 		if(ts.TotalMilliseconds < IdlePeriod)
 		{
-			WriteLog("The call interval is less than the set value", ts.TotalMilliseconds.ToString(), "set:" + IdlePeriod, str_url);
+			Logger.WriteLog(Logger.LogType.Error,
+				"The call interval is less than the set value", 
+				"value:   " + ts.TotalMilliseconds.ToString(),
+				"setting: " + IdlePeriod );
 			return false;
 		}
 		
@@ -251,7 +289,7 @@ class VRChatOpenBrowser : Form
 		}
 		catch(UriFormatException e)
 		{
-			WriteLog("Invalid URL", str_url);
+			Logger.WriteLog(Logger.LogType.Error, "Invalid URL");
 			if(e==null){}
 			return false;
 		}
@@ -268,7 +306,7 @@ class VRChatOpenBrowser : Form
 			}
 			if(!p)
 			{
-				WriteLog("Not an authorized Protocol", str_url);
+				Logger.WriteLog(Logger.LogType.Error, "Not an authorized Protocol");
 				return false;
 			}
 		}
@@ -288,7 +326,7 @@ class VRChatOpenBrowser : Form
 			}
 			if(!p)
 			{
-				WriteLog("Not an authorized Domain", str_url);
+				Logger.WriteLog(Logger.LogType.Error, "Not an authorized Domain");
 				return false;
 			}
 		}
@@ -299,7 +337,7 @@ class VRChatOpenBrowser : Form
 	private static SoundPlayer MySoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
 	static void OpenBrowser(string str_url)
 	{
-		WriteLog("Open URL", str_url);
+		Logger.WriteLog(Logger.LogType.Success, str_url);
 		cmdstart(str_url);
 		try{
 			MySoundPlayer.Play();
@@ -315,23 +353,77 @@ class VRChatOpenBrowser : Form
 		
 		Process.Start(psi);
 	}
-	// ログを書く
-	static void WriteLog(params string[] str)
+}
+
+class Logger
+{
+	private static int level = 0;
+	public enum LogType
 	{
-		string joined = String.Join(", ", str);
+		Session,
+		Version,
+		DateTime,
+		Exception,
+		HttpLog,
+		Request,
+		Log,
+		Success,
+		Error,
+		Response
+	};
+	private static string MakeIndent()
+	{
+		return new String(' ', level);
+	}
+	public static void StartBlock(LogType t)
+	{
+		string space = MakeIndent();
+		WriteLog(space + "<div class='"+ t +"'>");
+		level++;
+	}
+	public static void EndBlock()
+	{
+		level--;
+		string space = MakeIndent();
+		WriteLog(space + "</div>");
+	}
+	public static void TimeLog()
+	{
+		string space = MakeIndent();
+		WriteLog(space + "<time>" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "</time>");
+	}
+	public static void WriteLog(Exception e)
+	{
+		WriteLog(LogType.Exception, e.ToString());
+	}
+	public static void WriteLog(LogType t, params string[] strs)
+	{
+		string space = MakeIndent();
+		for(int i=0; i<strs.Length; i++)
+		{
+			strs[i] = space + " " + strs[i];
+		}
 		
-		Console.WriteLine(joined);
+		string joined =
+			  space + "<div class='" + t + "'>\n"
+			+ String.Join("\n", strs) + "\n"
+			+ space + "</div>";
+			
+		WriteLog(joined);
+	}
+	public static void WriteLog(string str)
+	{
+		Console.WriteLine(str);
 		using (var writer = new StreamWriter("VRChatOpenBrowser.log", true))
 		{
-			writer.WriteLine(joined);
+			writer.WriteLine(str);
 		}
 	}
 }
-
-
 // 設定を読み込むクラス
 // パブリックメンバーをReadして使う
-class Settings{
+class Settings
+{
 	public int IdlePeriod;
 	public List<string> Protocol;
 	public List<string> Domain;
@@ -348,7 +440,8 @@ class Settings{
 	// 設定ファイルを読み込む
 	public bool GetSettings()
 	{
-		try{
+		try
+		{
 			// テキストファイルをUTF-8で処理する
 			using(StreamReader sr = new StreamReader(filename, Encoding.GetEncoding("UTF-8") ) )
 			{
@@ -417,3 +510,4 @@ class Settings{
 		return list;
 	}
 }
+
