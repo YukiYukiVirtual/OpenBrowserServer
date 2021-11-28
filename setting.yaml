@@ -4,6 +4,7 @@ CheckUpdate: true
 Protocol:
   - https
 Domain:
+  - alice-books.com
   - amazon.co.jp
   - avatarmuseum.jp
   - bandcamp.com
@@ -37,6 +38,7 @@ Domain:
   - streamlabs.com
   - suzuri.jp
   - techbookfest.org
+  - thebase.in
   - tinami.com
   - toranoana.jp
   - tunecore.co.jp
