@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	const string version_local = "v2.4.1";
+	const string version_local = "v2.5.0";
 	
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
