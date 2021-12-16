@@ -11,17 +11,19 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	const string version_local = "v2.5.0";
+	const string version_local = "v2.5.1";
 	
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
 	static Settings userSettings;
 	static HttpListener listener;
 	
+	private NotifyIcon ni;
+	
 	private static readonly HttpClient client = new HttpClient();
 	
 	// 設定ファイルを更新する処理
-	private static async void UpdateSettingFile()
+	private static async void UpdateSettingFile(VRChatOpenBrowser c)
 	{
 		// Call asynchronous network methods in a try/catch block to handle exceptions.
 		try	
@@ -37,10 +39,27 @@ class VRChatOpenBrowser : Form
 			
 			if(!version_latest.Equals(version_local))
 			{
-				string msg = "更新があります。\n"+
-				             "現在のバージョン: "+version_local+"\n"+
-							 "最新バージョン: " +version_latest+"\n";
-				MessageBox.Show(msg, "VRChatOpenBrowser");
+				string msg = "更新があります。\n" +
+				             "現在のバージョン: " + version_local + "\n" +
+							 "最新バージョン: " + version_latest + "\n\n" +
+							 "プログラムを終了しますか？\n" +
+							 "(ダウンロードページを開くので手動で更新してください)" ;
+				DialogResult result = MessageBox.Show(msg, "Check Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+				if(result == DialogResult.Yes)
+				{
+					#if BOOTH
+					{
+						OpenBrowser("https://yukiyukivirtual.booth.pm/items/2539784");
+					}
+					#else
+					{
+						OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
+					}
+					#endif
+					
+					// アイコン、サーバーも止めて、プログラムを終了する
+					c.ExitAll();
+				}
 			}
 		}
 		catch(HttpRequestException e)
@@ -57,34 +76,29 @@ class VRChatOpenBrowser : Form
 		StreamReader reader = new System.IO.StreamReader(stream);
 		return new System.Drawing.Icon(reader.BaseStream);
 	}
-	
+	private void ExitAll()
+	{
+		ni.Dispose();
+		StopServer();
+		Application.Exit();
+	}
 	// コンストラクタ
 	public VRChatOpenBrowser()
 	{
 		// タスクトレイを作成する
-		NotifyIcon ni = new NotifyIcon();
+		ni = new NotifyIcon();
 		ni.Icon = LoadIcon();
 		ni.Text = "VRChatOpenBrowser";
 		ni.Visible = true;
-		var menu = new ContextMenuStrip();
+		ContextMenuStrip menu = new ContextMenuStrip();
 
 		menu.Items.AddRange(new ToolStripMenuItem[]{
-			new ToolStripMenuItem("更新をチェックしに行く", null, (s,e)=>{
-				#if BOOTH
-				{
-					OpenBrowser("https://yukiyukivirtual.booth.pm/items/2539784");
-				}
-				#else
-				{
-					OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
-				}
-				#endif
+			new ToolStripMenuItem("設定ファイル更新&アップデートチェック", null, (s,e)=>{
+				UpdateSettingFile(this);
 			}, "Check Update"),
 			new ToolStripMenuItem("フォルダを開く", null, (s,e)=>{cmdstart(".");}, "Open Folder"),
 			new ToolStripMenuItem("終了", null, (s,e)=>{
-				ni.Dispose();
-				StopServer();
-				Application.Exit();
+				ExitAll();
 				return;
 			}, "Exit"),
 		});
@@ -113,8 +127,11 @@ class VRChatOpenBrowser : Form
 		Logger.EndBlock();
 		
 		
+		// Formアプリとしてインスタンス化
+		VRChatOpenBrowser inst = new VRChatOpenBrowser();
+		
 		// 設定ファイル更新
-		UpdateSettingFile();
+		UpdateSettingFile(inst);
 		
 		// 設定クラスをインスタンス化
 		settings = new Settings("setting.yaml");
@@ -133,8 +150,6 @@ class VRChatOpenBrowser : Form
 		// サーバーを起動する
 		StartServer();
 		
-		// Formアプリとしてインスタンス化
-		new VRChatOpenBrowser();
 		Application.Run();
 	}
 	// サーバーを終了させる
