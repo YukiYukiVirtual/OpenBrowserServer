@@ -418,7 +418,7 @@ class VRChatOpenBrowser : Form
 	private static SoundPlayer MySoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
 	static void OpenBrowser(string str_url)
 	{
-		Logger.WriteLog(Logger.LogType.Success, str_url);
+		Logger.WriteLog(Logger.LogType.OpenBrowser, str_url);
 		cmdstart(str_url);
 		try{
 			MySoundPlayer.Play();
@@ -448,7 +448,7 @@ class Logger
 		HttpLog,
 		Request,
 		Log,
-		Success,
+		OpenBrowser,
 		Error,
 		Response
 	};
