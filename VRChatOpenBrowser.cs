@@ -6,6 +6,7 @@ using System.Media;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Web;
 using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
@@ -459,7 +460,7 @@ class Logger
 	}
 	public static void WriteLog(Exception e)
 	{
-		WriteLog(LogType.Exception, e.ToString());
+		WriteLog(LogType.Exception, HttpUtility.HtmlEncode(e));
 	}
 	public static void WriteLog(LogType t, params string[] strs)
 	{
@@ -471,12 +472,12 @@ class Logger
 		
 		string joined =
 			  space + "<div class='" + t + "'>\n"
-			+ String.Join("\n", strs) + "\n"
+			+ HttpUtility.HtmlEncode(String.Join("\n", strs)) + "\n"
 			+ space + "</div>";
 			
 		WriteLog(joined);
 	}
-	public static void WriteLog(string str)
+	private static void WriteLog(string str)
 	{
 		Console.WriteLine(str);
 		using (var writer = new StreamWriter("VRChatOpenBrowser.log", true))
