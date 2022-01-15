@@ -584,3 +584,7 @@ class Settings
 	}
 }
 
+/*
+コンパイルオプション 
+csc -t:winexe VRChatOpenBrowser.cs /win32icon:ice.ico /res:ice.ico -r:System.Net.Http.dll -define:
+*/
