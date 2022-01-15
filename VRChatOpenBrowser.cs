@@ -23,21 +23,26 @@ class VRChatOpenBrowser : Form
 	private static readonly HttpClient client = new HttpClient();
 	
 	// 設定ファイルを更新する処理
-	private static async void UpdateSettingFile(VRChatOpenBrowser c)
+	// アップデートがある場合は0を返します
+	// アップデートがない場合は1を返します
+	private static int UpdateSettingFile(VRChatOpenBrowser c)
 	{
-		// Call asynchronous network methods in a try/catch block to handle exceptions.
 		try	
 		{
 			string uri = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();
 			System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-			string responseBody = await client.GetStringAsync(uri);
+			string responseBody = client.GetStringAsync(uri).Result;
 
 			File.WriteAllText("setting.yaml", responseBody);
 			
 			int firstLineEnd = responseBody.IndexOf("\r\n");
 			string version_latest = responseBody.Substring(2, firstLineEnd-2); // "# v1.2.3".IndexOf("v")
 			
-			if(!version_latest.Equals(version_local))
+			if(version_latest.Equals(version_local))
+			{
+				return 1;
+			}
+			else
 			{
 				string msg = "更新があります。\n" +
 				             "現在のバージョン: " + version_local + "\n" +
@@ -47,15 +52,9 @@ class VRChatOpenBrowser : Form
 				DialogResult result = MessageBox.Show(msg, "Check Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 				if(result == DialogResult.Yes)
 				{
-					#if BOOTH
-					{
-						OpenBrowser("https://yukiyukivirtual.booth.pm/items/2539784");
-					}
-					#else
-					{
-						OpenBrowser("https://github.com/YukiYukiVirtual/OpenBrowserServer/releases/");
-					}
-					#endif
+					cmdstart("."); // フォルダを開く
+					// ダウンロードページを開く
+					OpenBrowser("https://yukiyukivirtual.booth.pm/items/2539784");
 					
 					// アイコン、サーバーも止めて、プログラムを終了する
 					c.ExitAll();
@@ -66,6 +65,7 @@ class VRChatOpenBrowser : Form
 		{
 			Logger.WriteLog(e);
 		}
+		return 0;
 	}
 	
 	// アイコンをリソースからロードする処理
@@ -93,8 +93,11 @@ class VRChatOpenBrowser : Form
 		ContextMenuStrip menu = new ContextMenuStrip();
 
 		menu.Items.AddRange(new ToolStripMenuItem[]{
-			new ToolStripMenuItem("設定ファイル更新&アップデートチェック", null, (s,e)=>{
-				UpdateSettingFile(this);
+			new ToolStripMenuItem("アップデートチェック", null, (s,e)=>{
+				if(UpdateSettingFile(this) == 1)
+				{
+					MessageBox.Show("設定ファイルの更新完了！\nアップデートはありませんでした。", "Check Update");
+				}
 			}, "Check Update"),
 			new ToolStripMenuItem("フォルダを開く", null, (s,e)=>{cmdstart(".");}, "Open Folder"),
 			new ToolStripMenuItem("終了", null, (s,e)=>{
