@@ -15,7 +15,6 @@ class VRChatOpenBrowser : Form
 	
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
-	static Settings userSettings;
 	static HttpListener listener;
 	
 	private NotifyIcon ni;
@@ -138,7 +137,6 @@ class VRChatOpenBrowser : Form
 		
 		// 設定クラスをインスタンス化
 		settings = new Settings("setting.yaml");
-		userSettings = new Settings("user_setting.yaml");
 		
 		// Boothで買ってほしい気持ち
 		#if BOOTH
@@ -343,15 +341,6 @@ class VRChatOpenBrowser : Form
 		Protocol.AddRange(settings.Protocol);
 		Domain.AddRange(settings.Domain);
 		
-		
-		// ユーザー設定読み込み
-		if(userSettings.GetSettings())
-		{
-			// ユーザー設定を適用する
-			Protocol.AddRange(userSettings.Protocol);
-			Domain.AddRange(userSettings.Domain);
-			// 呼び出し間隔は更新が入ったらみんなに適用されてほしいので、ユーザー設定は使えません！
-		}
 		
 		// 呼び出し間隔チェック
 		TimeSpan ts = DateTime.Now - lastTime;
