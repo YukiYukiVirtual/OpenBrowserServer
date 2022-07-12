@@ -231,6 +231,10 @@ class VRChatOpenBrowser : Form
 		{
 			Logger.WriteLog(e);
 		}
+		
+		// メモリ使用量をログ
+		Logger.WriteLog(Logger.LogType.Log, "現在のメモリ使用量: " + Environment.WorkingSet);
+		
 		Logger.EndBlock();
 	}
 	static string GetAPIPath(string rawurl)
@@ -242,6 +246,24 @@ class VRChatOpenBrowser : Form
 		// リクエストとレスポンス
 		HttpListenerRequest request = context.Request;
 		HttpListenerResponse response = context.Response;
+		
+		// 呼び出し間隔チェック
+		int IdlePeriod = 10 * 1000;
+		TimeSpan ts = DateTime.Now - lastTime;
+		
+			
+		if(ts.TotalMilliseconds < IdlePeriod)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 403;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(Logger.LogType.Error,
+				"呼び出し間隔が短すぎます", 
+				"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
+				"必要待機時間(ms): " + IdlePeriod );
+			return;
+		}
 		
 		string keyname = request.RawUrl.Split(new string[]{"Auth/", "Auth"}, StringSplitOptions.None)[1];
 		
@@ -297,6 +319,8 @@ class VRChatOpenBrowser : Form
 			
 			Logger.WriteLog(e);
 		}
+		// 呼び出し間隔の基準時刻を更新する
+		lastTime = DateTime.Now;
 	}
 	static void ProcessOpenURL(HttpListenerContext context)
 	{
@@ -349,9 +373,9 @@ class VRChatOpenBrowser : Form
 		if(ts.TotalMilliseconds < IdlePeriod)
 		{
 			Logger.WriteLog(Logger.LogType.Error,
-				"The call interval is less than the set value", 
-				"value:   " + ts.TotalMilliseconds.ToString(),
-				"setting: " + IdlePeriod );
+				"呼び出し間隔が短すぎます", 
+				"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
+				"必要待機時間(ms): " + IdlePeriod );
 			return false;
 		}
 		
