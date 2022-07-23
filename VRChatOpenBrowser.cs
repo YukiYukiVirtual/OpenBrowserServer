@@ -20,6 +20,7 @@ class VRChatOpenBrowser : Form
 	private NotifyIcon ni;
 	
 	private static readonly HttpClient client = new HttpClient();
+	private static readonly byte[] videoBinary = LoadVideoBinary();
 	
 	// 設定ファイルを更新する処理
 	// アップデートがある場合は0を返します
@@ -73,7 +74,22 @@ class VRChatOpenBrowser : Form
 		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
 		Stream stream = assembly.GetManifestResourceStream("ice.ico");
 		StreamReader reader = new System.IO.StreamReader(stream);
-		return new System.Drawing.Icon(reader.BaseStream);
+		System.Drawing.Icon icon = new System.Drawing.Icon(reader.BaseStream);
+		reader.Dispose();
+		return icon;
+	}
+	// 動画のバイナリをリソースからロードする処理
+	private static byte[] LoadVideoBinary()
+	{
+		
+		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+		Stream stream = assembly.GetManifestResourceStream("OpenBrowser.mp4");
+		BinaryReader reader = new System.IO.BinaryReader(stream);
+		int len = (int)stream.Length;
+		byte[] buf = new Byte[len];
+		reader.Read(buf, 0, len);
+		reader.Dispose();
+		return buf;
 	}
 	private void ExitAll()
 	{
@@ -340,10 +356,21 @@ class VRChatOpenBrowser : Form
 			OpenBrowser(str_url);
 		}
 		
-		// HTTPヘッダ
+		byte[] buf = videoBinary;
+		int len = buf.Length;
 		response.KeepAlive = false;
 		response.StatusCode = 200;
-		response.ContentLength64 = 0;
+		response.ContentType  = "video/mp4";
+		response.ContentLength64 = len;
+		
+		if(request.HttpMethod.Equals("GET"))
+		{
+			response.OutputStream.Write(buf, 0, len);
+		}
+		else if(request.HttpMethod.Equals("HEAD"))
+		{
+			// NOP
+		}
 		
 		// 呼び出し間隔の基準時刻を更新する
 		lastTime = DateTime.Now;
@@ -610,5 +637,5 @@ class Settings
 
 /*
 コンパイルオプション 
-csc -t:winexe VRChatOpenBrowser.cs /win32icon:ice.ico /res:ice.ico -r:System.Net.Http.dll -define:
+csc -t:winexe VRChatOpenBrowser.cs /win32icon:ice.ico /res:ice.ico /res:OpenBrowser.mp4 -r:System.Net.Http.dll -define:
 */
