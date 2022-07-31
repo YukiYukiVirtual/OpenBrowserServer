@@ -557,7 +557,7 @@ class Settings
 	public Settings(string filename)
 	{
 		this.filename = filename;
-		IdlePeriod = 1000;
+		IdlePeriod = 500;
 		Protocol = new List<string>();
 		Domain = new List<string>();
 	}
@@ -589,10 +589,10 @@ class Settings
 						StringReader srr = new StringReader(str_ip);	// 1行目を取得する
 						IdlePeriod = Int32.Parse(srr.ReadLine());	// 1行目を取得して、数値に変換してIdlePeriodに入れようとする
 					}
-					catch(Exception e)	// 例外発生時は、代わりに1000を入れる
+					catch(Exception e)	// 例外発生時は、代わりに500を入れる
 					{
 						if(e == null){}
-						IdlePeriod = 1000;
+						IdlePeriod = 500;
 					}
 				}
 				// ProtocolとDomainを取得する
