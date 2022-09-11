@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	const string version_local = "v2.6.1";
+	const string version_local = "v2.6.2";
 	
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
@@ -257,6 +257,8 @@ class VRChatOpenBrowser : Form
 	{
 		return rawurl.Split('/')[2]; // /Temporary_Listen_Addresses/API
 	}
+	
+	private static int p_ProcessAuth_count = 0; // 短時間連続リクエスト回数(この関数でしか使ってはいけないstatic変数)
 	static void ProcessAuth(HttpListenerContext context)
 	{
 		// リクエストとレスポンス
@@ -264,21 +266,44 @@ class VRChatOpenBrowser : Form
 		HttpListenerResponse response = context.Response;
 		
 		// 呼び出し間隔チェック
-		int IdlePeriod = 10 * 1000;
+		int IdlePeriod = 3 * 1000;
 		TimeSpan ts = DateTime.Now - lastTime;
 		
-			
-		if(ts.TotalMilliseconds < IdlePeriod)
+		if(ts.TotalMilliseconds > 500) // 間隔が100ms超え
 		{
-			response.KeepAlive = false;
-			response.StatusCode = 403;
-			response.ContentLength64 = 0;
-			
-			Logger.WriteLog(Logger.LogType.Error,
-				"呼び出し間隔が短すぎます", 
-				"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
-				"必要待機時間(ms): " + IdlePeriod );
-			return;
+			// 次のリクエストは少なくとも3秒間隔をあけてほしい
+			if(ts.TotalMilliseconds < IdlePeriod)
+			{
+				response.KeepAlive = false;
+				response.StatusCode = 403;
+				response.ContentLength64 = 0;
+				
+				Logger.WriteLog(Logger.LogType.Error,
+					"呼び出し間隔が短すぎます", 
+					"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
+					"必要待機時間(ms): " + IdlePeriod );
+				return;
+			}
+			else // このリクエストは10秒以上間隔をあけている=新しいリクエストだから連続回数をリセットする
+			{
+				p_ProcessAuth_count = 0;
+			}
+		}
+		else // 間隔が500ms以下
+		{
+			// 500ms以下でリクエストが多すぎる？
+			p_ProcessAuth_count++;
+			if(p_ProcessAuth_count >= 5)
+			{
+				response.KeepAlive = false;
+				response.StatusCode = 403;
+				response.ContentLength64 = 0;
+				
+				Logger.WriteLog(Logger.LogType.Error,
+					"短時間でリクエストが多すぎます", 
+					"回数: " + p_ProcessAuth_count );
+				return;
+			}
 		}
 		
 		string keyname = request.RawUrl.Split(new string[]{"Auth/", "Auth"}, StringSplitOptions.None)[1];
