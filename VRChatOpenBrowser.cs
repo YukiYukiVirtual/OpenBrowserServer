@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	const string version_local = "v2.6.2";
+	const string version_local = "v2.6.3";
 	
 	static DateTime lastTime = DateTime.Now;
 	static Settings settings;
@@ -269,7 +269,7 @@ class VRChatOpenBrowser : Form
 		int IdlePeriod = 3 * 1000;
 		TimeSpan ts = DateTime.Now - lastTime;
 		
-		if(ts.TotalMilliseconds > 500) // 間隔が100ms超え
+		if(ts.TotalMilliseconds > 1000) // 間隔が1000ms超え
 		{
 			// 次のリクエストは少なくとも3秒間隔をあけてほしい
 			if(ts.TotalMilliseconds < IdlePeriod)
@@ -284,14 +284,14 @@ class VRChatOpenBrowser : Form
 					"必要待機時間(ms): " + IdlePeriod );
 				return;
 			}
-			else // このリクエストは10秒以上間隔をあけている=新しいリクエストだから連続回数をリセットする
+			else // このリクエストは3秒以上間隔をあけている=新しいリクエストだから連続回数をリセットする
 			{
 				p_ProcessAuth_count = 0;
 			}
 		}
-		else // 間隔が500ms以下
+		else // 間隔が1000ms以下
 		{
-			// 500ms以下でリクエストが多すぎる？
+			// 1000ms以下でリクエストが多すぎる？
 			p_ProcessAuth_count++;
 			if(p_ProcessAuth_count >= 5)
 			{
@@ -360,8 +360,11 @@ class VRChatOpenBrowser : Form
 			
 			Logger.WriteLog(e);
 		}
-		// 呼び出し間隔の基準時刻を更新する
-		lastTime = DateTime.Now;
+		if(p_ProcessAuth_count == 0)
+		{
+			// 呼び出し間隔の基準時刻を更新する
+			lastTime = DateTime.Now;
+		}
 	}
 	static void ProcessOpenURL(HttpListenerContext context)
 	{
