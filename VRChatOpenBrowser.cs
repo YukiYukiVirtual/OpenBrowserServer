@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Media;
-using System.Net;
 using System.Net.Http;
+using System.Net;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Web;
 using System.Windows.Forms;
@@ -13,14 +15,18 @@ class VRChatOpenBrowser : Form
 {
 	const string version_local = "v2.6.3";
 	
-	static DateTime lastTime = DateTime.Now;
-	static Settings settings;
-	static HttpListener listener;
+	static DateTime lastTime = DateTime.Now; // 最後にリクエストを受けた時間
+	static Settings settings; // 設定ファイルを読み込むクラス
+	static HttpListener listener; // HTTPサーバー
 	
-	private NotifyIcon ni;
+	static FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
+	static Process observerProcess; // ログを監視するプロセス
 	
-	private static readonly HttpClient client = new HttpClient();
-	private static readonly byte[] videoBinary = LoadVideoBinary();
+	private NotifyIcon ni; // タスクトレイのアイコン
+	
+	private static readonly HttpClient client = new HttpClient(); // 設定ファイルを更新する用のHTTPクライアント
+	private static readonly byte[] videoBinary = LoadVideoBinary(); // Auth用ビデオ
+	
 	
 	// 設定ファイルを更新する処理
 	// アップデートがある場合は0を返します
@@ -164,11 +170,85 @@ class VRChatOpenBrowser : Form
 		}
 		#endif
 		
+		// ログウォッチャーを起動する
+		WatcherInitialize();
+		ObserveLatestLogFile();
+		
 		// サーバーを起動する
 		StartServer();
 		
 		Application.Run();
 	}
+	// FileSystemWatcherの初期化
+	static void WatcherInitialize()
+	{
+		fswatcher = new FileSystemWatcher();
+		fswatcher.Path = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat"); // VRChatのログがあるフォルダを監視
+		fswatcher.NotifyFilter = NotifyFilters.FileName;
+		fswatcher.Filter = "output_log_*.txt";
+		fswatcher.Created += new FileSystemEventHandler(LogFileCreated);
+		fswatcher.EnableRaisingEvents = true;
+	}
+	// 最新のログファイルを開く
+	static void ObserveLatestLogFile()
+	{
+		DirectoryInfo dir = new DirectoryInfo(fswatcher.Path);
+		FileInfo[] fi = dir.GetFiles(fswatcher.Filter).OrderByDescending(p => p.LastWriteTime).ToArray();
+		if(fi.Length == 0)
+		{
+			Logger.WriteLog(Logger.LogType.Log, "VRChatのログファイル無し");
+			return;
+		}
+		ObserveVRChatLog(fi[0].DirectoryName+"\\"+fi[0].Name);
+	}
+	// VRChatのログ監視をスタートする
+	static void ObserveVRChatLog(String fullpath)
+	{
+		observerProcess = new Process();
+		observerProcess.StartInfo.FileName = "PowerShell.exe";
+		observerProcess.StartInfo.Arguments = "Get-Content -Wait -Tail 0 -Encoding UTF8 -Path " + "'" + fullpath + "'";
+		observerProcess.StartInfo.CreateNoWindow = true;
+		observerProcess.StartInfo.UseShellExecute = false;
+		observerProcess.StartInfo.RedirectStandardOutput = true;
+		observerProcess.OutputDataReceived += new DataReceivedEventHandler(LogOutputDataReceived);
+
+		observerProcess.Start();
+		observerProcess.BeginOutputReadLine();
+	}
+	static void StopObserver()
+	{
+		if(!observerProcess.HasExited)
+		{
+			observerProcess.Kill();
+		}
+		observerProcess.Close();
+	}
+	static void LogOutputDataReceived(Object source, DataReceivedEventArgs e)
+	{
+		//Console.WriteLine(e.Data);
+		string line = e.Data;
+		// "2222.22.22 22:22:22 Log       -  [YukiYukiVirtual/OpenURL]https://"
+		if(Regex.IsMatch(line, @"^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+) Log +-  \[YukiYukiVirtual/OpenURL\]*"))
+		{
+			
+			Logger.StartBlock(Logger.LogType.Observer);
+			Logger.TimeLog();
+			string LogName = "[YukiYukiVirtual/OpenURL]";
+			int index = line.IndexOf(LogName);
+			string rawurl = line.Substring(index + LogName.Length);
+			string url = rawurl.Trim();
+			
+			TryOpenURL(url);
+			Logger.EndBlock();
+		}
+	}
+	
+	static void LogFileCreated(Object source, FileSystemEventArgs e)
+	{
+		StopObserver();
+		ObserveVRChatLog(e.FullPath);
+	}
+	
 	// サーバーを終了させる
 	static void StopServer()
 	{
@@ -374,15 +454,8 @@ class VRChatOpenBrowser : Form
 		
 		// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
 		string str_url = request.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
-	
-		// ブラウザを起動するかチェックする
-		// 起動する場合：起動するURLをログ出力する
-		// 起動しない場合：起動しない理由をログ出力する
-		bool canOpen = CheckURL(str_url);
-		if(canOpen)
-		{
-			OpenBrowser(str_url);
-		}
+		
+		TryOpenURL(str_url);
 		
 		byte[] buf = videoBinary;
 		int len = buf.Length;
@@ -400,6 +473,19 @@ class VRChatOpenBrowser : Form
 			// NOP
 		}
 		
+	}
+	// 指定したURLを開こうとする
+	// 開けなくても何もしない
+	static void TryOpenURL(string str_url)
+	{
+		// ブラウザを起動するかチェックする
+		// 起動する場合：起動するURLをログ出力する
+		// 起動しない場合：起動しない理由をログ出力する
+		bool canOpen = CheckURL(str_url);
+		if(canOpen)
+		{
+			OpenBrowser(str_url);
+		}
 		// 呼び出し間隔の基準時刻を更新する
 		lastTime = DateTime.Now;
 	}
@@ -441,7 +527,9 @@ class VRChatOpenBrowser : Form
 		}
 		catch(UriFormatException e)
 		{
-			Logger.WriteLog(Logger.LogType.Error, "Invalid URL");
+			Logger.WriteLog(Logger.LogType.Error,
+				"Invalid URL",
+				"URL: " + str_url );
 			if(e==null){}
 			return false;
 		}
@@ -521,7 +609,8 @@ class Logger
 		Log,
 		OpenBrowser,
 		Error,
-		Response
+		Response,
+		Observer
 	};
 	private static string MakeIndent()
 	{
