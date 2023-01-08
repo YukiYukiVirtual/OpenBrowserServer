@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	const string version_local = "v2.6.3";
+	const string version_local = "v2.7.0";
 	
 	static DateTime lastTime = DateTime.Now; // 最後にリクエストを受けた時間
 	static Settings settings; // 設定ファイルを読み込むクラス
@@ -193,13 +193,14 @@ class VRChatOpenBrowser : Form
 	static void ObserveLatestLogFile()
 	{
 		DirectoryInfo dir = new DirectoryInfo(fswatcher.Path);
-		FileInfo[] fi = dir.GetFiles(fswatcher.Filter).OrderByDescending(p => p.LastWriteTime).ToArray();
-		if(fi.Length == 0)
+		FileInfo[] fis = dir.GetFiles(fswatcher.Filter);
+		if(fis.Length == 0)
 		{
 			Logger.WriteLog(Logger.LogType.Log, "VRChatのログファイル無し");
 			return;
 		}
-		ObserveVRChatLog(fi[0].DirectoryName+"\\"+fi[0].Name);
+		FileInfo fi = fis.OrderByDescending(p => p.LastWriteTime).ToArray()[0];
+		ObserveVRChatLog(fi.DirectoryName+"\\"+fi.Name);
 	}
 	// VRChatのログ監視をスタートする
 	static void ObserveVRChatLog(String fullpath)
@@ -214,6 +215,8 @@ class VRChatOpenBrowser : Form
 
 		observerProcess.Start();
 		observerProcess.BeginOutputReadLine();
+		
+		Logger.WriteLog(Logger.LogType.Log, "VRChatのログファイル監視スタートしました。", Path.GetFileName(fullpath));
 	}
 	static void StopObserver()
 	{
@@ -225,8 +228,12 @@ class VRChatOpenBrowser : Form
 	}
 	static void LogOutputDataReceived(Object source, DataReceivedEventArgs e)
 	{
-		//Console.WriteLine(e.Data);
 		string line = e.Data;
+		if(String.IsNullOrEmpty(line))
+		{
+			// NOP
+			return;
+		}
 		// "2222.22.22 22:22:22 Log       -  [YukiYukiVirtual/OpenURL]https://"
 		if(Regex.IsMatch(line, @"^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+) Log +-  \[YukiYukiVirtual/OpenURL\]*"))
 		{
