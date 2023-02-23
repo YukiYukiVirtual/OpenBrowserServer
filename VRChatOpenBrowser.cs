@@ -405,7 +405,18 @@ class VRChatOpenBrowser : Form
 	}
 	static string GetAPIPath(string rawurl)
 	{
-		return rawurl.Split('/')[2]; // /Temporary_Listen_Addresses/API
+		string[] str = rawurl.Split('/');
+		Console.WriteLine(str);
+		foreach(string s in str)Console.WriteLine(s);
+		Console.WriteLine(str.Length-1);
+		if(rawurl.IndexOf("Temporary_Listen_Addresses") != -1)
+		{
+			return str[2]; // /Temporary_Listen_Addresses/API
+		}
+		else
+		{
+			return str[1]; // /API
+		}
 	}
 	
 	private static int p_ProcessAuth_count = 0; // 短時間連続リクエスト回数(この関数でしか使ってはいけないstatic変数)
