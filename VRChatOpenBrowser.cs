@@ -319,9 +319,6 @@ class VRChatOpenBrowser : Form
 			
 			switch(apipath)
 			{
-			case "openURL" :
-				ProcessOpenURL(context);
-				break;
 			case "Auth" :
 				ProcessAuth(context);
 				break;
