@@ -358,13 +358,14 @@ class VRChatOpenBrowser : Form
 		
 		try
 		{
-			listener_deprecated.BeginGetContext(OnRequested, null);
+			listener_deprecated.BeginGetContext(OnRequested_deprecated, null);
 			HttpListenerContext context = listener_deprecated.EndGetContext(ar);
 			HttpListenerRequest request = context.Request;
 			HttpListenerResponse response = context.Response;
 			
 			string apipath = GetAPIPath(request.RawUrl);
 			
+			Logger.WriteLog(Logger.LogType.Log, "非推奨API");
 			Logger.WriteLog(Logger.LogType.Request,
 				"HTTP Method: " + request.HttpMethod,
 				"RawURL: " + request.RawUrl,
