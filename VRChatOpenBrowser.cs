@@ -18,6 +18,7 @@ class VRChatOpenBrowser : Form
 	static DateTime lastTime = DateTime.Now; // 最後にリクエストを受けた時間
 	static Settings settings; // 設定ファイルを読み込むクラス
 	static HttpListener listener_deprecated; // HTTPサーバー(非推奨)
+	static HttpListener listener; // HTTPサーバー
 	
 	static FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
 	static Process observerProcess; // ログを監視するプロセス
@@ -259,6 +260,8 @@ class VRChatOpenBrowser : Form
 	// サーバーを終了させる
 	static void StopServer()
 	{
+		listener.Stop();
+		listener.Close();
 		listener_deprecated.Stop();
 		listener_deprecated.Close();
 	}
@@ -268,14 +271,18 @@ class VRChatOpenBrowser : Form
 		try{
 			
 			// サーバーを建てる
+			listener = new HttpListener();
 			listener_deprecated = new HttpListener();
 			
 			// 受け付けるURL
+			listener.Prefixes.Add("http://localhost:21983/Auth/"); // Auth/鍵名でアクセス
 			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
 			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/Auth/");
 			
+			listener.Start();
+			listener.BeginGetContext(OnRequested, null);
 			listener_deprecated.Start();
-			listener_deprecated.BeginGetContext(OnRequested, null);
+			listener_deprecated.BeginGetContext(OnRequested_deprecated, null);
 		}
 		catch(Exception e)
 		{
@@ -286,6 +293,61 @@ class VRChatOpenBrowser : Form
 	}
 	// HTTPリクエスト処理
 	static void OnRequested(IAsyncResult ar)
+	{
+		if(!listener.IsListening)
+		{
+			return;
+		}
+		Logger.StartBlock(Logger.LogType.HttpLog);
+		Logger.TimeLog();
+		
+		try
+		{
+			listener.BeginGetContext(OnRequested, null);
+			HttpListenerContext context = listener.EndGetContext(ar);
+			HttpListenerRequest request = context.Request;
+			HttpListenerResponse response = context.Response;
+			
+			string apipath = GetAPIPath(request.RawUrl);
+			
+			Logger.WriteLog(Logger.LogType.Request,
+				"HTTP Method: " + request.HttpMethod,
+				"RawURL: " + request.RawUrl,
+				"ApiPath: " + apipath );
+			
+			Logger.StartBlock(Logger.LogType.Log);
+			
+			switch(apipath)
+			{
+			case "openURL" :
+				ProcessOpenURL(context);
+				break;
+			case "Auth" :
+				ProcessAuth(context);
+				break;
+			default :
+				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
+				break;
+			}
+			
+			Logger.EndBlock();
+			
+			Logger.WriteLog(Logger.LogType.Response,
+				"StatusCode: " + response.StatusCode);
+				
+			response.Close();
+		}
+		catch(Exception e)
+		{
+			Logger.WriteLog(e);
+		}
+		
+		// メモリ使用量をログ
+		Logger.WriteLog(Logger.LogType.Log, "現在のメモリ使用量: " + Environment.WorkingSet);
+		
+		Logger.EndBlock();
+	}
+	static void OnRequested_deprecated(IAsyncResult ar)
 	{
 		if(!listener_deprecated.IsListening)
 		{
