@@ -17,7 +17,7 @@ class VRChatOpenBrowser : Form
 	
 	static DateTime lastTime = DateTime.Now; // 最後にリクエストを受けた時間
 	static Settings settings; // 設定ファイルを読み込むクラス
-	static HttpListener listener; // HTTPサーバー
+	static HttpListener listener_deprecated; // HTTPサーバー(非推奨)
 	
 	static FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
 	static Process observerProcess; // ログを監視するプロセス
@@ -259,8 +259,8 @@ class VRChatOpenBrowser : Form
 	// サーバーを終了させる
 	static void StopServer()
 	{
-		listener.Stop();
-		listener.Close();
+		listener_deprecated.Stop();
+		listener_deprecated.Close();
 	}
 	// サーバーを起動する
 	static void StartServer()
@@ -268,14 +268,14 @@ class VRChatOpenBrowser : Form
 		try{
 			
 			// サーバーを建てる
-			listener = new HttpListener();
+			listener_deprecated = new HttpListener();
 			
 			// 受け付けるURL
-			listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
-			listener.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/Auth/");
+			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
+			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/Auth/");
 			
-			listener.Start();
-			listener.BeginGetContext(OnRequested, null);
+			listener_deprecated.Start();
+			listener_deprecated.BeginGetContext(OnRequested, null);
 		}
 		catch(Exception e)
 		{
@@ -287,7 +287,7 @@ class VRChatOpenBrowser : Form
 	// HTTPリクエスト処理
 	static void OnRequested(IAsyncResult ar)
 	{
-		if(!listener.IsListening)
+		if(!listener_deprecated.IsListening)
 		{
 			return;
 		}
@@ -296,8 +296,8 @@ class VRChatOpenBrowser : Form
 		
 		try
 		{
-			listener.BeginGetContext(OnRequested, null);
-			HttpListenerContext context = listener.EndGetContext(ar);
+			listener_deprecated.BeginGetContext(OnRequested, null);
+			HttpListenerContext context = listener_deprecated.EndGetContext(ar);
 			HttpListenerRequest request = context.Request;
 			HttpListenerResponse response = context.Response;
 			
