@@ -26,7 +26,7 @@ class VRChatOpenBrowser : Form
 	private NotifyIcon ni; // タスクトレイのアイコン
 	
 	private static readonly HttpClient client = new HttpClient(); // 設定ファイルを更新する用のHTTPクライアント
-	private static readonly byte[] videoBinary = LoadVideoBinary(); // Auth用ビデオ
+	private static readonly byte[] videoBinary = LoadVideoBinary(); // Auth用ビデオ(非推奨)
 	
 	
 	// 設定ファイルを更新する処理
@@ -84,19 +84,6 @@ class VRChatOpenBrowser : Form
 		System.Drawing.Icon icon = new System.Drawing.Icon(reader.BaseStream);
 		reader.Dispose();
 		return icon;
-	}
-	// 動画のバイナリをリソースからロードする処理
-	private static byte[] LoadVideoBinary()
-	{
-		
-		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-		Stream stream = assembly.GetManifestResourceStream("OpenBrowser.mp4");
-		BinaryReader reader = new System.IO.BinaryReader(stream);
-		int len = (int)stream.Length;
-		byte[] buf = new Byte[len];
-		reader.Read(buf, 0, len);
-		reader.Dispose();
-		return buf;
 	}
 	private void ExitAll()
 	{
@@ -180,6 +167,7 @@ class VRChatOpenBrowser : Form
 		
 		Application.Run();
 	}
+	//#########################################################################################################################
 	// FileSystemWatcherの初期化
 	static void WatcherInitialize()
 	{
@@ -255,302 +243,6 @@ class VRChatOpenBrowser : Form
 	{
 		StopObserver();
 		ObserveVRChatLog(e.FullPath);
-	}
-	
-	// サーバーを終了させる
-	static void StopServer()
-	{
-		listener.Stop();
-		listener.Close();
-		listener_deprecated.Stop();
-		listener_deprecated.Close();
-	}
-	// サーバーを起動する
-	static void StartServer()
-	{
-		try{
-			
-			// サーバーを建てる
-			listener = new HttpListener();
-			listener_deprecated = new HttpListener();
-			
-			// 受け付けるURL
-			listener.Prefixes.Add("http://localhost:21983/Auth/"); // Auth/鍵名でアクセス
-			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/");
-			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/Auth/");
-			
-			listener.Start();
-			listener.BeginGetContext(OnRequested, null);
-			listener_deprecated.Start();
-			listener_deprecated.BeginGetContext(OnRequested_deprecated, null);
-		}
-		catch(Exception e)
-		{
-			Logger.WriteLog(e);
-			MessageBox.Show("起動に失敗しました。", "例外");
-			return;
-		}
-	}
-	// HTTPリクエスト処理
-	static void OnRequested(IAsyncResult ar)
-	{
-		if(!listener.IsListening)
-		{
-			return;
-		}
-		Logger.StartBlock(Logger.LogType.HttpLog);
-		Logger.TimeLog();
-		
-		try
-		{
-			listener.BeginGetContext(OnRequested, null);
-			HttpListenerContext context = listener.EndGetContext(ar);
-			HttpListenerRequest request = context.Request;
-			HttpListenerResponse response = context.Response;
-			
-			string apipath = GetAPIPath(request.RawUrl);
-			
-			Logger.WriteLog(Logger.LogType.Request,
-				"HTTP Method: " + request.HttpMethod,
-				"RawURL: " + request.RawUrl,
-				"ApiPath: " + apipath );
-			
-			Logger.StartBlock(Logger.LogType.Log);
-			
-			switch(apipath)
-			{
-			case "Auth" :
-				ProcessAuth(context);
-				break;
-			default :
-				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
-				break;
-			}
-			
-			Logger.EndBlock();
-			
-			Logger.WriteLog(Logger.LogType.Response,
-				"StatusCode: " + response.StatusCode);
-				
-			response.Close();
-		}
-		catch(Exception e)
-		{
-			Logger.WriteLog(e);
-		}
-		
-		// メモリ使用量をログ
-		Logger.WriteLog(Logger.LogType.Log, "現在のメモリ使用量: " + Environment.WorkingSet);
-		
-		Logger.EndBlock();
-	}
-	static void OnRequested_deprecated(IAsyncResult ar)
-	{
-		if(!listener_deprecated.IsListening)
-		{
-			return;
-		}
-		Logger.StartBlock(Logger.LogType.HttpLog);
-		Logger.TimeLog();
-		
-		try
-		{
-			listener_deprecated.BeginGetContext(OnRequested_deprecated, null);
-			HttpListenerContext context = listener_deprecated.EndGetContext(ar);
-			HttpListenerRequest request = context.Request;
-			HttpListenerResponse response = context.Response;
-			
-			string apipath = GetAPIPath(request.RawUrl);
-			
-			Logger.WriteLog(Logger.LogType.Log, "非推奨API");
-			Logger.WriteLog(Logger.LogType.Request,
-				"HTTP Method: " + request.HttpMethod,
-				"RawURL: " + request.RawUrl,
-				"ApiPath: " + apipath );
-			
-			Logger.StartBlock(Logger.LogType.Log);
-			
-			switch(apipath)
-			{
-			case "openURL" :
-				ProcessOpenURL(context);
-				break;
-			case "Auth" :
-				ProcessAuth(context);
-				break;
-			default :
-				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
-				break;
-			}
-			
-			Logger.EndBlock();
-			
-			Logger.WriteLog(Logger.LogType.Response,
-				"StatusCode: " + response.StatusCode);
-				
-			response.Close();
-		}
-		catch(Exception e)
-		{
-			Logger.WriteLog(e);
-		}
-		
-		// メモリ使用量をログ
-		Logger.WriteLog(Logger.LogType.Log, "現在のメモリ使用量: " + Environment.WorkingSet);
-		
-		Logger.EndBlock();
-	}
-	static string GetAPIPath(string rawurl)
-	{
-		string[] str = rawurl.Split('/');
-		Console.WriteLine(str);
-		foreach(string s in str)Console.WriteLine(s);
-		Console.WriteLine(str.Length-1);
-		if(rawurl.IndexOf("Temporary_Listen_Addresses") != -1)
-		{
-			return str[2]; // /Temporary_Listen_Addresses/API
-		}
-		else
-		{
-			return str[1]; // /API
-		}
-	}
-	
-	private static int p_ProcessAuth_count = 0; // 短時間連続リクエスト回数(この関数でしか使ってはいけないstatic変数)
-	static void ProcessAuth(HttpListenerContext context)
-	{
-		// リクエストとレスポンス
-		HttpListenerRequest request = context.Request;
-		HttpListenerResponse response = context.Response;
-		
-		// 呼び出し間隔チェック
-		int IdlePeriod = 3 * 1000;
-		TimeSpan ts = DateTime.Now - lastTime;
-		
-		if(ts.TotalMilliseconds > 1000) // 間隔が1000ms超え
-		{
-			// 次のリクエストは少なくとも3秒間隔をあけてほしい
-			if(ts.TotalMilliseconds < IdlePeriod)
-			{
-				response.KeepAlive = false;
-				response.StatusCode = 403;
-				response.ContentLength64 = 0;
-				
-				Logger.WriteLog(Logger.LogType.Error,
-					"呼び出し間隔が短すぎます", 
-					"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
-					"必要待機時間(ms): " + IdlePeriod );
-				return;
-			}
-			else // このリクエストは3秒以上間隔をあけている=新しいリクエストだから連続回数をリセットする
-			{
-				p_ProcessAuth_count = 0;
-			}
-		}
-		else // 間隔が1000ms以下
-		{
-			// 1000ms以下でリクエストが多すぎる？
-			p_ProcessAuth_count++;
-			if(p_ProcessAuth_count >= 5)
-			{
-				response.KeepAlive = false;
-				response.StatusCode = 403;
-				response.ContentLength64 = 0;
-				
-				Logger.WriteLog(Logger.LogType.Error,
-					"短時間でリクエストが多すぎます", 
-					"回数: " + p_ProcessAuth_count );
-				return;
-			}
-		}
-		
-		string keyname = request.RawUrl.Split(new string[]{"Auth/", "Auth"}, StringSplitOptions.None)[1];
-		
-		// /がファイル名に含まれてはいけない
-		if(keyname.IndexOf('/') != -1)
-		{
-			response.KeepAlive = false;
-			response.StatusCode = 403;
-			response.ContentLength64 = 0;
-			
-			Logger.WriteLog(Logger.LogType.Error, "不正なファイル名が指定されました", keyname);
-			return;
-		}
-		string filepath = "keys/" + keyname;
-		
-		try
-		{
-			using (FileStream filestream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
-			{
-				int len = (int)filestream.Length;
-				byte[] buf = new Byte[len];
-				
-				filestream.Read(buf, 0, len);
-				
-				response.KeepAlive = false;
-				response.StatusCode = 200;
-				response.ContentType  = "video/mp4";
-				response.ContentLength64 = len;
-				
-				if(request.HttpMethod.Equals("GET"))
-				{
-					response.OutputStream.Write(buf, 0, len);
-				}
-				else if(request.HttpMethod.Equals("HEAD"))
-				{
-					// NOP
-				}
-			}
-		}
-		catch(FileNotFoundException e)
-		{
-			response.KeepAlive = false;
-			response.StatusCode = 404;
-			response.ContentLength64 = 0;
-			
-			Logger.WriteLog(e);
-		}
-		catch(Exception e)
-		{
-			response.KeepAlive = false;
-			response.StatusCode = 500;
-			response.ContentLength64 = 0;
-			
-			Logger.WriteLog(e);
-		}
-		if(p_ProcessAuth_count == 0)
-		{
-			// 呼び出し間隔の基準時刻を更新する
-			lastTime = DateTime.Now;
-		}
-	}
-	static void ProcessOpenURL(HttpListenerContext context)
-	{
-		// リクエストとレスポンス
-		HttpListenerRequest request = context.Request;
-		HttpListenerResponse response = context.Response;
-		
-		// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
-		string str_url = request.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
-		
-		TryOpenURL(str_url);
-		
-		byte[] buf = videoBinary;
-		int len = buf.Length;
-		response.KeepAlive = false;
-		response.StatusCode = 200;
-		response.ContentType  = "video/mp4";
-		response.ContentLength64 = len;
-		
-		if(request.HttpMethod.Equals("GET"))
-		{
-			response.OutputStream.Write(buf, 0, len);
-		}
-		else if(request.HttpMethod.Equals("HEAD"))
-		{
-			// NOP
-		}
-		
 	}
 	// 指定したURLを開こうとする
 	// 開けなくても何もしない
@@ -671,6 +363,417 @@ class VRChatOpenBrowser : Form
 		
 		Process.Start(psi);
 	}
+	//#########################################################################################################################
+	
+	// サーバーを終了させる
+	static void StopServer()
+	{
+		listener.Stop();
+		listener.Close();
+		listener_deprecated.Stop();
+		listener_deprecated.Close();
+	}
+	// サーバーを起動する
+	static void StartServer()
+	{
+		try{
+			
+			// サーバーを建てる
+			listener = new HttpListener();
+			listener_deprecated = new HttpListener(); // (非推奨)
+			
+			// 受け付けるURL
+			listener.Prefixes.Add("http://localhost:21983/keys/"); // keys/鍵名でアクセス
+			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/openURL/"); // (非推奨)
+			listener_deprecated.Prefixes.Add("http://+:80/Temporary_Listen_Addresses/Auth/"); // (非推奨)
+			
+			listener.Start();
+			listener.BeginGetContext(OnRequested, null);
+			listener_deprecated.Start(); // (非推奨)
+			listener_deprecated.BeginGetContext(OnRequested_deprecated, null); // (非推奨)
+		}
+		catch(Exception e)
+		{
+			Logger.WriteLog(e);
+			MessageBox.Show("起動に失敗しました。", "例外");
+			return;
+		}
+	}
+	// HTTPリクエスト処理
+	static void OnRequested(IAsyncResult ar)
+	{
+		if(!listener.IsListening)
+		{
+			return;
+		}
+		Logger.StartBlock(Logger.LogType.HttpLog);
+		Logger.TimeLog();
+		
+		try
+		{
+			listener.BeginGetContext(OnRequested, null);
+			HttpListenerContext context = listener.EndGetContext(ar);
+			HttpListenerRequest request = context.Request;
+			HttpListenerResponse response = context.Response;
+			
+			string apipath = GetAPIPath(request.RawUrl);
+			
+			Logger.WriteLog(Logger.LogType.Request,
+				"HTTP Method: " + request.HttpMethod,
+				"RawURL: " + request.RawUrl,
+				"ApiPath: " + apipath );
+			
+			Logger.StartBlock(Logger.LogType.Log);
+			
+			switch(apipath)
+			{
+			case "keys" :
+				ProcessKeys(context);
+				break;
+			default :
+				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
+				break;
+			}
+			
+			Logger.EndBlock();
+			
+			Logger.WriteLog(Logger.LogType.Response,
+				"StatusCode: " + response.StatusCode);
+				
+			response.Close();
+		}
+		catch(Exception e)
+		{
+			Logger.WriteLog(e);
+		}
+		
+		// メモリ使用量をログ
+		Logger.WriteLog(Logger.LogType.Log, "現在のメモリ使用量: " + Environment.WorkingSet);
+		
+		Logger.EndBlock();
+	}
+	static string GetAPIPath(string rawurl)
+	{
+		string[] str = rawurl.Split('/');
+		Console.WriteLine(str);
+		foreach(string s in str)Console.WriteLine(s);
+		Console.WriteLine(str.Length-1);
+		if(rawurl.IndexOf("Temporary_Listen_Addresses") != -1)
+		{
+			return str[2]; // /Temporary_Listen_Addresses/API (非推奨)
+		}
+		else
+		{
+			return str[1]; // /API/xxx.xyz
+		}
+	}
+	
+	private static int _ProcessKeys_count = 0; // 短時間連続リクエスト回数(この関数でしか使ってはいけないstatic変数)
+	static void ProcessKeys(HttpListenerContext context)
+	{
+		// リクエストとレスポンス
+		HttpListenerRequest request = context.Request;
+		HttpListenerResponse response = context.Response;
+		
+		// 呼び出し間隔チェック
+		int IdlePeriod = 3 * 1000;
+		TimeSpan ts = DateTime.Now - lastTime;
+		
+		if(ts.TotalMilliseconds > 1000) // 間隔が1000ms超え
+		{
+			// 次のリクエストは少なくとも3秒間隔をあけてほしい
+			if(ts.TotalMilliseconds < IdlePeriod)
+			{
+				response.KeepAlive = false;
+				response.StatusCode = 403;
+				response.ContentLength64 = 0;
+				
+				Logger.WriteLog(Logger.LogType.Error,
+					"呼び出し間隔が短すぎます",
+					"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
+					"必要待機時間(ms): " + IdlePeriod );
+				return;
+			}
+			else // このリクエストは3秒以上間隔をあけている=新しいリクエストだから連続回数をリセットする
+			{
+				_ProcessKeys_count = 0;
+			}
+		}
+		else // 間隔が1000ms以下
+		{
+			// 1000ms以下でリクエストが多すぎる？
+			_ProcessKeys_count++;
+			if(_ProcessKeys_count >= 5)
+			{
+				response.KeepAlive = false;
+				response.StatusCode = 403;
+				response.ContentLength64 = 0;
+				
+				Logger.WriteLog(Logger.LogType.Error,
+					"短時間でリクエストが多すぎます",
+					"回数: " + _ProcessKeys_count );
+				return;
+			}
+		}
+		
+		string filename = Path.GetFileName(request.RawUrl);
+		string filepath = "keys/" + filename;
+		string mimetype = System.Web.MimeMapping.GetMimeMapping(filename);
+		
+		try
+		{
+			using (FileStream filestream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+			{
+				int len = (int)filestream.Length;
+				byte[] buf = new Byte[len];
+				
+				filestream.Read(buf, 0, len);
+				
+				response.KeepAlive = false;
+				response.StatusCode = 200;
+				response.ContentType  = mimetype;
+				response.ContentLength64 = len;
+				
+				if(request.HttpMethod.Equals("GET"))
+				{
+					response.OutputStream.Write(buf, 0, len);
+				}
+				else if(request.HttpMethod.Equals("HEAD"))
+				{
+					// NOP
+				}
+			}
+		}
+		catch(FileNotFoundException e)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 404;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(e);
+		}
+		catch(Exception e)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 500;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(e);
+		}
+		if(_ProcessKeys_count == 0)
+		{
+			// 呼び出し間隔の基準時刻を更新する
+			lastTime = DateTime.Now;
+		}
+	}
+	//#########################################################################################################################
+	// 動画のバイナリをリソースからロードする処理(非推奨)
+	private static byte[] LoadVideoBinary()
+	{
+		
+		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+		Stream stream = assembly.GetManifestResourceStream("OpenBrowser.mp4");
+		BinaryReader reader = new System.IO.BinaryReader(stream);
+		int len = (int)stream.Length;
+		byte[] buf = new Byte[len];
+		reader.Read(buf, 0, len);
+		reader.Dispose();
+		return buf;
+	}
+	static void OnRequested_deprecated(IAsyncResult ar) // (非推奨)
+	{
+		if(!listener_deprecated.IsListening)
+		{
+			return;
+		}
+		Logger.StartBlock(Logger.LogType.HttpLog);
+		Logger.TimeLog();
+		
+		try
+		{
+			listener_deprecated.BeginGetContext(OnRequested_deprecated, null);
+			HttpListenerContext context = listener_deprecated.EndGetContext(ar);
+			HttpListenerRequest request = context.Request;
+			HttpListenerResponse response = context.Response;
+			
+			string apipath = GetAPIPath(request.RawUrl);
+			
+			Logger.WriteLog(Logger.LogType.Log, "非推奨API");
+			Logger.WriteLog(Logger.LogType.Request,
+				"HTTP Method: " + request.HttpMethod,
+				"RawURL: " + request.RawUrl,
+				"ApiPath: " + apipath );
+			
+			Logger.StartBlock(Logger.LogType.Log);
+			
+			switch(apipath)
+			{
+			case "openURL" :
+				ProcessOpenURL(context);
+				break;
+			case "Auth" :
+				ProcessAuth(context);
+				break;
+			default :
+				Logger.WriteLog(Logger.LogType.Error, "Apiが不正(バグってる)", apipath);
+				break;
+			}
+			
+			Logger.EndBlock();
+			
+			Logger.WriteLog(Logger.LogType.Response,
+				"StatusCode: " + response.StatusCode);
+				
+			response.Close();
+		}
+		catch(Exception e)
+		{
+			Logger.WriteLog(e);
+		}
+		
+		// メモリ使用量をログ
+		Logger.WriteLog(Logger.LogType.Log, "現在のメモリ使用量: " + Environment.WorkingSet);
+		
+		Logger.EndBlock();
+	}
+	private static int _ProcessAuth_count = 0; // 短時間連続リクエスト回数(この関数でしか使ってはいけないstatic変数)
+	static void ProcessAuth(HttpListenerContext context)
+	{
+		// リクエストとレスポンス
+		HttpListenerRequest request = context.Request;
+		HttpListenerResponse response = context.Response;
+		
+		// 呼び出し間隔チェック
+		int IdlePeriod = 3 * 1000;
+		TimeSpan ts = DateTime.Now - lastTime;
+		
+		if(ts.TotalMilliseconds > 1000) // 間隔が1000ms超え
+		{
+			// 次のリクエストは少なくとも3秒間隔をあけてほしい
+			if(ts.TotalMilliseconds < IdlePeriod)
+			{
+				response.KeepAlive = false;
+				response.StatusCode = 403;
+				response.ContentLength64 = 0;
+				
+				Logger.WriteLog(Logger.LogType.Error,
+					"呼び出し間隔が短すぎます", 
+					"呼び出し間隔(ms):   " + ts.TotalMilliseconds.ToString(),
+					"必要待機時間(ms): " + IdlePeriod );
+				return;
+			}
+			else // このリクエストは3秒以上間隔をあけている=新しいリクエストだから連続回数をリセットする
+			{
+				_ProcessAuth_count = 0;
+			}
+		}
+		else // 間隔が1000ms以下
+		{
+			// 1000ms以下でリクエストが多すぎる？
+			_ProcessAuth_count++;
+			if(_ProcessAuth_count >= 5)
+			{
+				response.KeepAlive = false;
+				response.StatusCode = 403;
+				response.ContentLength64 = 0;
+				
+				Logger.WriteLog(Logger.LogType.Error,
+					"短時間でリクエストが多すぎます", 
+					"回数: " + _ProcessAuth_count );
+				return;
+			}
+		}
+		
+		string keyname = request.RawUrl.Split(new string[]{"Auth/", "Auth"}, StringSplitOptions.None)[1];
+		
+		// /がファイル名に含まれてはいけない
+		if(keyname.IndexOf('/') != -1)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 403;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(Logger.LogType.Error, "不正なファイル名が指定されました", keyname);
+			return;
+		}
+		string filepath = "keys/" + keyname;
+		string mimetype = System.Web.MimeMapping.GetMimeMapping(keyname);
+		
+		try
+		{
+			using (FileStream filestream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+			{
+				int len = (int)filestream.Length;
+				byte[] buf = new Byte[len];
+				
+				filestream.Read(buf, 0, len);
+				
+				response.KeepAlive = false;
+				response.StatusCode = 200;
+				response.ContentType  = mimetype;
+				response.ContentLength64 = len;
+				
+				if(request.HttpMethod.Equals("GET"))
+				{
+					response.OutputStream.Write(buf, 0, len);
+				}
+				else if(request.HttpMethod.Equals("HEAD"))
+				{
+					// NOP
+				}
+			}
+		}
+		catch(FileNotFoundException e)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 404;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(e);
+		}
+		catch(Exception e)
+		{
+			response.KeepAlive = false;
+			response.StatusCode = 500;
+			response.ContentLength64 = 0;
+			
+			Logger.WriteLog(e);
+		}
+		if(_ProcessAuth_count == 0)
+		{
+			// 呼び出し間隔の基準時刻を更新する
+			lastTime = DateTime.Now;
+		}
+	}
+	static void ProcessOpenURL(HttpListenerContext context)
+	{
+		// リクエストとレスポンス
+		HttpListenerRequest request = context.Request;
+		HttpListenerResponse response = context.Response;
+		
+		// openURL/より後ろのURLを取得する /無しでも起動できるため、処理しておく
+		string str_url = request.RawUrl.Split(new string[]{"openURL/", "openURL"}, StringSplitOptions.None)[1];
+		
+		TryOpenURL(str_url);
+		
+		byte[] buf = videoBinary;
+		int len = buf.Length;
+		response.KeepAlive = false;
+		response.StatusCode = 200;
+		response.ContentType  = "video/mp4";
+		response.ContentLength64 = len;
+		
+		if(request.HttpMethod.Equals("GET"))
+		{
+			response.OutputStream.Write(buf, 0, len);
+		}
+		else if(request.HttpMethod.Equals("HEAD"))
+		{
+			// NOP
+		}
+		
+	}
+	//#########################################################################################################################
 }
 
 class Logger
