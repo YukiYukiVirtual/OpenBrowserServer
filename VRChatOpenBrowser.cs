@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 class VRChatOpenBrowser : Form
 {
-	const string version_local = "v3.0.1";
+	const string version_local = "v4.0.0";
 	
 	static DateTime lastTime = DateTime.Now; // 最後にリクエストを受けた時間
 	static Settings settings; // 設定ファイルを読み込むクラス
