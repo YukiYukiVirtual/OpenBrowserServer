@@ -194,7 +194,7 @@ class VRChatOpenBrowser : Form
 	{
 		try{
 			observerProcess = new Process();
-			observerProcess.StartInfo.FileName = "PowerShell.exe";
+			observerProcess.StartInfo.FileName = Environment.ExpandEnvironmentVariables(@"%systemroot%\system32\WindowsPowerShell\v1.0\PowerShell.exe");
 			observerProcess.StartInfo.Arguments = "Get-Content -Wait -Tail 0 -Encoding UTF8 -Path " + "'" + fullpath + "'";
 			observerProcess.StartInfo.CreateNoWindow = true;
 			observerProcess.StartInfo.UseShellExecute = false;
@@ -205,6 +205,12 @@ class VRChatOpenBrowser : Form
 			observerProcess.BeginOutputReadLine();
 
 			Logger.WriteLog(Logger.LogType.Log, "VRChatのログファイル監視スタートしました。", Path.GetFileName(fullpath));
+		}
+		catch(System.ComponentModel.Win32Exception e)
+		{
+			Logger.WriteLog(e);
+			MessageBox.Show("起動に失敗しました。\n" + observerProcess.StartInfo.FileName + "がみつかりません。", "例外");
+			return;
 		}
 		catch(Exception e)
 		{
