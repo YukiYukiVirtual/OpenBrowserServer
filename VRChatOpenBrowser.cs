@@ -100,7 +100,7 @@ class VRChatOpenBrowser : Form
 		ContextMenuStrip menu = new ContextMenuStrip();
 
 		menu.Items.AddRange(new ToolStripMenuItem[]{
-			new ToolStripMenuItem("アップデートチェック", null, (s,e)=>{
+			new ToolStripMenuItem("設定ファイル更新・アップデートチェック", null, (s,e)=>{
 				if(UpdateSettingFile(this) == 1)
 				{
 					MessageBox.Show("設定ファイルの更新完了！\nアップデートはありませんでした。", "Check Update");
@@ -192,18 +192,26 @@ class VRChatOpenBrowser : Form
 	// VRChatのログ監視をスタートする
 	static void ObserveVRChatLog(String fullpath)
 	{
-		observerProcess = new Process();
-		observerProcess.StartInfo.FileName = "PowerShell.exe";
-		observerProcess.StartInfo.Arguments = "Get-Content -Wait -Tail 0 -Encoding UTF8 -Path " + "'" + fullpath + "'";
-		observerProcess.StartInfo.CreateNoWindow = true;
-		observerProcess.StartInfo.UseShellExecute = false;
-		observerProcess.StartInfo.RedirectStandardOutput = true;
-		observerProcess.OutputDataReceived += new DataReceivedEventHandler(LogOutputDataReceived);
+		try{
+			observerProcess = new Process();
+			observerProcess.StartInfo.FileName = "PowerShell.exe";
+			observerProcess.StartInfo.Arguments = "Get-Content -Wait -Tail 0 -Encoding UTF8 -Path " + "'" + fullpath + "'";
+			observerProcess.StartInfo.CreateNoWindow = true;
+			observerProcess.StartInfo.UseShellExecute = false;
+			observerProcess.StartInfo.RedirectStandardOutput = true;
+			observerProcess.OutputDataReceived += new DataReceivedEventHandler(LogOutputDataReceived);
 
-		observerProcess.Start();
-		observerProcess.BeginOutputReadLine();
-		
-		Logger.WriteLog(Logger.LogType.Log, "VRChatのログファイル監視スタートしました。", Path.GetFileName(fullpath));
+			observerProcess.Start();
+			observerProcess.BeginOutputReadLine();
+
+			Logger.WriteLog(Logger.LogType.Log, "VRChatのログファイル監視スタートしました。", Path.GetFileName(fullpath));
+		}
+		catch(Exception e)
+		{
+			Logger.WriteLog(e);
+			MessageBox.Show("起動に失敗しました。", "例外");
+			return;
+		}
 	}
 	static void StopObserver()
 	{
