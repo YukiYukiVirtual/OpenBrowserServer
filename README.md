@@ -11,7 +11,6 @@
 2. Windowsキー+Rで開く窓に「shell:startup」と打ち込む。
 3. 開いたフォルダにショートカットを置く。
 4. VRChatを起動して、SettingsからALLOW UNTRUSTED URLSを有効にする。
-5. 環境変数のPATHに「%systemroot%\system32\WindowsPowerShell\v1.0\」を追加してください。
 
 ***※ALLOW UNTRUSTED URLSを有効にしないと動作しません。確実に実施してください。***
 
