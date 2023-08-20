@@ -400,7 +400,7 @@ class VRChatOpenBrowser : Form
 		catch(Exception e)
 		{
 			Logger.WriteLog(e);
-			MessageBox.Show("起動に失敗しました。", "例外");
+			MessageBox.Show("起動に失敗しました。\nポート番号21983が既に使用されているかもしれません。", "例外");
 			return;
 		}
 	}
