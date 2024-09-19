@@ -144,6 +144,11 @@ class VRChatOpenBrowser : Form
 		
 		// ログ開始
 		Logger.LogInfo("Version: " + Version.revision);
+		#if TraceLogging
+		Logger.LogInfo("TraceLogging: true");
+		#else
+		Logger.LogInfo("TraceLogging: false");
+		#endif
 		
 		// Formアプリとしてインスタンス化
 		VRChatOpenBrowser inst = new VRChatOpenBrowser();
@@ -179,7 +184,7 @@ class VRChatOpenBrowser : Form
 		catch(System.Net.Sockets.SocketException e)
 		{
 			Logger.LogError(e.ToString());
-			MessageBox.Show("Webサーバーの起動に失敗しました。ポート443がすでに使用されているかもしれません。\n機能が一部制限されます。", "例外");
+			MessageBox.Show("Webサーバーの起動に失敗しました。ポート20443がすでに使用されているかもしれません。\n機能が一部制限されます。", "例外");
 		}
 		catch(Exception e)
 		{
@@ -697,10 +702,10 @@ class VRChatLogWatcher
 			// NOP
 			return;
 		}
+		string LogName = "[YukiYukiVirtual/OpenURL]";
 		// "2222.22.22 22:22:22 Log       -  [YukiYukiVirtual/OpenURL]https://"
-		if(Regex.IsMatch(line, @"^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+) Log +-  \[YukiYukiVirtual/OpenURL\]*"))
+		if(line.Contains(LogName))
 		{
-			string LogName = "[YukiYukiVirtual/OpenURL]";
 			int index = line.IndexOf(LogName);
 			string rawurl = line.Substring(index + LogName.Length);
 			string url = rawurl.Trim();
@@ -832,7 +837,9 @@ class Logger
 {
 	public static void LogTrace(string body, [CallerLineNumber]int lineNumber = 0, [CallerMemberName]string memberName = "")
 	{
+		#if TraceLogging
 		Log("<T>", memberName, lineNumber, body);
+		#endif
 	}
 	public static void LogInfo(string body, [CallerLineNumber]int lineNumber = 0, [CallerMemberName]string memberName = "")
 	{
@@ -940,5 +947,5 @@ class Settings
 
 /*
 コンパイルオプション 
-csc -t:winexe VRChatOpenBrowser.cs /win32icon:resource\\ice.ico /res:resource\\ice.ico /res:resource\\certificate.pfx -r:System.Net.Http.dll -define:
+csc -t:winexe VRChatOpenBrowser.cs /win32icon:resource\\ice.ico /res:resource\\ice.ico /res:resource\\certificate.pfx -r:System.Net.Http.dll -define:TraceLogging -define:
 */
