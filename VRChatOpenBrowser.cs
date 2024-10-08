@@ -392,30 +392,24 @@ class HttpsServer
 	private TcpListener listener;
 	public HttpsServer(int port)
 	{
-		cert = new X509Certificate2(GetCertificatePfxBytes(), "password");
-		listener = new TcpListener(IPAddress.Loopback, port);
-		listener.Start();
-		serverThread = new Thread(ListenerThread);
-		serverThread.Start();
+		try
+		{
+			cert = new X509Certificate2("certificate.pfx", "password");
+			listener = new TcpListener(IPAddress.Loopback, port);
+			listener.Start();
+			serverThread = new Thread(ListenerThread);
+			serverThread.Start();
+		}
+		catch(Exception e)
+		{
+			Logger.LogError(e.ToString());
+			throw e;
+		}
 		Logger.LogInfo("サーバー起動");
 	}
 	~HttpsServer()
 	{
 		Stop();
-	}
-	// アイコンをリソースからロードする処理
-	private byte[] GetCertificatePfxBytes()
-	{
-		System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-		Stream stream = assembly.GetManifestResourceStream("certificate.pfx");
-		StreamReader reader = new System.IO.StreamReader(stream);
-		// StreamをByte[]に変換してリターン
-        using (MemoryStream ms = new MemoryStream())
-        {
-            reader.BaseStream.CopyTo(ms);
-			reader.Dispose();
-            return ms.ToArray();
-        }
 	}
 	public void Stop()
 	{
@@ -947,5 +941,5 @@ class Settings
 
 /*
 コンパイルオプション 
-csc -t:winexe VRChatOpenBrowser.cs /win32icon:resource\\ice.ico /res:resource\\ice.ico /res:resource\\certificate.pfx -r:System.Net.Http.dll -define:TraceLogging -define:
+csc -t:winexe VRChatOpenBrowser.cs /win32icon:resource\\ice.ico /res:resource\\ice.ico -r:System.Net.Http.dll -define:TraceLogging -define:
 */
