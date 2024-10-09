@@ -1,20 +1,4 @@
-Add-Type -AssemblyName System.Windows.Forms
-
-echo "---注意事項をダイアログに表示---"
-[void][System.Windows.Forms.MessageBox]::Show("すべて「はい」を選んでください
-Choose Yes on all dialogs.","Start","OK","Information")
-
-echo "
----古いRoot証明書を削除---"
-$oldcert = ls Cert:\CurrentUser\Root|where Subject -like "CN=Root.local.yukiyukivirtual.net"
-echo $oldcert
-if($oldcert){
-  rm $oldcert.PSPath
-}
-else{
-  echo "new install"
-}
-
+echo "---インストール開始---"
 echo "
 ---Root証明書を作成---"
 $params = @{
@@ -62,5 +46,16 @@ echo "
 mv $rootcert.PSPath Cert:\CurrentUser\Root
 
 echo "
----完了---"
-[void][System.Windows.Forms.MessageBox]::Show("完了しました","Done","OK","Information")
+---スタートアップにショートカットを作成---"
+$UserProperty = $(Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders')
+$UserProperty.Startup
+$WsShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WsShell.CreateShortcut("$($UserProperty.Startup)\VRChatOpenBrowser.lnk")
+$Shortcut.TargetPath = "$(pwd)\VRChatOpenBrowser.exe"
+$Shortcut.IconLocation = "$(pwd)\VRChatOpenBrowser.exe"
+$Shortcut.Save()
+
+ls Cert:\CurrentUser\* -Recurse|where Subject -like "CN=*.local.yukiyukivirtual.net"
+echo "---インストール完了---"
+echo "---VRChatOpenBrowser.exe起動---"
+start VRChatOpenBrowser.exe
