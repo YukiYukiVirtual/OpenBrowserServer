@@ -53,9 +53,10 @@ $WsShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WsShell.CreateShortcut("$($UserProperty.Startup)\VRChatOpenBrowser.lnk")
 $Shortcut.TargetPath = "$(pwd)\VRChatOpenBrowser.exe"
 $Shortcut.IconLocation = "$(pwd)\VRChatOpenBrowser.exe"
+$Shortcut.WorkingDirectory = "$(pwd)"
 $Shortcut.Save()
 
-ls Cert:\CurrentUser\* -Recurse|where Subject -like "CN=*.local.yukiyukivirtual.net"
+ls Cert:\CurrentUser\* -Recurse|where Subject -like "CN=*.yukiyukivirtual.net"
 echo "---インストール完了---"
 echo "---VRChatOpenBrowser.exe起動---"
 start VRChatOpenBrowser.exe

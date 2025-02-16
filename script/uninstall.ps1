@@ -9,9 +9,9 @@ Stop-Process -Name "VRChatOpenBrowser" 2>&1 > $null
 
 echo "---ファイル削除---"
 ls Cert:\CurrentUser\* -Recurse|where Subject -like "CN=*.local.yukiyukivirtual.net"
-ls Cert:\CurrentUser\* -Recurse|where Subject -like "CN=*.local.yukiyukivirtual.net"|rm 2>&1 > $null
+ls Cert:\CurrentUser\* -Recurse|where Subject -like "CN=*.local.yukiyukivirtual.net"|rm
 
 $UserProperty = $(Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders')
 ls "$($UserProperty.Startup)\VRChatOpenBrowser*.lnk"
-rm "$($UserProperty.Startup)\VRChatOpenBrowser*.lnk" 2>&1 > $null
+rm "$($UserProperty.Startup)\VRChatOpenBrowser*.lnk" 
 echo "---始末完了---"

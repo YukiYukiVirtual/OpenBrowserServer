@@ -415,6 +415,7 @@ class HttpsServer
 	{
 		if(serverThread != null) serverThread.Abort();
 		if(listener != null) listener.Stop();
+		if(cert != null) cert.Reset();
 		Logger.LogInfo("サーバー停止");
 	}
 	void ListenerThread()
@@ -423,6 +424,7 @@ class HttpsServer
 		DateTime lastTime = DateTime.Now;
 		while(true)
 		{
+			string httpRequestHeader = "";
 			Logger.LogTrace("Listen");
 			TcpClient client = listener.AcceptTcpClient();
 			Logger.LogTrace("Accept");
@@ -440,6 +442,7 @@ class HttpsServer
 				while ((line = sr.ReadLine()) != null && !line.Equals(""))
 				{
 					Logger.LogTrace(line);
+					httpRequestHeader += line;
 					if(lineCount == 0)
 					{
 						string[] subs = line.Split(' ');
@@ -460,8 +463,9 @@ class HttpsServer
 					requestCount++;
 					if(requestCount >= 5)
 					{
-						SetHttpResponce((HttpStatusCode)429, stream);
 						Logger.LogWarn("短時間でリクエストが多すぎます 回数: " + requestCount );
+						Logger.LogWarn(httpRequestHeader);
+						SetHttpResponce((HttpStatusCode)429, stream);
 						continue;
 					}
 				}
@@ -505,29 +509,34 @@ class HttpsServer
 						}
 						catch(FileNotFoundException e)
 						{
-							SetHttpResponce(HttpStatusCode.NotFound, stream);
 							Logger.LogWarn(e.ToString());
+							Logger.LogWarn(httpRequestHeader);
+							SetHttpResponce(HttpStatusCode.NotFound, stream);
 						}
 						catch(ArgumentException e)
 						{
-							SetHttpResponce(HttpStatusCode.NotFound, stream);
 							Logger.LogWarn(e.ToString());
+							Logger.LogWarn(httpRequestHeader);
+							SetHttpResponce(HttpStatusCode.NotFound, stream);
 						}
 						catch(DirectoryNotFoundException e)
 						{
-							SetHttpResponce(HttpStatusCode.NotFound, stream);
 							Logger.LogWarn(e.ToString());
+							Logger.LogWarn(httpRequestHeader);
+							SetHttpResponce(HttpStatusCode.NotFound, stream);
 						}
 						catch(Exception e)
 						{
-							SetHttpResponce(HttpStatusCode.InternalServerError, stream);
 							Logger.LogError(e.ToString());
+							Logger.LogError(httpRequestHeader);
+							SetHttpResponce(HttpStatusCode.InternalServerError, stream);
 						}
 					}
 					else // ファイル名指定されてないかパスが不正
 					{
-						SetHttpResponce(HttpStatusCode.Forbidden, stream);
 						Logger.LogWarn(path);
+						Logger.LogWarn(httpRequestHeader);
+						SetHttpResponce(HttpStatusCode.Forbidden, stream);
 					}
 				}
 				else if(path.Equals("/favicon.ico")) // ブラウザでアクセスしたときにfavicon.icoを勝手に見るので無いよって教えてあげる
@@ -536,14 +545,21 @@ class HttpsServer
 				}
 				else // 無いよ
 				{
-					SetHttpResponce(HttpStatusCode.NotImplemented, stream);
 					Logger.LogWarn(path);
+					Logger.LogWarn(httpRequestHeader);
+					SetHttpResponce(HttpStatusCode.NotImplemented, stream);
 				}
+			}
+			catch(System.Security.Authentication.AuthenticationException e)
+			{
+				Logger.LogError(e.ToString());
+				Logger.LogError(httpRequestHeader);
 			}
 			catch (Exception e)
 			{
-				SetHttpResponce(HttpStatusCode.InternalServerError, stream);
 				Logger.LogError(e.ToString());
+				Logger.LogError(httpRequestHeader);
+				SetHttpResponce(HttpStatusCode.InternalServerError, stream);
 			}
 			finally
 			{
@@ -674,6 +690,7 @@ class VRChatLogWatcher
 	// 監視プロセスを停止する
 	void StopObserver()
 	{
+		Logger.LogInfo("Observing stop.");
 		if(!observerProcess.HasExited)
 		{
 			observerProcess.Kill();
