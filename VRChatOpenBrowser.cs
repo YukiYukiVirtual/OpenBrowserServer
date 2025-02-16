@@ -235,18 +235,17 @@ class VRChatOpenBrowser : Form
 			// NOP
 			return;
 		}
-		// "2222.22.22 22:22:22 Log       -  [YukiYukiVirtual/OpenURL]https://"
-		if(Regex.IsMatch(line, @"^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+) Log +-  \[YukiYukiVirtual/OpenURL\]*"))
+		string LogPrefix = "[YukiYukiVirtual/OpenURL]";
+		if(line.Contains(LogPrefix))
 		{
-			
 			Logger.StartBlock(Logger.LogType.Observer);
 			Logger.TimeLog();
-			string LogName = "[YukiYukiVirtual/OpenURL]";
-			int index = line.IndexOf(LogName);
-			string rawurl = line.Substring(index + LogName.Length);
+
+			int index = line.IndexOf(LogPrefix);
+			string rawurl = line.Substring(index + LogPrefix.Length);
 			string url = rawurl.Trim();
-			
 			TryOpenURL(url);
+
 			Logger.EndBlock();
 		}
 	}
