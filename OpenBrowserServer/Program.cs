@@ -16,7 +16,8 @@ namespace OpenBrowserServer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            NotifyIconForm notifyIconForm = new NotifyIconForm();
+            Application.Run();
         }
     }
 }

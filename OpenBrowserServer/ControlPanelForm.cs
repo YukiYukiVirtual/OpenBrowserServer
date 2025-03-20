@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace OpenBrowserServer
 {
-    public partial class Form1 : Form
+    public partial class ControlPanelForm : Form
     {
-        public Form1()
+        public ControlPanelForm()
         {
             InitializeComponent();
         }
