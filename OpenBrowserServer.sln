@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35913.81 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBrowserServer", "OpenBrowserServer\OpenBrowserServer.csproj", "{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8AB86A6D-7916-4B1C-81AF-7F8AE50A94C2}
+	EndGlobalSection
+EndGlobal
