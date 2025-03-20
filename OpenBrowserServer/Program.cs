@@ -17,6 +17,7 @@ namespace OpenBrowserServer
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             NotifyIconForm notifyIconForm = new NotifyIconForm();
+            VRChatLogWatcher watcher = new VRChatLogWatcher();
             Application.Run();
         }
     }

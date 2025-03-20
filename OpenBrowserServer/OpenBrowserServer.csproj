@@ -73,9 +73,10 @@
     <Compile Include="NotifyIconForm.Designer.cs">
       <DependentUpon>NotifyIconForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Opener.cs" />
+    <Compile Include="URLOpener.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VRChatLogWatcher.cs" />
     <EmbeddedResource Include="ControlPanelForm.resx">
       <DependentUpon>ControlPanelForm.cs</DependentUpon>
     </EmbeddedResource>

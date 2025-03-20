@@ -8,16 +8,29 @@ using System.Threading.Tasks;
 
 namespace OpenBrowserServer
 {
-    internal class Opener
+    internal class URLOpener
     {
-        public static void Open(string str_url)
+        public URLOpener()
         {
-            cmdstart(str_url);
+            // 設定ファイルのインスタンスを保持
+        }
+        public void Open(string url)
+        {
+            // URLを開いていいかチェック
+
+            // URLを開く
             try
             {
                 SystemSounds.Asterisk.Play();
             }
-            finally {/*ここの例外処理は重要ではない*/}
+            finally
+            {
+                StaticOpen(url);
+            }
+        }
+        public static void StaticOpen(string url)
+        {
+            cmdstart(url);
         }
         private static void cmdstart(string arg)
         {
