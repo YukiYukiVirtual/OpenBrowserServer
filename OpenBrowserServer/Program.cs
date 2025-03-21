@@ -19,8 +19,10 @@ namespace OpenBrowserServer
         }
         static void Initialize()
         {
+            Settings settings = new Settings();
+            settings.UpdateSetting();
             NotifyIconForm notifyIconForm = new NotifyIconForm();
-            VRChatLogWatcher watcher = new VRChatLogWatcher();
+            VRChatLogWatcher watcher = new VRChatLogWatcher(settings);
         }
     }
 }

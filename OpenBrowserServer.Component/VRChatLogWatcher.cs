@@ -10,9 +10,10 @@ namespace OpenBrowserServer.Component
         URLOpener opener; // URLを開くやつ
         FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
         Process observerProcess; // ログを監視するプロセス
-        public VRChatLogWatcher()
+        public VRChatLogWatcher(Settings setting)
         {
-            this.opener = new URLOpener();
+            this.opener = new URLOpener(setting);
+
             string targetDirectoryName = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat");
             string targetFileName = "output_log_*.txt";
             // VRChat起動時のログファイルの作成を監視するために、FileSystemWatcherの初期化
