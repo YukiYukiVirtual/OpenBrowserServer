@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using OpenBrowserServer.Component;
 
 namespace OpenBrowserServer
 {
@@ -16,9 +14,13 @@ namespace OpenBrowserServer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Initialize();
+            Application.Run();
+        }
+        static void Initialize()
+        {
             NotifyIconForm notifyIconForm = new NotifyIconForm();
             VRChatLogWatcher watcher = new VRChatLogWatcher();
-            Application.Run();
         }
     }
 }

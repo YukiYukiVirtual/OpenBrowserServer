@@ -1,34 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace OpenBrowserServer
+namespace OpenBrowserServer.Component
 {
-    internal class VRChatLogWatcher
+    public class VRChatLogWatcher
     {
-        URLOpener opener;
+        URLOpener opener; // URLを開くやつ
         FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
         Process observerProcess; // ログを監視するプロセス
         public VRChatLogWatcher()
         {
             this.opener = new URLOpener();
-
+            string targetDirectoryName = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat");
+            string targetFileName = "output_log_*.txt";
             // VRChat起動時のログファイルの作成を監視するために、FileSystemWatcherの初期化
             this.fswatcher = new FileSystemWatcher();
-            this.fswatcher.Path = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat"); // VRChatのログがあるフォルダを監視
+            this.fswatcher.Path = targetDirectoryName; // VRChatのログがあるフォルダを監視
             this.fswatcher.NotifyFilter = NotifyFilters.FileName; // ファイル名を監視
-            this.fswatcher.Filter = "output_log_*.txt";
+            this.fswatcher.Filter = targetFileName;
             this.fswatcher.Created += new FileSystemEventHandler(LogFileCreated); // ファイル作成を監視
             this.fswatcher.EnableRaisingEvents = true;
 
             // 最新のログファイルを監視する
-            DirectoryInfo dir = new DirectoryInfo(this.fswatcher.Path);
-            FileInfo[] fis = dir.GetFiles(this.fswatcher.Filter);
+            DirectoryInfo dir = new DirectoryInfo(targetDirectoryName);
+            FileInfo[] fis = dir.GetFiles(targetFileName);
             if (fis.Length == 0)
             {
                 //Logger.LogInfo("VRChatのログファイル無し");
@@ -65,13 +62,13 @@ namespace OpenBrowserServer
             catch (System.ComponentModel.Win32Exception e)
             {
                 //Logger.LogError(e.ToString());
-                MessageBox.Show("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
+                //MessageBox.Show("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
                 return;
             }
             catch (Exception e)
             {
                 //Logger.LogError(e.ToString());
-                MessageBox.Show("起動に失敗しました。", "例外");
+                //MessageBox.Show("起動に失敗しました。", "例外");
                 return;
             }
         }
@@ -102,7 +99,6 @@ namespace OpenBrowserServer
                 return;
             }
             string LogName = "[YukiYukiVirtual/OpenURL]";
-            // "2222.22.22 22:22:22 Log       -  [YukiYukiVirtual/OpenURL]https://"
             if (line.Contains(LogName))
             {
                 int index = line.IndexOf(LogName);
