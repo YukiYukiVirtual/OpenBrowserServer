@@ -25,7 +25,7 @@ namespace OpenBrowserServer.Component
                 // 前に開いた時間との差が規定以上であればURLを開く
                 DateTime now = DateTime.Now;
                 TimeSpan timeSpan = now - lastOpenTime;
-                if (timeSpan.TotalMilliseconds >= 500)
+                if (timeSpan.TotalMilliseconds >= settings.IdlePeriod)
                 {
                     // URLを開く
                     try

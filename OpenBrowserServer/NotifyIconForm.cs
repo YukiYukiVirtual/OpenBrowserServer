@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
 
@@ -14,8 +7,10 @@ namespace OpenBrowserServer
     public partial class NotifyIconForm : Form
     {
         ControlPanelForm controlPanelForm = null;
-        public NotifyIconForm()
+        Settings settings;
+        public NotifyIconForm(Settings settings)
         {
+            this.settings = settings;
             InitializeComponent();
             this.Visible = false;
         }
@@ -55,7 +50,7 @@ namespace OpenBrowserServer
         /// <param name="e"></param>
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            settings.Update();
         }
         /// <summary>
         /// フォルダを開く

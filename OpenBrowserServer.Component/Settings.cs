@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using YamlDotNet.Core;
-using YamlDotNet.Serialization;
 using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization.NamingConventions;
+using YamlDotNet.Serialization;
 
 namespace OpenBrowserServer.Component
 {
@@ -18,16 +14,21 @@ namespace OpenBrowserServer.Component
         private const string DefaultPath = "setting.yaml";
         private static readonly HttpClient client = new HttpClient(); // 設定ファイルを更新する用のHTTPクライアント
 
-        public string Version;
-        public HashSet<string> Protocol;
-        public HashSet<string> Domain;
-        public Settings()
+        public readonly string FileVersion;
+        public string Version { get; private set; }
+        public int IdlePeriod { get; private set; }
+        public HashSet<string> Protocol { get; private set; }
+        public HashSet<string> Domain { get; private set; }
+        public Settings(FileVersionInfo fileVersionInfo)
         {
             Clear();
+            FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductPrivatePart}";
+            Console.WriteLine(ToString());
         }
         public void Clear()
         {
             Version = "unknown";
+            IdlePeriod = 500;
             Protocol = new HashSet<string>()
             {
                 "https",
@@ -39,10 +40,15 @@ namespace OpenBrowserServer.Component
                 "yukiyukivirtual.net",
             };
         }
-        public void UpdateSetting()
+        public void Update()
         {
+            Clear();
             string yaml = Download();
             ImportYaml(yaml);
+        }
+        public bool NeedUpgrade()
+        {
+            return !FileVersion.Equals(Version);
         }
         public static string Download()
         {
@@ -62,13 +68,41 @@ namespace OpenBrowserServer.Component
                 var root = (YamlMappingNode)yamlStream.Documents[0].RootNode;
                 try
                 {
-                    var version = (YamlScalarNode)root.Children[new YamlScalarNode("Version")];
-                    Version = version.Value;
-                    Console.WriteLine(Version);
+                    var item = (YamlScalarNode)root.Children[new YamlScalarNode("Version")];
+                    Version = item.Value;
                 }
                 catch (KeyNotFoundException e)
                 {
+                    Console.WriteLine(e.ToString());
                     Console.WriteLine("Versionキーが不在");
+                }
+                try
+                {
+                    var item = (YamlScalarNode)root.Children[new YamlScalarNode("IdlePeriod")];
+                    try
+                    {
+                        IdlePeriod = int.Parse(item.Value);
+                    }
+                    catch(ArgumentNullException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        Console.WriteLine($"IdlePeriodキーの値が不正 '{item.Value}'");
+                    }
+                    catch(FormatException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        Console.WriteLine($"IdlePeriodキーの値が不正 '{item.Value}'");
+                    }
+                    catch(OverflowException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        Console.WriteLine($"IdlePeriodキーの値がintの範囲外 '{item.Value}'");
+                    }
+                }
+                catch (KeyNotFoundException e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.WriteLine($"IdlePeriodキーが不在");
                 }
                 try
                 {
@@ -81,6 +115,7 @@ namespace OpenBrowserServer.Component
                 }
                 catch (KeyNotFoundException e)
                 {
+                    Console.WriteLine(e.ToString());
                     Console.WriteLine("Protocolキーが不在");
                 }
                 try
@@ -94,6 +129,7 @@ namespace OpenBrowserServer.Component
                 }
                 catch (KeyNotFoundException e)
                 {
+                    Console.WriteLine(e.ToString());
                     Console.WriteLine("Domainキーが不在");
                 }
 
@@ -103,9 +139,7 @@ namespace OpenBrowserServer.Component
         public override string ToString()
         {
 
-            var serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
+            var serializer = new Serializer();
             return serializer.Serialize(this).Trim();
         }
     }

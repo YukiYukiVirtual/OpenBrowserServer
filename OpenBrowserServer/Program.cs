@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
 
@@ -19,9 +20,10 @@ namespace OpenBrowserServer
         }
         static void Initialize()
         {
-            Settings settings = new Settings();
-            settings.UpdateSetting();
-            NotifyIconForm notifyIconForm = new NotifyIconForm();
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location); // プログラムファイルのバージョン情報取得
+            Settings settings = new Settings(fileVersionInfo);
+            settings.Update();
+            NotifyIconForm notifyIconForm = new NotifyIconForm(settings);
             VRChatLogWatcher watcher = new VRChatLogWatcher(settings);
         }
     }
