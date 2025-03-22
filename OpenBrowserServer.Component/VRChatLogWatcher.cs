@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 namespace OpenBrowserServer.Component
 {
+    public delegate void VRChatLogCallback(string key, string line);
     public class VRChatLogWatcher
     {
         URLOpener opener; // URLを開くやつ
@@ -101,15 +102,49 @@ namespace OpenBrowserServer.Component
                 // NOP
                 return;
             }
-            string LogName = "[YukiYukiVirtual/OpenURL]";
-            if (line.Contains(LogName))
+            foreach(var callback in new Callback[] { OpenURL, JoinWorld })
             {
-                int index = line.IndexOf(LogName);
-                string rawurl = line.Substring(index + LogName.Length);
-                string url = rawurl.Trim();
-                Console.WriteLine("OpenURL: " + url);
-                this.opener.Open(url);
+                if (callback(line)) break;
             }
+        }
+        delegate bool Callback(string line);
+        bool OpenURL(string line)
+        {
+            string LogPrefix = "[YukiYukiVirtual/OpenURL]";
+            if (line.Contains(LogPrefix))
+            {
+                int index = line.IndexOf(LogPrefix);
+                string rawurl = line.Substring(index + LogPrefix.Length);
+                string url = rawurl.Trim();
+                Console.WriteLine($"OpenURL: {url}");
+                this.opener.Open(url);
+                return true;
+            }
+            return false;
+        }
+        bool JoinWorld(string line)
+        {
+            string LogPrefix1 = "[Behaviour] Joining or Creating Room: ";
+            string LogPrefix2 = "[Behaviour] Joining wrld_";
+            if (line.Contains(LogPrefix1))
+            {
+                int index = line.IndexOf(LogPrefix1);
+                string worldName = line.Substring(index + LogPrefix1.Length);
+                Console.WriteLine($"Joining world name: {worldName}");
+                return true;
+            }
+            else if (line.Contains(LogPrefix2))
+            {
+                int index = line.IndexOf(LogPrefix2);
+                try
+                {
+                    string worldId = line.Substring(index + LogPrefix2.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length);
+                    Console.WriteLine($"Joining world blueprint: {worldId}");
+                }
+                finally { }
+                return true;
+            }
+            return false;
         }
     }
 }
