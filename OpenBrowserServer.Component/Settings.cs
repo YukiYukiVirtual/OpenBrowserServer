@@ -76,7 +76,7 @@ namespace OpenBrowserServer.Component
                 catch(Exception e)
                 {
                     Console.WriteLine(e.ToString());
-                    Console.WriteLine("設定ファイルのダウンロードが失敗しました。");
+                    Console.WriteLine("設定ファイルのダウンロードが失敗しました。過去にダウンロードしたものがあればそれを使います。");
                 }
 
             }
