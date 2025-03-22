@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBrowserServer.WebServer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBrowserServer.Logger", "OpenBrowserServer.Logger\OpenBrowserServer.Logger.csproj", "{C909570F-7BBB-4208-ADC8-D3417B001664}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{2022CB0F-8BAF-F49E-0C48-8EF4C96EC109}"
+	ProjectSection(SolutionItems) = preProject
+		setting.yaml = setting.yaml
+		UpdateVersion.ps1 = UpdateVersion.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Booth|Any CPU = Booth|Any CPU

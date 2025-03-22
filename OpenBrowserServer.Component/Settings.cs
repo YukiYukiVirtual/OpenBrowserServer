@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
+using System.Linq;
 
 namespace OpenBrowserServer.Component
 {
@@ -134,9 +135,10 @@ namespace OpenBrowserServer.Component
                 try
                 {
                     var protocols = (YamlSequenceNode)root.Children[new YamlScalarNode("Protocol")];
-                    foreach (YamlScalarNode item in protocols)
+                    foreach (var value in from YamlScalarNode item in protocols
+                                          let value = item.Value
+                                          select value)
                     {
-                        string value = item.Value;
                         Protocol.Add(value);
                     }
                 }
@@ -148,9 +150,10 @@ namespace OpenBrowserServer.Component
                 try
                 {
                     var domains = (YamlSequenceNode)root.Children[new YamlScalarNode("Domain")];
-                    foreach (YamlScalarNode item in domains)
+                    foreach (var value in from YamlScalarNode item in domains
+                                          let value = item.Value
+                                          select value)
                     {
-                        string value = item.Value;
                         Domain.Add(value);
                     }
                 }

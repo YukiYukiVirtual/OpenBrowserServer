@@ -1,4 +1,4 @@
-Version: v0.0.0
+﻿Version: v6.0.0
 IdlePeriod: 500
 HttpRequestPeriod: 5000
 Protocol:
@@ -64,4 +64,3 @@ Domain:
   - youtube.com
   - yukiyukivirtual.github.io
   - yukiyukivirtual.net
-  
