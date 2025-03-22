@@ -50,7 +50,19 @@ namespace OpenBrowserServer
         /// <param name="e"></param>
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            settings.Update();
+            DialogResult dialogResult = MessageBox.Show("設定ファイルをダウンロードして再読み込みしますか？", "更新確認", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            { 
+                settings.Update();
+                if (settings.NeedUpgrade())
+                {
+                    if (UpdateDialog.Confirm())
+                    {
+                        this.Close();
+                        Application.Exit();
+                    }
+                }
+            }
         }
         /// <summary>
         /// フォルダを開く

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBrowserServer", "OpenBr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBrowserServer.Component", "OpenBrowserServer.Component\OpenBrowserServer.Component.csproj", "{5FC24151-AFB4-428C-899D-55F130774E33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBrowserServer.WebServer", "OpenBrowserServer.WebServer\OpenBrowserServer.WebServer.csproj", "{B19ADB0A-CC3F-44BF-BD67-43FCB1E69FB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5FC24151-AFB4-428C-899D-55F130774E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FC24151-AFB4-428C-899D-55F130774E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FC24151-AFB4-428C-899D-55F130774E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19ADB0A-CC3F-44BF-BD67-43FCB1E69FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19ADB0A-CC3F-44BF-BD67-43FCB1E69FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19ADB0A-CC3F-44BF-BD67-43FCB1E69FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19ADB0A-CC3F-44BF-BD67-43FCB1E69FB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

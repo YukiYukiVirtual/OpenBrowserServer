@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace OpenBrowserServer.Component
 {
@@ -29,7 +30,7 @@ namespace OpenBrowserServer.Component
             FileInfo[] fis = dir.GetFiles(targetFileName);
             if (fis.Length == 0)
             {
-                //Logger.LogInfo("VRChatのログファイル無し");
+                Console.WriteLine("VRChatのログファイル無し");
             }
             else
             {
@@ -39,6 +40,7 @@ namespace OpenBrowserServer.Component
         }
         ~VRChatLogWatcher()
         {
+            Console.WriteLine("VRChatLogWatcher destructor");
             StopObserver();
         }
         // VRChatのログ監視をスタートする
@@ -58,25 +60,25 @@ namespace OpenBrowserServer.Component
                 this.observerProcess.Start();
                 this.observerProcess.BeginOutputReadLine();
 
-                //Logger.LogInfo("VRChatのログファイル監視スタートしました。 " + Path.GetFileName(fullpath));
+                Console.WriteLine("VRChatのログファイル監視スタートしました。 " + Path.GetFileName(fullpath));
             }
             catch (System.ComponentModel.Win32Exception e)
             {
-                //Logger.LogError(e.ToString());
-                //MessageBox.Show("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
+                Console.WriteLine(e.ToString());
+                MessageBox.Show("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
                 return;
             }
             catch (Exception e)
             {
-                //Logger.LogError(e.ToString());
-                //MessageBox.Show("起動に失敗しました。", "例外");
+                Console.WriteLine(e.ToString());
+                MessageBox.Show("起動に失敗しました。", "例外");
                 return;
             }
         }
         // 監視プロセスを停止する
         void StopObserver()
         {
-            //Logger.LogInfo("Observing stop.");
+            Console.WriteLine("Observing stop.");
             if (!this.observerProcess.HasExited)
             {
                 this.observerProcess.Kill();
@@ -86,7 +88,7 @@ namespace OpenBrowserServer.Component
         // ログファイルが新しく作成されたことを監視するイベントハンドラ
         void LogFileCreated(Object source, FileSystemEventArgs e)
         {
-            //Logger.LogInfo("new LogFile Created. " + e.FullPath);
+            Console.WriteLine("new LogFile Created. " + e.FullPath);
             StopObserver(); // 監視プロセスを停止する
             ObserveVRChatLog(e.FullPath); // 作成されたファイルを監視対象にする
         }
@@ -105,7 +107,7 @@ namespace OpenBrowserServer.Component
                 int index = line.IndexOf(LogName);
                 string rawurl = line.Substring(index + LogName.Length);
                 string url = rawurl.Trim();
-                //Logger.LogTrace("OpenURL: " + url);
+                Console.WriteLine("OpenURL: " + url);
                 this.opener.Open(url);
             }
         }

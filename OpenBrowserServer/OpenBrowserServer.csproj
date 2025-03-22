@@ -121,6 +121,10 @@
       <Project>{5fc24151-afb4-428c-899d-55f130774e33}</Project>
       <Name>OpenBrowserServer.Component</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenBrowserServer.WebServer\OpenBrowserServer.WebServer.csproj">
+      <Project>{b19adb0a-cc3f-44bf-bd67-43fcb1e69fb4}</Project>
+      <Name>OpenBrowserServer.WebServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

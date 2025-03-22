@@ -17,6 +17,10 @@ namespace OpenBrowserServer.Component
             lastOpenTime = DateTime.MinValue;
             openSoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
         }
+        ~URLOpener()
+        {
+            Console.WriteLine("URLOpener destructor");
+        }
         public void Open(string url)
         {
             // URLを開いていいかチェック
@@ -57,17 +61,6 @@ namespace OpenBrowserServer.Component
                 return false;
             }
 
-            // プロトコルチェック
-            // result = false;
-            // foreach (string protocol in settings.Protocol)
-            // {
-            //     Console.WriteLine(protocol);
-            //     if (uri.Scheme == protocol)
-            //     {
-            //         result = true;
-            //         break;
-            //     }
-            // }
             result = settings.Protocol.Contains(uri.Scheme);
             if (!result)
             {
@@ -88,7 +81,7 @@ namespace OpenBrowserServer.Component
             }
             if(!result)
             {
-                Console.WriteLine($"{uri.Scheme}を開くことはできません。'{url}'");
+                Console.WriteLine($"{uri.Host}を開くことはできません。'{url}'");
                 return false;
             }
 

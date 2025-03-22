@@ -12,23 +12,34 @@ namespace OpenBrowserServer.Component
     public class Settings
     {
         private const string DefaultPath = "setting.yaml";
-        private static readonly HttpClient client = new HttpClient(); // 設定ファイルを更新する用のHTTPクライアント
+        public string Build { get => "DEBUG"; }
 
-        public readonly string FileVersion;
+        public readonly FileVersionInfo fileVersionInfo;
+        public string FileVersion { get
+            {
+                return $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductPrivatePart}";
+            }
+        }
         public string Version { get; private set; }
         public int IdlePeriod { get; private set; }
+        public int HttpRequestPeriod { get; private set; }
         public HashSet<string> Protocol { get; private set; }
         public HashSet<string> Domain { get; private set; }
         public Settings(FileVersionInfo fileVersionInfo)
         {
-            Clear();
-            FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductPrivatePart}";
+            this.fileVersionInfo = fileVersionInfo;
+            Update();
             Console.WriteLine(ToString());
+        }
+        ~Settings()
+        {
+            Console.WriteLine("Settings destructor");
         }
         public void Clear()
         {
             Version = "unknown";
             IdlePeriod = 500;
+            HttpRequestPeriod = 5000;
             Protocol = new HashSet<string>()
             {
                 "https",
@@ -43,24 +54,40 @@ namespace OpenBrowserServer.Component
         public void Update()
         {
             Clear();
-            string yaml = Download();
-            ImportYaml(yaml);
+            Download();
+            ImportYaml();
         }
         public bool NeedUpgrade()
         {
             return !FileVersion.Equals(Version);
         }
-        public static string Download()
+        public static void Download()
         {
-            // ダウンロード
             string url = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            string responseBody = client.GetStringAsync(url).Result;
-            File.WriteAllText(DefaultPath, responseBody);
-            return responseBody;
+            // ダウンロード
+            using(HttpClient client = new HttpClient())
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                try
+                {
+                    string responseBody = client.GetStringAsync(url).Result;
+                    File.WriteAllText(DefaultPath, responseBody);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("設定ファイルのダウンロードが失敗しました。");
+                }
+
+            }
         }
-        private void ImportYaml(string yaml)
+        private void ImportYaml()
         {
+            if(!File.Exists(DefaultPath))
+            {
+                Console.WriteLine($"{DefaultPath}が存在しないため、設定ファイルのインポートを中止します。デフォルト設定が使用されます。");
+                return;
+            }
             using (var streamReader = new StreamReader(DefaultPath))
             {
                 YamlStream yamlStream = new YamlStream();
@@ -71,38 +98,30 @@ namespace OpenBrowserServer.Component
                     var item = (YamlScalarNode)root.Children[new YamlScalarNode("Version")];
                     Version = item.Value;
                 }
-                catch (KeyNotFoundException e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
-                    Console.WriteLine("Versionキーが不在");
+                    Console.WriteLine("Versionキーのパースに失敗");
                 }
                 try
                 {
                     var item = (YamlScalarNode)root.Children[new YamlScalarNode("IdlePeriod")];
-                    try
-                    {
-                        IdlePeriod = int.Parse(item.Value);
-                    }
-                    catch(ArgumentNullException e)
-                    {
-                        Console.WriteLine(e.ToString());
-                        Console.WriteLine($"IdlePeriodキーの値が不正 '{item.Value}'");
-                    }
-                    catch(FormatException e)
-                    {
-                        Console.WriteLine(e.ToString());
-                        Console.WriteLine($"IdlePeriodキーの値が不正 '{item.Value}'");
-                    }
-                    catch(OverflowException e)
-                    {
-                        Console.WriteLine(e.ToString());
-                        Console.WriteLine($"IdlePeriodキーの値がintの範囲外 '{item.Value}'");
-                    }
+                    IdlePeriod = int.Parse(item.Value); ;
                 }
-                catch (KeyNotFoundException e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
-                    Console.WriteLine($"IdlePeriodキーが不在");
+                    Console.WriteLine("IdlePeriodキーのパースに失敗");
+                }
+                try
+                {
+                    var item = (YamlScalarNode)root.Children[new YamlScalarNode("HttpRequestPeriod")];
+                    HttpRequestPeriod = int.Parse(item.Value); ;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("HttpRequestPeriodキーのパースに失敗");
                 }
                 try
                 {
@@ -113,10 +132,10 @@ namespace OpenBrowserServer.Component
                         Protocol.Add(value);
                     }
                 }
-                catch (KeyNotFoundException e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
-                    Console.WriteLine("Protocolキーが不在");
+                    Console.WriteLine("Protocolキーのパースに失敗");
                 }
                 try
                 {
@@ -127,10 +146,10 @@ namespace OpenBrowserServer.Component
                         Domain.Add(value);
                     }
                 }
-                catch (KeyNotFoundException e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
-                    Console.WriteLine("Domainキーが不在");
+                    Console.WriteLine("Domainキーのパースに失敗");
                 }
 
                 Console.WriteLine(this.ToString());

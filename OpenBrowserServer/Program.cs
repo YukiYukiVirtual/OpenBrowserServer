@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
+using OpenBrowserServer.WebServer;
 
 namespace OpenBrowserServer
 {
@@ -22,9 +23,17 @@ namespace OpenBrowserServer
         {
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location); // プログラムファイルのバージョン情報取得
             Settings settings = new Settings(fileVersionInfo);
-            settings.Update();
+            if(settings.NeedUpgrade())
+            {
+                if(UpdateDialog.Confirm())
+                {
+                    Environment.Exit(0);
+                    return;
+                }
+            }
             NotifyIconForm notifyIconForm = new NotifyIconForm(settings);
             VRChatLogWatcher watcher = new VRChatLogWatcher(settings);
+            HttpServer httpServer = new HttpServer(settings);
         }
     }
 }
