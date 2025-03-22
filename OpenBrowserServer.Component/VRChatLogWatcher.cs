@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using OpenBrowserServer.Logger;
 
 namespace OpenBrowserServer.Component
 {
@@ -12,12 +13,22 @@ namespace OpenBrowserServer.Component
         URLOpener opener; // URLを開くやつ
         FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
         Process observerProcess; // ログを監視するプロセス
-        public VRChatLogWatcher(Settings setting)
+        History history; // 履歴ログ
+        string worldName;
+        string worldId;
+        bool worldJoined;
+        public VRChatLogWatcher(Settings setting, History history)
         {
             this.opener = new URLOpener(setting);
+            this.history = history;
+
+            worldName = null;
+            worldId = null;
+            worldJoined = false;
 
             string targetDirectoryName = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat");
             string targetFileName = "output_log_*.txt";
+
             // VRChat起動時のログファイルの作成を監視するために、FileSystemWatcherの初期化
             this.fswatcher = new FileSystemWatcher();
             this.fswatcher.Path = targetDirectoryName; // VRChatのログがあるフォルダを監視
@@ -38,6 +49,8 @@ namespace OpenBrowserServer.Component
                 FileInfo fi = fis.OrderByDescending(p => p.LastWriteTime).ToArray()[0];
                 ObserveVRChatLog(fi.DirectoryName + "\\" + fi.Name); // 最新のログファイルのログ監視をスタートする
             }
+
+            this.history = history;
         }
         ~VRChatLogWatcher()
         {
@@ -61,7 +74,7 @@ namespace OpenBrowserServer.Component
                 this.observerProcess.Start();
                 this.observerProcess.BeginOutputReadLine();
 
-                Console.WriteLine("VRChatのログファイル監視スタートしました。 " + Path.GetFileName(fullpath));
+                //Console.WriteLine("VRChatのログファイル監視スタートしました。 " + Path.GetFileName(fullpath));
             }
             catch (System.ComponentModel.Win32Exception e)
             {
@@ -79,7 +92,7 @@ namespace OpenBrowserServer.Component
         // 監視プロセスを停止する
         void StopObserver()
         {
-            Console.WriteLine("Observing stop.");
+            //Console.WriteLine("Observing stop.");
             if (!this.observerProcess.HasExited)
             {
                 this.observerProcess.Kill();
@@ -89,7 +102,7 @@ namespace OpenBrowserServer.Component
         // ログファイルが新しく作成されたことを監視するイベントハンドラ
         void LogFileCreated(Object source, FileSystemEventArgs e)
         {
-            Console.WriteLine("new LogFile Created. " + e.FullPath);
+            //Console.WriteLine("new LogFile Created. " + e.FullPath);
             StopObserver(); // 監視プロセスを停止する
             ObserveVRChatLog(e.FullPath); // 作成されたファイルを監視対象にする
         }
@@ -116,8 +129,8 @@ namespace OpenBrowserServer.Component
                 int index = line.IndexOf(LogPrefix);
                 string rawurl = line.Substring(index + LogPrefix.Length);
                 string url = rawurl.Trim();
-                Console.WriteLine($"OpenURL: {url}");
-                this.opener.Open(url);
+                URLOpenResult urlOpenResult = opener.Open(url);
+                history.WriteLine($"OpenURL: {url} {urlOpenResult}");
                 return true;
             }
             return false;
@@ -129,8 +142,8 @@ namespace OpenBrowserServer.Component
             if (line.Contains(LogPrefix1))
             {
                 int index = line.IndexOf(LogPrefix1);
-                string worldName = line.Substring(index + LogPrefix1.Length);
-                Console.WriteLine($"Joining world name: {worldName}");
+                worldName = line.Substring(index + LogPrefix1.Length).Trim();
+                JoinWorldLogging();
                 return true;
             }
             else if (line.Contains(LogPrefix2))
@@ -138,13 +151,25 @@ namespace OpenBrowserServer.Component
                 int index = line.IndexOf(LogPrefix2);
                 try
                 {
-                    string worldId = line.Substring(index + LogPrefix2.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length);
-                    Console.WriteLine($"Joining world blueprint: {worldId}");
+                    worldId = line.Substring(index + LogPrefix2.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
+                    JoinWorldLogging();
                 }
                 finally { }
                 return true;
             }
             return false;
+        }
+        void JoinWorldLogging()
+        {
+            if (worldJoined)
+            {
+                worldJoined = false;
+                history.WriteLine($"■Joining world. '{worldName}' ({worldId})");
+            }
+            else
+            {
+                worldJoined = true;
+            }
         }
     }
 }

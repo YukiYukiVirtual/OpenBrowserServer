@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using OpenBrowserServer.Component;
+using OpenBrowserServer.Logger;
 
 namespace OpenBrowserServer.WebServer
 {
@@ -9,10 +10,12 @@ namespace OpenBrowserServer.WebServer
         HttpListener listener;
         Settings settings;
         DateTime lastRequestTime;
-
-        public HttpServer(Settings settings)
+        History history;
+        public HttpServer(Settings settings, History history)
         {
             this.settings = settings;
+            this.history = history;
+
             lastRequestTime = DateTime.MinValue;
 
             listener = new HttpListener();
@@ -41,32 +44,32 @@ namespace OpenBrowserServer.WebServer
                 HttpListenerRequest request = context.Request;
                 HttpListenerResponse response = context.Response;
 
-                Console.WriteLine("OnRequested");
+                //Console.WriteLine("OnRequested");
 
                 DateTime now = DateTime.Now;
                 TimeSpan timeSpan = now - lastRequestTime;
                 if (timeSpan.TotalMilliseconds >= settings.HttpRequestPeriod)
                 {
-                    Console.WriteLine($"RawUrl:{request.RawUrl}");
+                    //Console.WriteLine($"RawUrl:{request.RawUrl}");
                     switch (request.RawUrl)
                     {
                         case "/":
-                            Console.WriteLine("Root");
+                            //Console.WriteLine("Root");
                             ProcessRoot(context);
                             break;
                         case "/favicon.ico":
-                            Console.WriteLine("favicon");
+                            //Console.WriteLine("favicon");
                             response.KeepAlive = false;
                             response.StatusCode = 404;
                             response.ContentLength64 = 0;
                             break;
                         default:
                             string apiPath = GetApiPath(request.RawUrl);
-                            Console.WriteLine($"API:{apiPath}.");
+                            //Console.WriteLine($"API:{apiPath}.");
                             switch (apiPath)
                             {
                                 case "keys":
-                                    Console.WriteLine($"/keysは廃止の可能性があります");
+                                    //Console.WriteLine($"/keysは廃止の可能性があります");
                                     ProcessKeys(context);
                                     break;
                                 default:
@@ -76,6 +79,11 @@ namespace OpenBrowserServer.WebServer
                             break;
                     }
                     lastRequestTime = now;
+                    history.WriteLine($"Http Requested: URL: '{request.RawUrl}' OK"); // TODO 関数化して、OpenURLと同じようにenumを返す
+                }
+                else
+                {
+                    history.WriteLine($"Http Requested: URL: '{request.RawUrl}' TimeSpanError");
                 }
                 response.Close();
             }
@@ -87,9 +95,9 @@ namespace OpenBrowserServer.WebServer
         private string GetApiPath(string rawUrl)
         {
             string[] str = rawUrl.Split('/');
-            Console.WriteLine(str);
+            //Console.WriteLine(str);
             foreach (string s in str) Console.WriteLine(s);
-            Console.WriteLine(str.Length - 1);
+            //Console.WriteLine(str.Length - 1);
             if (rawUrl.IndexOf("Temporary_Listen_Addresses") != -1)
             {
                 return str[2]; // /Temporary_Listen_Addresses/API (非推奨)

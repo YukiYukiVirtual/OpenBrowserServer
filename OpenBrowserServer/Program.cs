@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
+using OpenBrowserServer.Logger;
 using OpenBrowserServer.WebServer;
 
 namespace OpenBrowserServer
@@ -31,9 +32,10 @@ namespace OpenBrowserServer
                     return;
                 }
             }
+            History history = new History();
             NotifyIconForm notifyIconForm = new NotifyIconForm(settings);
-            VRChatLogWatcher watcher = new VRChatLogWatcher(settings);
-            HttpServer httpServer = new HttpServer(settings);
+            VRChatLogWatcher watcher = new VRChatLogWatcher(settings, history);
+            HttpServer httpServer = new HttpServer(settings, history);
         }
     }
 }

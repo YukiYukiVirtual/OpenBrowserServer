@@ -4,6 +4,14 @@ using System.Media;
 
 namespace OpenBrowserServer.Component
 {
+    public enum URLOpenResult
+    {
+        OK,
+        TimeSpanError,
+        DomainError,
+        ProtocolError,
+        FormatError,
+    }
     public class URLOpener
     {
         Settings settings;
@@ -21,30 +29,34 @@ namespace OpenBrowserServer.Component
         {
             Console.WriteLine("URLOpener destructor");
         }
-        public void Open(string url)
+        public URLOpenResult Open(string url)
         {
             // URLを開いていいかチェック
-            if (CheckURL(url))
+            URLOpenResult urlOpenResult = CheckURL(url);
+            if (urlOpenResult != URLOpenResult.OK)
             {
-                // 前に開いた時間との差が規定以上であればURLを開く
-                DateTime now = DateTime.Now;
-                TimeSpan timeSpan = now - lastOpenTime;
-                if (timeSpan.TotalMilliseconds >= settings.IdlePeriod)
-                {
-                    // URLを開く
-                    try
-                    {
-                        openSoundPlayer.Play(); // TODO オリジナルの音にする
-                    }
-                    finally
-                    {
-                        StaticOpen(url);
-                        lastOpenTime = now;
-                    }
-                }
+                return urlOpenResult;
             }
+            // 前に開いた時間との差が規定以上であればURLを開く
+            DateTime now = DateTime.Now;
+            TimeSpan timeSpan = now - lastOpenTime;
+            if (timeSpan.TotalMilliseconds < settings.IdlePeriod)
+            {
+                return URLOpenResult.TimeSpanError;
+            }
+            // URLを開く
+            try
+            {
+                openSoundPlayer.Play(); // TODO オリジナルの音にする
+            }
+            finally
+            {
+                StaticOpen(url);
+                lastOpenTime = now;
+            }
+            return URLOpenResult.OK;
         }
-        private bool CheckURL(string url)
+        private URLOpenResult CheckURL(string url)
         {
             bool result; // ループチェック用一時変数
 
@@ -58,21 +70,20 @@ namespace OpenBrowserServer.Component
             {
                 Console.WriteLine(e.ToString());
                 Console.WriteLine($"URLをUriに出来ませんでした。'{url}'");
-                return false;
+                return URLOpenResult.FormatError;
             }
 
             result = settings.Protocol.Contains(uri.Scheme);
             if (!result)
             {
                 Console.WriteLine($"{uri.Scheme}を開くことはできません。'{url}'");
-                return false;
+                return URLOpenResult.ProtocolError;
             }
 
             // ドメインチェック
             result = false;
             foreach (string host in settings.Domain)
             {
-                Console.WriteLine(host);
                 if(uri.Host == host || uri.Host.EndsWith("."+host))
                 {
                     result= true;
@@ -82,11 +93,11 @@ namespace OpenBrowserServer.Component
             if(!result)
             {
                 Console.WriteLine($"{uri.Host}を開くことはできません。'{url}'");
-                return false;
+                return URLOpenResult.DomainError;
             }
 
             // ここまで来たらチェックはOK
-            return true;
+            return URLOpenResult.OK;
         }
         public static void StaticOpen(string url)
         {

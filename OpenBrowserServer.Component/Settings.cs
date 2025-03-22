@@ -12,12 +12,20 @@ namespace OpenBrowserServer.Component
     public class Settings
     {
         private const string DefaultPath = "setting.yaml";
-        public string Build { get => "DEBUG"; }
+        public string Edition {
+            get =>
+#if   BOOTH
+                "Booth"
+#else
+                "Free"
+#endif
+                ; 
+        }
 
         public readonly FileVersionInfo fileVersionInfo;
         public string FileVersion { get
             {
-                return $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductPrivatePart}";
+                return $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
             }
         }
         public string Version { get; private set; }
@@ -29,7 +37,7 @@ namespace OpenBrowserServer.Component
         {
             this.fileVersionInfo = fileVersionInfo;
             Update();
-            Console.WriteLine(ToString());
+            //Console.WriteLine(ToString());
         }
         ~Settings()
         {
@@ -37,7 +45,7 @@ namespace OpenBrowserServer.Component
         }
         public void Clear()
         {
-            Version = "unknown";
+            Version = FileVersion;
             IdlePeriod = 500;
             HttpRequestPeriod = 5000;
             Protocol = new HashSet<string>()
@@ -151,8 +159,7 @@ namespace OpenBrowserServer.Component
                     Console.WriteLine(e.ToString());
                     Console.WriteLine("Domainキーのパースに失敗");
                 }
-
-                Console.WriteLine(this.ToString());
+                //Console.WriteLine(this.ToString());
             }
         }
         public override string ToString()

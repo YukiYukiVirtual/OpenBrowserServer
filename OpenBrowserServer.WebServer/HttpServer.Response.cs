@@ -11,7 +11,18 @@ namespace OpenBrowserServer.WebServer
         {
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
-            string content = $"{{\"version\": {{\"major\": {settings.fileVersionInfo.FileMajorPart}, \"minor\": {settings.fileVersionInfo.FileMinorPart}, \"private\": {settings.fileVersionInfo.FilePrivatePart}, \"full\": \"{settings.FileVersion}\" }}, \"build\": \"{settings.Build}\"}}";
+            var obj = new
+            {
+                version = new
+                {
+                    major = settings.fileVersionInfo.ProductMajorPart,
+                    minor = settings.fileVersionInfo.ProductMinorPart,
+                    build = settings.fileVersionInfo.ProductBuildPart,
+                    full  = settings.FileVersion,
+                },
+                edition = settings.Edition,
+            };
+            string content = $"{obj}";
             byte[] buffer = Encoding.GetEncoding("UTF-8").GetBytes(content);
             response.KeepAlive = false;
             response.StatusCode = 200;

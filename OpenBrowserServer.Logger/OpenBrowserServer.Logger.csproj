@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B19ADB0A-CC3F-44BF-BD67-43FCB1E69FB4}</ProjectGuid>
+    <ProjectGuid>{C909570F-7BBB-4208-ADC8-D3417B001664}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpenBrowserServer.WebServer</RootNamespace>
-    <AssemblyName>OpenBrowserServer.WebServer</AssemblyName>
+    <RootNamespace>OpenBrowserServer.Logger</RootNamespace>
+    <AssemblyName>OpenBrowserServer.Logger</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -51,7 +51,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,19 +59,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpServer.cs" />
-    <Compile Include="HttpServer.Response.cs" />
+    <Compile Include="History.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenBrowserServer.Component\OpenBrowserServer.Component.csproj">
-      <Project>{5fc24151-afb4-428c-899d-55f130774e33}</Project>
-      <Name>OpenBrowserServer.Component</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenBrowserServer.Logger\OpenBrowserServer.Logger.csproj">
-      <Project>{c909570f-7bbb-4208-adc8-d3417b001664}</Project>
-      <Name>OpenBrowserServer.Logger</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
