@@ -1,0 +1,67 @@
+Version: v0.0.0
+IdlePeriod: 500
+HttpRequestPeriod: 5000
+Protocol:
+  - https
+Domain:
+  - alice-books.com
+  - amazon.co.jp
+  - avatarmuseum.jp
+  - bandcamp.com
+  - bilibili.com
+  - booth.pm
+  - camp-fire.jp
+  - ci-en.net
+  - circle.ms
+  - clip-studio.com
+  - discord.com
+  - discord.gg
+  - dlsite.com
+  - fanbox.cc
+  - fantia.jp
+  - github.com
+  - gitlab.com
+  - kotobukiya.co.jp
+  - linkco.re
+  - lit.link
+  - liss-san.com
+  - melonbooks.co.jp
+  - misskey.io
+  - mixcloud.com
+  - mochi152.com
+  - nico.ms
+  - nicovideo.jp
+  - pictsquare.net
+  - pixiv.net
+  - seed.online
+  - sekai-kabuka.com
+  - ske.be
+  - skeb.jp
+  - sketchfab.com
+  - soundcloud.com
+  - steamcommunity.com
+  - steampowered.com
+  - streamlabs.com
+  - suzuri.jp
+  - techbookfest.org
+  - thebase.in
+  - tinami.com
+  - togetter.com
+  - toranoana.jp
+  - tunecore.co.jp
+  - twitch.tv
+  - twitter.com
+  - unity.com
+  - v-market.work
+  - virtualcast.jp
+  - vket.com
+  - vrchat.com
+  - vrchat.net
+  - vrcw.net
+  - vroid.com
+  - x.com
+  - youtu.be
+  - youtube.com
+  - yukiyukivirtual.github.io
+  - yukiyukivirtual.net
+  
