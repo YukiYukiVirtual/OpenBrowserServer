@@ -117,9 +117,14 @@ namespace OpenBrowserServer.Component
             }
             foreach(var callback in new Callback[] { OpenURL, JoinWorld })
             {
-                if (callback(line)) break;
+                if (callback(line)) break; // ログの処理が出来たら、他の種類のログではないので終わる
             }
         }
+        /// <summary>
+        /// VRChatログ解析コールバック
+        /// </summary>
+        /// <param name="line">1行のログ</param>
+        /// <returns>ログを処理したか</returns>
         delegate bool Callback(string line);
         bool OpenURL(string line)
         {
@@ -137,21 +142,20 @@ namespace OpenBrowserServer.Component
         }
         bool JoinWorld(string line)
         {
-            string LogPrefix1 = "[Behaviour] Joining or Creating Room: ";
-            string LogPrefix2 = "[Behaviour] Joining wrld_";
-            if (line.Contains(LogPrefix1))
+            string LogPrefix;
+            if (line.Contains(LogPrefix = "[Behaviour] Joining or Creating Room: "))
             {
-                int index = line.IndexOf(LogPrefix1);
-                worldName = line.Substring(index + LogPrefix1.Length).Trim();
+                int index = line.IndexOf(LogPrefix);
+                worldName = line.Substring(index + LogPrefix.Length).Trim();
                 JoinWorldLogging();
                 return true;
             }
-            else if (line.Contains(LogPrefix2))
+            else if (line.Contains(LogPrefix = "[Behaviour] Joining wrld_"))
             {
-                int index = line.IndexOf(LogPrefix2);
+                int index = line.IndexOf(LogPrefix);
                 try
                 {
-                    worldId = line.Substring(index + LogPrefix2.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
+                    worldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
                     JoinWorldLogging();
                 }
                 finally { }
