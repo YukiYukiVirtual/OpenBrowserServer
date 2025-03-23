@@ -10,10 +10,11 @@ namespace OpenBrowserServer.Component
     public delegate void VRChatLogCallback(string key, string line);
     public class VRChatLogWatcher
     {
-        URLOpener opener; // URLを開くやつ
-        FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
+        readonly URLOpener opener; // URLを開くやつ
+        readonly FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
+        readonly History history; // 履歴ログ
+
         Process observerProcess; // ログを監視するプロセス
-        History history; // 履歴ログ
         string worldName;
         string worldId;
         bool worldJoined;
@@ -30,10 +31,12 @@ namespace OpenBrowserServer.Component
             string targetFileName = "output_log_*.txt";
 
             // VRChat起動時のログファイルの作成を監視するために、FileSystemWatcherの初期化
-            this.fswatcher = new FileSystemWatcher();
-            this.fswatcher.Path = targetDirectoryName; // VRChatのログがあるフォルダを監視
-            this.fswatcher.NotifyFilter = NotifyFilters.FileName; // ファイル名を監視
-            this.fswatcher.Filter = targetFileName;
+            this.fswatcher = new FileSystemWatcher
+            {
+                Path = targetDirectoryName, // VRChatのログがあるフォルダを監視
+                NotifyFilter = NotifyFilters.FileName, // ファイル名を監視
+                Filter = targetFileName,
+            };
             this.fswatcher.Created += new FileSystemEventHandler(LogFileCreated); // ファイル作成を監視
             this.fswatcher.EnableRaisingEvents = true;
 

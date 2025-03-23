@@ -71,7 +71,6 @@ namespace OpenBrowserServer.WebServer
         /// <param name="context"></param>
         private WebRequest ProcessRoot(HttpListenerContext context)
         {
-            HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
             // レスポンスデータを匿名型で作成

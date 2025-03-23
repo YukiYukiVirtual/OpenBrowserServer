@@ -7,10 +7,10 @@ namespace OpenBrowserServer.WebServer
 {
     public partial class HttpServer
     {
-        HttpListener listener;
-        Settings settings;
+        readonly HttpListener listener;
+        readonly Settings settings;
+        readonly History history;
         DateTime lastRequestTime;
-        History history;
         public HttpServer(Settings settings, History history)
         {
             this.settings = settings;

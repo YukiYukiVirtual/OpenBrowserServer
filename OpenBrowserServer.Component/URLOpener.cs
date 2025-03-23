@@ -14,9 +14,9 @@ namespace OpenBrowserServer.Component
     }
     public class URLOpener
     {
-        Settings settings;
+        readonly Settings settings;
+        readonly SoundPlayer openSoundPlayer;
         DateTime lastOpenTime;
-        SoundPlayer openSoundPlayer;
         public URLOpener(Settings settings)
         {
             // 設定ファイルのインスタンスを保持
@@ -101,13 +101,15 @@ namespace OpenBrowserServer.Component
         }
         public static void StaticOpen(string url)
         {
-            cmdstart(url);
+            CmdStartProcess(url);
         }
-        private static void cmdstart(string arg)
+        private static void CmdStartProcess(string arg)
         {
-            ProcessStartInfo psi = new ProcessStartInfo(arg);
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = true;
+            ProcessStartInfo psi = new ProcessStartInfo(arg)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = true,
+            };
 
             Process.Start(psi);
         }
