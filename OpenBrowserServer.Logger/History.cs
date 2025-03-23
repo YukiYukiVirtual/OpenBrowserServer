@@ -8,11 +8,11 @@ namespace OpenBrowserServer.Logger
     {
         const string directoryName = "Log";
         const string filePrefix = "History_";
-        readonly string logFileName;
+        public string LogFileName { get; private set; }
         public History()
         {
             // 起動時の日付でログファイル名を作成する
-            logFileName = $"{directoryName}/{filePrefix}{DateTime.Today:yyyy-MM-dd}.log";
+            LogFileName = $"{directoryName}/{filePrefix}{DateTime.Today:yyyy-MM-dd}.log";
             // ログ用ディレクトリを作成する(無ければ)
             Directory.CreateDirectory(directoryName);
 
@@ -32,7 +32,7 @@ namespace OpenBrowserServer.Logger
         {
             string log = $"{DateTime.Now:[yyyy-MM-dd HH:mm:ss.ffff]} {str}";
             Console.WriteLine(log);
-            using (var writer = new StreamWriter(logFileName, true))
+            using (var writer = new StreamWriter(LogFileName, true))
             {
                 writer.WriteLine(log);
             }

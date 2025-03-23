@@ -1,16 +1,23 @@
 ﻿using System;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
+using OpenBrowserServer.Logger;
 
 namespace OpenBrowserServer
 {
     public partial class NotifyIconForm : Form
     {
+        readonly Settings settings;
+        readonly History history;
+        readonly VRChatLogWatcher vrchatLogWatcher;
+
         ControlPanelForm controlPanelForm = null;
-        Settings settings;
-        public NotifyIconForm(Settings settings)
+        public NotifyIconForm(Settings settings, History history, VRChatLogWatcher vrchatLogWatcher)
         {
             this.settings = settings;
+            this.history = history;
+            this.vrchatLogWatcher = vrchatLogWatcher;
+
             InitializeComponent();
             this.Visible = false;
         }
@@ -20,7 +27,7 @@ namespace OpenBrowserServer
         {
             if(controlPanelForm == null)
             {
-                controlPanelForm = new ControlPanelForm();
+                controlPanelForm = new ControlPanelForm(settings, history, vrchatLogWatcher);
                 controlPanelForm.Visible = true;
             }
         }

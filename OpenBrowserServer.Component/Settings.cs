@@ -32,8 +32,8 @@ namespace OpenBrowserServer.Component
         public string Version { get; private set; }
         public int IdlePeriod { get; private set; }
         public int HttpRequestPeriod { get; private set; }
-        public HashSet<string> Protocol { get; private set; }
-        public HashSet<string> Domain { get; private set; }
+        public List<string> Protocol { get; private set; }
+        public List<string> Domain { get; private set; }
         public Settings(FileVersionInfo fileVersionInfo)
         {
             this.fileVersionInfo = fileVersionInfo;
@@ -49,16 +49,8 @@ namespace OpenBrowserServer.Component
             Version = FileVersion;
             IdlePeriod = 500;
             HttpRequestPeriod = 5000;
-            Protocol = new HashSet<string>()
-            {
-                "https",
-            };
-            Domain = new HashSet<string>()
-            {
-                "booth.pm",
-                "yukiyukivirtual.github.io",
-                "yukiyukivirtual.net",
-            };
+            Protocol = new List<string>();
+            Domain = new List<string>();
         }
         public void Update()
         {
@@ -95,6 +87,12 @@ namespace OpenBrowserServer.Component
             if(!File.Exists(DefaultPath))
             {
                 Console.WriteLine($"{DefaultPath}が存在しないため、設定ファイルのインポートを中止します。デフォルト設定が使用されます。");
+
+                Protocol.Add("https");
+
+                Domain.Add("booth.pm");
+                Domain.Add("yukiyukivirtual.github.io");
+                Domain.Add("yukiyukivirtual.net");
                 return;
             }
             using (var streamReader = new StreamReader(DefaultPath))

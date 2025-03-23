@@ -21,46 +21,53 @@ namespace OpenBrowserServer.WebServer
             HttpListenerResponse response = context.Response;
 
             //Console.WriteLine("OnRequested");
-
-            DateTime now = DateTime.Now;
-            TimeSpan timeSpan = now - lastRequestTime;
-            if (timeSpan.TotalMilliseconds >= settings.HttpRequestPeriod)
+            try
             {
-                //Console.WriteLine($"RawUrl:{request.RawUrl}");
-                switch (request.RawUrl)
+                DateTime now = DateTime.Now;
+                TimeSpan timeSpan = now - lastRequestTime;
+                if (timeSpan.TotalMilliseconds >= settings.HttpRequestPeriod)
                 {
-                    case "/":
-                        //Console.WriteLine("Root");
-                        webRequestResult = ProcessRoot(context);
-                        break;
-                    case "/favicon.ico":
-                        //Console.WriteLine("favicon");
-                        response.KeepAlive = false;
-                        response.StatusCode = 404;
-                        response.ContentLength64 = 0;
-                        webRequestResult = WebRequest.OK;
-                        break;
-                    default:
-                        string apiPath = GetApiPath(request.RawUrl);
-                        //Console.WriteLine($"API:{apiPath}.");
-                        switch (apiPath)
-                        {
-                            case "keys":
-                                //Console.WriteLine($"/keysは廃止の可能性があります");
-                                webRequestResult = ProcessKeys(context);
-                                break;
-                            default:
-                                Console.WriteLine($"{apiPath}は未実装のAPIまたは不正なリクエスト");
-                                webRequestResult = WebRequest.NotImplemented;
-                                break;
-                        }
-                        break;
+                    //Console.WriteLine($"RawUrl:{request.RawUrl}");
+                    switch (request.RawUrl)
+                    {
+                        case "/":
+                            //Console.WriteLine("Root");
+                            webRequestResult = ProcessRoot(context);
+                            break;
+                        case "/favicon.ico":
+                            //Console.WriteLine("favicon");
+                            response.KeepAlive = false;
+                            response.StatusCode = 404;
+                            response.ContentLength64 = 0;
+                            webRequestResult = WebRequest.OK;
+                            break;
+                        default:
+                            string apiPath = GetApiPath(request.RawUrl);
+                            //Console.WriteLine($"API:{apiPath}.");
+                            switch (apiPath)
+                            {
+                                case "keys":
+                                    //Console.WriteLine($"/keysは廃止の可能性があります");
+                                    webRequestResult = ProcessKeys(context);
+                                    break;
+                                default:
+                                    Console.WriteLine($"{apiPath}は未実装のAPIまたは不正なリクエスト");
+                                    webRequestResult = WebRequest.NotImplemented;
+                                    break;
+                            }
+                            break;
+                    }
+                    lastRequestTime = now;
                 }
-                lastRequestTime = now;
+                else
+                {
+                    webRequestResult = WebRequest.TimeSpanError;
+                }
             }
-            else
+            catch (Exception e)
             {
-                webRequestResult = WebRequest.TimeSpanError;
+                history.WriteLine(e.ToString());
+                webRequestResult = WebRequest.Exception;
             }
             response.Close();
             return webRequestResult;

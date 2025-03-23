@@ -15,16 +15,14 @@ namespace OpenBrowserServer.Component
         readonly History history; // 履歴ログ
 
         Process observerProcess; // ログを監視するプロセス
-        string worldName;
-        string worldId;
+        public string NowWorldId { get; private set; }
         bool worldJoined;
         public VRChatLogWatcher(Settings setting, History history)
         {
             this.opener = new URLOpener(setting);
             this.history = history;
 
-            worldName = null;
-            worldId = null;
+            NowWorldId = null;
             worldJoined = false;
 
             string targetDirectoryName = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat");
@@ -118,64 +116,25 @@ namespace OpenBrowserServer.Component
                 // NOP
                 return;
             }
-            foreach(var callback in new Callback[] { OpenURL, JoinWorld })
-            {
-                if (callback(line)) break; // ログの処理が出来たら、他の種類のログではないので終わる
-            }
-        }
-        /// <summary>
-        /// VRChatログ解析コールバック
-        /// </summary>
-        /// <param name="line">1行のログ</param>
-        /// <returns>ログを処理したか</returns>
-        delegate bool Callback(string line);
-        bool OpenURL(string line)
-        {
-            string LogPrefix = "[YukiYukiVirtual/OpenURL]";
-            if (line.Contains(LogPrefix))
+
+            string LogPrefix;
+            if (line.Contains(LogPrefix = "[YukiYukiVirtual/OpenURL]"))
             {
                 int index = line.IndexOf(LogPrefix);
                 string rawurl = line.Substring(index + LogPrefix.Length);
                 string url = rawurl.Trim();
                 URLOpenResult urlOpenResult = opener.Open(url);
                 history.WriteLine($"OpenURL: '{url}' {urlOpenResult}");
-                return true;
-            }
-            return false;
-        }
-        bool JoinWorld(string line)
-        {
-            string LogPrefix;
-            if (line.Contains(LogPrefix = "[Behaviour] Joining or Creating Room: "))
-            {
-                int index = line.IndexOf(LogPrefix);
-                worldName = line.Substring(index + LogPrefix.Length).Trim();
-                JoinWorldLogging();
-                return true;
             }
             else if (line.Contains(LogPrefix = "[Behaviour] Joining wrld_"))
             {
                 int index = line.IndexOf(LogPrefix);
                 try
                 {
-                    worldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
-                    JoinWorldLogging();
+                    NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
+                    history.WriteLine($"■Joining world. '{NowWorldId}'");
                 }
                 finally { }
-                return true;
-            }
-            return false;
-        }
-        void JoinWorldLogging()
-        {
-            if (worldJoined)
-            {
-                worldJoined = false;
-                history.WriteLine($"■Joining world. '{worldName}' ({worldId})");
-            }
-            else
-            {
-                worldJoined = true;
             }
         }
     }
