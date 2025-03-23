@@ -37,60 +37,10 @@ namespace OpenBrowserServer.WebServer
             {
                 return;
             }
-            try
-            {
-                listener.BeginGetContext(OnRequested, null);
-                HttpListenerContext context = listener.EndGetContext(ar);
-                HttpListenerRequest request = context.Request;
-                HttpListenerResponse response = context.Response;
-
-                //Console.WriteLine("OnRequested");
-
-                DateTime now = DateTime.Now;
-                TimeSpan timeSpan = now - lastRequestTime;
-                if (timeSpan.TotalMilliseconds >= settings.HttpRequestPeriod)
-                {
-                    //Console.WriteLine($"RawUrl:{request.RawUrl}");
-                    switch (request.RawUrl)
-                    {
-                        case "/":
-                            //Console.WriteLine("Root");
-                            ProcessRoot(context);
-                            break;
-                        case "/favicon.ico":
-                            //Console.WriteLine("favicon");
-                            response.KeepAlive = false;
-                            response.StatusCode = 404;
-                            response.ContentLength64 = 0;
-                            break;
-                        default:
-                            string apiPath = GetApiPath(request.RawUrl);
-                            //Console.WriteLine($"API:{apiPath}.");
-                            switch (apiPath)
-                            {
-                                case "keys":
-                                    //Console.WriteLine($"/keysは廃止の可能性があります");
-                                    ProcessKeys(context);
-                                    break;
-                                default:
-                                    Console.WriteLine($"{apiPath}は未実装のAPIまたは不正なリクエスト");
-                                    break;
-                            }
-                            break;
-                    }
-                    lastRequestTime = now;
-                    history.WriteLine($"Http Requested: URL: '{request.RawUrl}' OK"); // TODO 関数化して、OpenURLと同じようにenumを返す
-                }
-                else
-                {
-                    history.WriteLine($"Http Requested: URL: '{request.RawUrl}' TimeSpanError");
-                }
-                response.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            listener.BeginGetContext(OnRequested, null);
+            HttpListenerContext context = listener.EndGetContext(ar);
+            WebRequest webRequestResult = RequestHandler(context);
+            history.WriteLine($"Web Requested: URL: '{context.Request.Url}' {webRequestResult}");
         }
         private string GetApiPath(string rawUrl)
         {

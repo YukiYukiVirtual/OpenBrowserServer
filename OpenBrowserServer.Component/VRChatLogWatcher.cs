@@ -130,7 +130,7 @@ namespace OpenBrowserServer.Component
                 string rawurl = line.Substring(index + LogPrefix.Length);
                 string url = rawurl.Trim();
                 URLOpenResult urlOpenResult = opener.Open(url);
-                history.WriteLine($"OpenURL: {url} {urlOpenResult}");
+                history.WriteLine($"OpenURL: '{url}' {urlOpenResult}");
                 return true;
             }
             return false;

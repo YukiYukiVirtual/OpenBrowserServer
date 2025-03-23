@@ -18,6 +18,10 @@ namespace OpenBrowserServer
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Initialize();
+#if BOOTH
+#else
+            URLOpener.StaticOpen("https://yukiyukivirtual.booth.pm/items/2539784");
+#endif
             Application.Run();
         }
         static void Initialize()
@@ -33,6 +37,7 @@ namespace OpenBrowserServer
                 }
             }
             History history = new History();
+            history.WriteLine($"★Version: {settings.FileVersion}");
             NotifyIconForm notifyIconForm = new NotifyIconForm(settings);
             VRChatLogWatcher watcher = new VRChatLogWatcher(settings, history);
             HttpServer httpServer = new HttpServer(settings, history);
