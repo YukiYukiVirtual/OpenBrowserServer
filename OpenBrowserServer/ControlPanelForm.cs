@@ -31,9 +31,7 @@ namespace OpenBrowserServer
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
         {
-            //if (vrchatLogWatcher.NowWorldName == null || vrchatLogWatcher.NowWorldId == null) return; // 未設定なら何もしない
-
-            string url = $"https://vrchat.com/home/world/wrld_ddbe108f-0c70-43e7-8a13-bd5cb0f60c45";// {vrchatLogWatcher.NowWorldId}";
+            string url = $"https://vrchat.com/home/world/{vrchatLogWatcher.NowWorldId}";
             if (linkLabelOfWorld.Text == url) return; // ワールドIDが変わってなければ何もしない
 
             this.linkLabelOfWorld.Text = url;
@@ -44,8 +42,9 @@ namespace OpenBrowserServer
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
                 try
                 {
-                    string apiUrl = $"https://api.vrchat.cloud/api/1/worlds/wrld_ddbe108f-0c70-43e7-8a13-bd5cb0f60c45";// {vrchatLogWatcher.NowWorldId}";
+                    string apiUrl = $"https://api.vrchat.cloud/api/1/worlds/{vrchatLogWatcher.NowWorldId}";
                     client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
+
                     // JSONダウンロード
                     string responseBody = client.GetStringAsync(apiUrl).Result;
                     var jsonDocument = JsonDocument.Parse(responseBody).RootElement;
@@ -54,6 +53,7 @@ namespace OpenBrowserServer
                     string imageUrl = jsonDocument.GetProperty("thumbnailImageUrl").GetString();
                     Stream stream = client.GetStreamAsync(imageUrl).Result;
                     this.worldImageBox.Image = Image.FromStream(stream);
+
                     // ワールド名
                     this.groupBoxOfWorldName.Text = jsonDocument.GetProperty("name").GetString();
 
@@ -61,6 +61,7 @@ namespace OpenBrowserServer
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
+                    this.groupBoxOfWorldName.Text = "読み込みエラー";
                 }
 
             }
