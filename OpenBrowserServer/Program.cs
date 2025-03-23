@@ -30,7 +30,7 @@ namespace OpenBrowserServer
             Settings settings = new Settings(fileVersionInfo);
             if(settings.NeedUpgrade())
             {
-                if(UpdateDialog.Confirm())
+                if(DialogWrapper.UpdateConfirm())
                 {
                     Environment.Exit(0);
                     return;

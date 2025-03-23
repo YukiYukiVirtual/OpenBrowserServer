@@ -12,7 +12,7 @@ namespace OpenBrowserServer.Logger
         public History()
         {
             // 起動時の日付でログファイル名を作成する
-            LogFileName = $"{directoryName}/{filePrefix}{DateTime.Today:yyyy-MM-dd}.log";
+            LogFileName = $"{directoryName}\\{filePrefix}{DateTime.Today:yyyy-MM-dd}.log";
             // ログ用ディレクトリを作成する(無ければ)
             Directory.CreateDirectory(directoryName);
 

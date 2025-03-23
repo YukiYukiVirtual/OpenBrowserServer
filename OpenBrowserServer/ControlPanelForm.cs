@@ -14,10 +14,12 @@ namespace OpenBrowserServer
 {
     public partial class ControlPanelForm : Form
     {
+        readonly Settings settings;
         readonly History history;
         readonly VRChatLogWatcher vrchatLogWatcher;
         public ControlPanelForm(Settings settings, History history, VRChatLogWatcher vrchatLogWatcher)
         {
+            this.settings = settings;
             this.history = history;
             this.vrchatLogWatcher = vrchatLogWatcher;
 
@@ -25,11 +27,6 @@ namespace OpenBrowserServer
 
             textBoxAllowedDomainList.Text = string.Join("\r\n", settings.Domain);
             textBoxAllowedProtocolList.Text = string.Join("\r\n", settings.Protocol);
-        }
-
-        private void buttonOpenLogDirectory_Click(object sender, System.EventArgs e)
-        {
-            URLOpener.StaticOpen("Log");
         }
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
@@ -58,7 +55,7 @@ namespace OpenBrowserServer
                     Stream stream = client.GetStreamAsync(imageUrl).Result;
                     this.worldImageBox.Image = Image.FromStream(stream);
                     // ワールド名
-                    this.labelOfWorldName.Text = jsonDocument.GetProperty("name").GetString();
+                    this.groupBoxOfWorldName.Text = jsonDocument.GetProperty("name").GetString();
 
                 }
                 catch (Exception ex)
@@ -71,9 +68,45 @@ namespace OpenBrowserServer
 
         private void linkLabelOfWorld_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            var url = linkLabelOfWorld.Text;
-            if(string.IsNullOrEmpty(url)) return;
+            string url = linkLabelOfWorld.Text;
+            if (!url.StartsWith("http")) return;
             URLOpener.StaticOpen(url);
+        }
+
+        private void buttonOpenDirectory_Click(object sender, EventArgs e)
+        {
+            URLOpener.StaticOpen(".");
+        }
+
+        private void buttonUpdate_Click(object sender, EventArgs e)
+        {
+            if (DialogWrapper.DownloadConfirm())
+            {
+                settings.Update();
+                if (settings.NeedUpgrade())
+                {
+                    if (DialogWrapper.UpdateConfirm())
+                    {
+                        this.Close();
+                        Application.Exit();
+                    }
+                }
+                DialogWrapper.Completed();
+            }
+        }
+
+        private void buttonExit_Click(object sender, EventArgs e)
+        {
+            if (DialogWrapper.ExitConfirm())
+            {
+                this.Close();
+                Application.Exit();
+            }
+        }
+
+        private void buttonOpenLogFile_Click(object sender, EventArgs e)
+        {
+            URLOpener.StaticOpen(history.LogFileName);
         }
     }
 }

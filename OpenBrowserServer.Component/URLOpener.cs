@@ -105,6 +105,7 @@ namespace OpenBrowserServer.Component
         }
         private static void CmdStartProcess(string arg)
         {
+            Console.WriteLine($"CmdStartProcess: {arg}");
             ProcessStartInfo psi = new ProcessStartInfo(arg)
             {
                 CreateNoWindow = true,

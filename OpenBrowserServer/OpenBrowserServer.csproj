@@ -141,7 +141,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UpdateDialog.cs" />
+    <Compile Include="DialogWrapper.cs" />
     <EmbeddedResource Include="ControlPanelForm.resx">
       <DependentUpon>ControlPanelForm.cs</DependentUpon>
     </EmbeddedResource>

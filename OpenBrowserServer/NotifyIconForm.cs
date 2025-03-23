@@ -57,18 +57,18 @@ namespace OpenBrowserServer
         /// <param name="e"></param>
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show("設定ファイルをダウンロードして再読み込みしますか？", "更新確認", MessageBoxButtons.YesNo);
-            if (dialogResult == DialogResult.Yes)
+            if (DialogWrapper.DownloadConfirm())
             { 
                 settings.Update();
                 if (settings.NeedUpgrade())
                 {
-                    if (UpdateDialog.Confirm())
+                    if (DialogWrapper.UpdateConfirm())
                     {
                         this.Close();
                         Application.Exit();
                     }
                 }
+                DialogWrapper.Completed();
             }
         }
         /// <summary>
@@ -87,8 +87,11 @@ namespace OpenBrowserServer
         /// <param name="e"></param>
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
-            Application.Exit();
+            if (DialogWrapper.ExitConfirm())
+            {
+                this.Close();
+                Application.Exit();
+            }
         }
     }
 }
