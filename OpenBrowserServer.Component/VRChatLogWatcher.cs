@@ -16,14 +16,12 @@ namespace OpenBrowserServer.Component
 
         Process observerProcess; // ログを監視するプロセス
         public string NowWorldId { get; private set; }
-        bool worldJoined;
         public VRChatLogWatcher(Settings setting, History history)
         {
             this.opener = new URLOpener(setting);
             this.history = history;
 
             NowWorldId = null;
-            worldJoined = false;
 
             string targetDirectoryName = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat");
             string targetFileName = "output_log_*.txt";

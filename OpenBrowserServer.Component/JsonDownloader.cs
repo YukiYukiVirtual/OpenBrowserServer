@@ -11,21 +11,23 @@ namespace OpenBrowserServer.Component
     public class JsonDownloader
     {
         // キャッシュ
-        static string CachedUrl = "";
-        static string CachedWorldName = "";
-        static Image CachedThumbnailImage = null;
+        public static string CachedWorldId { get; private set; }
+        public static string CachedWorldName { get; private set; }
+        public static string CachedAuthorId { get; private set; }
+        public static string CachedAuthorName { get; private set; }
+        public static string CachedDescription { get; private set; }
+        public static Image  CachedThumbnailImage { get; private set; }
 
-        public static bool GetWorldInformation(
-            string url,
-            out string worldName,
-            out Image thumbnailImage)
+        public static bool CacheWorldInformation(
+            string worldId)
         {
-            if (url == CachedUrl)
+            if (worldId == CachedWorldId)
             {
-                Console.WriteLine("Cached {CachedUrl}");
+                Console.WriteLine($"Cached {CachedWorldId}");
             }
             else
             {
+                string url = $"https://api.vrchat.cloud/api/1/worlds/{worldId}";
                 using (HttpClient client = new HttpClient())
                 {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -38,29 +40,27 @@ namespace OpenBrowserServer.Component
                         string responseBody = client.GetStringAsync(url).Result;
                         JsonElement jsonDocument = JsonDocument.Parse(responseBody).RootElement;
 
-
                         // サムネイル
                         string imageUrl = jsonDocument.GetProperty("thumbnailImageUrl").GetString();
                         Stream stream = client.GetStreamAsync(imageUrl).Result;
                         CachedThumbnailImage = Image.FromStream(stream);
 
-                        // ワールド名
                         CachedWorldName = jsonDocument.GetProperty("name").GetString();
+                        CachedDescription = jsonDocument.GetProperty("description").GetString();
+                        CachedAuthorId = jsonDocument.GetProperty("authorId").GetString();
+                        CachedAuthorName = jsonDocument.GetProperty("authorName").GetString();
 
-                        CachedUrl = url;
+                        // 最後まで設定が完了してからキャッシュする
+                        CachedWorldId = worldId;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.ToString());
-                        worldName = "";
-                        thumbnailImage = null;
                         return false;
                     }
 
                 }
             }
-            worldName = CachedWorldName;
-            thumbnailImage = CachedThumbnailImage;
             return true;
         }
     }

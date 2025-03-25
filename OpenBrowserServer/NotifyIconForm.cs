@@ -25,10 +25,17 @@ namespace OpenBrowserServer
         // ================================================================================
         private void OpenControlPanel()
         {
-            if(controlPanelForm == null)
+            if(controlPanelForm == null || controlPanelForm.IsDisposed)
             {
-                controlPanelForm = new ControlPanelForm(settings, history, vrchatLogWatcher);
-                controlPanelForm.Visible = true;
+                Console.WriteLine("OpenControlPanel open");
+                controlPanelForm = new ControlPanelForm(settings, history, vrchatLogWatcher)
+                {
+                    Visible = true
+                };
+            }
+            else
+            {
+                Console.WriteLine("OpenControlPanel Already open");
             }
         }
         // ================================================================================

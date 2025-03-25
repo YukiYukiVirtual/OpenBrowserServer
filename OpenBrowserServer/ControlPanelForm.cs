@@ -32,20 +32,20 @@ namespace OpenBrowserServer
             this.linkLabelOfWorld.Text = url;
 
             // JSONを取ってきてワールド情報を書く
-            string apiUrl = $"https://api.vrchat.cloud/api/1/worlds/{vrchatLogWatcher.NowWorldId}";
-            if(JsonDownloader.GetWorldInformation(apiUrl,
-                out string worldName,
-                out Image thumbnailImage)
-                )
+            if(JsonDownloader.CacheWorldInformation(vrchatLogWatcher.NowWorldId))
             {
-                this.groupBoxOfWorldName.Text = worldName;
-                this.worldImageBox.Image = thumbnailImage;
+                this.textWorldName.Text = JsonDownloader.CachedWorldName;
+                this.textWorldDescription.Text = JsonDownloader.CachedDescription;
+                this.textAuthorName.Text = $"by {JsonDownloader.CachedAuthorName}";
+                this.worldImageBox.Image = JsonDownloader.CachedThumbnailImage;
             }
             else
             {
-                this.groupBoxOfWorldName.Text = "読み込みエラー";
+                this.textWorldName.Text = "読み込みエラー";
+                this.textWorldDescription.Text = "読み込みエラー";
+                this.textAuthorName.Text = "";
                 this.worldImageBox.Image = null;
-                history.WriteLine($"timerOfUpdate_Tick: Download Error. {url} {apiUrl}");
+                history.WriteLine($"timerOfUpdate_Tick: Download Error. {url} {vrchatLogWatcher.NowWorldId}");
             }
 
         }
