@@ -37,7 +37,7 @@ namespace OpenBrowserServer
                 }
             }
             History history = new History();
-            history.WriteLine($"■Start! Version: {settings.FileVersion}");
+            history.WriteLine($"■起動時のバージョン {settings.FileVersion}");
             VRChatLogWatcher vrchatLogWatcher = new VRChatLogWatcher(settings, history);
             new HttpServer(settings, history);
             new NotifyIconForm(settings, history, vrchatLogWatcher);

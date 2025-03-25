@@ -77,13 +77,13 @@ namespace OpenBrowserServer.Component
             }
             catch (System.ComponentModel.Win32Exception e)
             {
-                Console.WriteLine(e.ToString());
+                history.WriteLine(e.ToString());
                 MessageBox.Show("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
                 return;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                history.WriteLine(e.ToString());
                 MessageBox.Show("起動に失敗しました。", "例外");
                 return;
             }
@@ -122,7 +122,7 @@ namespace OpenBrowserServer.Component
                 string rawurl = line.Substring(index + LogPrefix.Length);
                 string url = rawurl.Trim();
                 URLOpenResult urlOpenResult = opener.Open(url);
-                history.WriteLine($"OpenURL: '{url}' {urlOpenResult}");
+                history.WriteLine($" OpenURL: '{url}' {urlOpenResult}");
             }
             else if (line.Contains(LogPrefix = "[Behaviour] Joining wrld_"))
             {
@@ -130,7 +130,7 @@ namespace OpenBrowserServer.Component
                 try
                 {
                     NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
-                    history.WriteLine($"■Joining world. '{NowWorldId}'");
+                    history.WriteLine($" Joining world. '{NowWorldId}'");
                 }
                 finally { }
             }

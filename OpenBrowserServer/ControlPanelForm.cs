@@ -45,7 +45,7 @@ namespace OpenBrowserServer
                 this.textWorldDescription.Text = "読み込みエラー";
                 this.textAuthorName.Text = "";
                 this.worldImageBox.Image = null;
-                history.WriteLine($"timerOfUpdate_Tick: Download Error. {url} {vrchatLogWatcher.NowWorldId}");
+                history.WriteLine($"▲ワールド情報取得失敗 {url} {vrchatLogWatcher.NowWorldId}");
             }
 
         }

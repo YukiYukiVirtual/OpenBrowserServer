@@ -51,7 +51,7 @@ namespace OpenBrowserServer.WebServer
                                     webRequestResult = ProcessKeys(context);
                                     break;
                                 default:
-                                    Console.WriteLine($"{apiPath}は未実装のAPIまたは不正なリクエスト");
+                                    history.WriteLine($"▲未実装のAPIまたは不正なリクエスト {apiPath}");
                                     webRequestResult = WebRequest.NotImplemented;
                                     break;
                             }
@@ -66,6 +66,7 @@ namespace OpenBrowserServer.WebServer
             }
             catch (Exception e)
             {
+                history.WriteLine($"▲Httpリクエストで予期せぬ例外が発生 {request.RawUrl}");
                 history.WriteLine(e.ToString());
                 webRequestResult = WebRequest.Exception;
             }
@@ -152,7 +153,8 @@ namespace OpenBrowserServer.WebServer
                 response.StatusCode = 404;
                 response.ContentLength64 = 0;
 
-                Console.WriteLine(e.ToString());
+                history.WriteLine($"▲ProcessKeys 要求されたファイルがありません {filepath}");
+                history.WriteLine(e.ToString());
                 webRequestResult = WebRequest.Exception;
             }
             catch (Exception e)
@@ -161,6 +163,7 @@ namespace OpenBrowserServer.WebServer
                 response.StatusCode = 500;
                 response.ContentLength64 = 0;
 
+                history.WriteLine($"▲ProcessKeys 何らかの例外発生 {filepath}");
                 Console.WriteLine(e.ToString());
                 webRequestResult = WebRequest.Exception;
             }
