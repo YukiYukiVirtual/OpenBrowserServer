@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net;
-using System.Security.Policy;
+using System.Drawing;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
 using OpenBrowserServer.Logger;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-using System.IO;
-using System.Drawing;
 
 namespace OpenBrowserServer
 {
@@ -31,40 +25,29 @@ namespace OpenBrowserServer
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
         {
+            if (string.IsNullOrEmpty(vrchatLogWatcher.NowWorldId)) return;
             string url = $"https://vrchat.com/home/world/{vrchatLogWatcher.NowWorldId}";
             if (linkLabelOfWorld.Text == url) return; // ワールドIDが変わってなければ何もしない
 
             this.linkLabelOfWorld.Text = url;
 
             // JSONを取ってきてワールド情報を書く
-            using (HttpClient client = new HttpClient())
+            string apiUrl = $"https://api.vrchat.cloud/api/1/worlds/{vrchatLogWatcher.NowWorldId}";
+            if(JsonDownloader.GetWorldInformation(apiUrl,
+                out string worldName,
+                out Image thumbnailImage)
+                )
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-                try
-                {
-                    string apiUrl = $"https://api.vrchat.cloud/api/1/worlds/{vrchatLogWatcher.NowWorldId}";
-                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
-
-                    // JSONダウンロード
-                    string responseBody = client.GetStringAsync(apiUrl).Result;
-                    var jsonDocument = JsonDocument.Parse(responseBody).RootElement;
-
-                    // サムネイル
-                    string imageUrl = jsonDocument.GetProperty("thumbnailImageUrl").GetString();
-                    Stream stream = client.GetStreamAsync(imageUrl).Result;
-                    this.worldImageBox.Image = Image.FromStream(stream);
-
-                    // ワールド名
-                    this.groupBoxOfWorldName.Text = jsonDocument.GetProperty("name").GetString();
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                    this.groupBoxOfWorldName.Text = "読み込みエラー";
-                }
-
+                this.groupBoxOfWorldName.Text = worldName;
+                this.worldImageBox.Image = thumbnailImage;
             }
+            else
+            {
+                this.groupBoxOfWorldName.Text = "読み込みエラー";
+                this.worldImageBox.Image = null;
+                history.WriteLine($"timerOfUpdate_Tick: Download Error. {url} {apiUrl}");
+            }
+
         }
 
         private void linkLabelOfWorld_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
