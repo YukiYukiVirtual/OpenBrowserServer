@@ -15,7 +15,7 @@ namespace OpenBrowserServer.Component
     public class URLOpener
     {
         readonly Settings settings;
-        readonly SoundPlayer openSoundPlayer;
+        static readonly SoundPlayer openSoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
         DateTime lastOpenTime;
         public URLOpener(Settings settings)
         {
@@ -23,7 +23,6 @@ namespace OpenBrowserServer.Component
             this.settings = settings;
             // 最初は必ず開けるようにするために、最小の有効時間で初期化する
             lastOpenTime = DateTime.MinValue;
-            openSoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
         }
         ~URLOpener()
         {
@@ -45,15 +44,8 @@ namespace OpenBrowserServer.Component
                 return URLOpenResult.TimeSpanError;
             }
             // URLを開く
-            try
-            {
-                openSoundPlayer.Play(); // TODO オリジナルの音にする
-            }
-            finally
-            {
-                StaticOpen(url);
-                lastOpenTime = now;
-            }
+            StaticOpen(url);
+            lastOpenTime = now;
             return URLOpenResult.OK;
         }
         private URLOpenResult CheckURL(string url)
@@ -101,7 +93,14 @@ namespace OpenBrowserServer.Component
         }
         public static void StaticOpen(string url)
         {
-            CmdStartProcess(url);
+            try
+            {
+                openSoundPlayer.Play(); // TODO オリジナルの音にする
+            }
+            finally
+            {
+                CmdStartProcess(url);
+            }
         }
         private static void CmdStartProcess(string arg)
         {
@@ -116,7 +115,7 @@ namespace OpenBrowserServer.Component
             }
             catch(Exception e)
             {
-                Console.WriteLine($"CmdStartProcess: {arg} {e.ToString()}");
+                Console.WriteLine($"CmdStartProcess: {arg} {e}");
             }
         }
     }
