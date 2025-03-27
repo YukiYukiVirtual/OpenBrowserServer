@@ -64,3 +64,5 @@ Domain:
   - youtube.com
   - yukiyukivirtual.github.io
   - yukiyukivirtual.net
+BannedUser:
+  - usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # 2025/03/28 xxxの理由により

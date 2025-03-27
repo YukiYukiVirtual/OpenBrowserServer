@@ -10,15 +10,17 @@ namespace OpenBrowserServer.Component
     public delegate void VRChatLogCallback(string key, string line);
     public class VRChatLogWatcher
     {
+        readonly Settings settings;
         readonly URLOpener opener; // URLを開くやつ
         readonly FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
         readonly History history; // 履歴ログ
 
         Process observerProcess; // ログを監視するプロセス
         public string NowWorldId { get; private set; }
-        public VRChatLogWatcher(Settings setting, History history)
+        public VRChatLogWatcher(Settings settings, History history)
         {
-            this.opener = new URLOpener(setting);
+            this.settings = settings;
+            this.opener = new URLOpener(settings);
             this.history = history;
 
             NowWorldId = null;
@@ -108,6 +110,10 @@ namespace OpenBrowserServer.Component
         // ファイル書き込みイベントハンドラ
         void LogOutputDataReceived(Object source, DataReceivedEventArgs e)
         {
+            if(settings.PauseSystem)
+            {
+                return;
+            }
             string line = e.Data;
             if (String.IsNullOrEmpty(line))
             {
@@ -131,6 +137,17 @@ namespace OpenBrowserServer.Component
                 {
                     NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
                     history.WriteLine($" Joining world. '{NowWorldId}'");
+                    // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
+                    if(JsonDownloader.CacheWorldInformation(NowWorldId))
+                    {
+                        if(settings.BannedUser.Contains(JsonDownloader.CachedAuthorId))
+                        {
+                            settings.PauseSystem = true;
+                            history.WriteLine($"▲BannedUser: {JsonDownloader.CachedAuthorName}({JsonDownloader.CachedAuthorId})");
+                            history.WriteLine($" System paused.");
+                            MessageBox.Show("今Joinしたワールドの作者はBANしています。\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    }
                 }
                 finally { }
             }

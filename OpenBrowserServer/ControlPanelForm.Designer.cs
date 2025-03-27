@@ -35,7 +35,11 @@
             this.textBoxAllowedProtocolList = new System.Windows.Forms.TextBox();
             this.timerOfUpdate = new System.Windows.Forms.Timer(this.components);
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
+            this.textWorldName = new System.Windows.Forms.TextBox();
             this.worldImageBox = new System.Windows.Forms.PictureBox();
+            this.textAuthorName = new System.Windows.Forms.TextBox();
+            this.textWorldDescription = new System.Windows.Forms.TextBox();
             this.linkLabelOfWorld = new System.Windows.Forms.LinkLabel();
             this.buttonUpdate = new System.Windows.Forms.Button();
             this.buttonExit = new System.Windows.Forms.Button();
@@ -44,17 +48,14 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.buttonOpenLogFile = new System.Windows.Forms.Button();
-            this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
-            this.textWorldDescription = new System.Windows.Forms.TextBox();
-            this.textWorldName = new System.Windows.Forms.TextBox();
-            this.textAuthorName = new System.Windows.Forms.TextBox();
+            this.buttonPauseResume = new System.Windows.Forms.Button();
             this.groupBox2.SuspendLayout();
+            this.flowLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.worldImageBox)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
-            this.flowLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOpenDirectory
@@ -114,6 +115,29 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "今いるワールド";
             // 
+            // flowLayoutPanel3
+            // 
+            this.flowLayoutPanel3.Controls.Add(this.textWorldName);
+            this.flowLayoutPanel3.Controls.Add(this.worldImageBox);
+            this.flowLayoutPanel3.Controls.Add(this.textAuthorName);
+            this.flowLayoutPanel3.Controls.Add(this.textWorldDescription);
+            this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel3.Location = new System.Drawing.Point(3, 19);
+            this.flowLayoutPanel3.Name = "flowLayoutPanel3";
+            this.flowLayoutPanel3.Size = new System.Drawing.Size(480, 361);
+            this.flowLayoutPanel3.TabIndex = 15;
+            // 
+            // textWorldName
+            // 
+            this.textWorldName.BackColor = System.Drawing.SystemColors.Control;
+            this.textWorldName.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textWorldName.Font = new System.Drawing.Font("MS UI Gothic", 16F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
+            this.textWorldName.Location = new System.Drawing.Point(3, 3);
+            this.textWorldName.Name = "textWorldName";
+            this.textWorldName.Size = new System.Drawing.Size(477, 22);
+            this.textWorldName.TabIndex = 16;
+            this.textWorldName.Text = "ワールド名";
+            // 
             // worldImageBox
             // 
             this.worldImageBox.Location = new System.Drawing.Point(3, 31);
@@ -121,6 +145,30 @@
             this.worldImageBox.Size = new System.Drawing.Size(256, 192);
             this.worldImageBox.TabIndex = 8;
             this.worldImageBox.TabStop = false;
+            // 
+            // textAuthorName
+            // 
+            this.textAuthorName.BackColor = System.Drawing.SystemColors.Control;
+            this.textAuthorName.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textAuthorName.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold);
+            this.textAuthorName.Location = new System.Drawing.Point(265, 31);
+            this.textAuthorName.Name = "textAuthorName";
+            this.textAuthorName.Size = new System.Drawing.Size(212, 16);
+            this.textAuthorName.TabIndex = 17;
+            this.textAuthorName.Text = "作者";
+            // 
+            // textWorldDescription
+            // 
+            this.textWorldDescription.BackColor = System.Drawing.SystemColors.Control;
+            this.textWorldDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textWorldDescription.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.textWorldDescription.Location = new System.Drawing.Point(3, 229);
+            this.textWorldDescription.Multiline = true;
+            this.textWorldDescription.Name = "textWorldDescription";
+            this.textWorldDescription.ReadOnly = true;
+            this.textWorldDescription.Size = new System.Drawing.Size(474, 130);
+            this.textWorldDescription.TabIndex = 12;
+            this.textWorldDescription.Text = "ワールドの説明";
             // 
             // linkLabelOfWorld
             // 
@@ -195,9 +243,10 @@
             this.flowLayoutPanel2.Controls.Add(this.buttonOpenDirectory);
             this.flowLayoutPanel2.Controls.Add(this.buttonOpenLogFile);
             this.flowLayoutPanel2.Controls.Add(this.buttonExit);
+            this.flowLayoutPanel2.Controls.Add(this.buttonPauseResume);
             this.flowLayoutPanel2.Location = new System.Drawing.Point(12, 413);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(781, 68);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(781, 134);
             this.flowLayoutPanel2.TabIndex = 11;
             // 
             // buttonOpenLogFile
@@ -211,59 +260,23 @@
             this.buttonOpenLogFile.UseVisualStyleBackColor = true;
             this.buttonOpenLogFile.Click += new System.EventHandler(this.buttonOpenLogFile_Click);
             // 
-            // flowLayoutPanel3
+            // buttonPauseResume
             // 
-            this.flowLayoutPanel3.Controls.Add(this.textWorldName);
-            this.flowLayoutPanel3.Controls.Add(this.worldImageBox);
-            this.flowLayoutPanel3.Controls.Add(this.textAuthorName);
-            this.flowLayoutPanel3.Controls.Add(this.textWorldDescription);
-            this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel3.Location = new System.Drawing.Point(3, 19);
-            this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-            this.flowLayoutPanel3.Size = new System.Drawing.Size(480, 361);
-            this.flowLayoutPanel3.TabIndex = 15;
-            // 
-            // textWorldDescription
-            // 
-            this.textWorldDescription.BackColor = System.Drawing.SystemColors.Control;
-            this.textWorldDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textWorldDescription.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.textWorldDescription.Location = new System.Drawing.Point(3, 229);
-            this.textWorldDescription.Multiline = true;
-            this.textWorldDescription.Name = "textWorldDescription";
-            this.textWorldDescription.ReadOnly = true;
-            this.textWorldDescription.Size = new System.Drawing.Size(474, 130);
-            this.textWorldDescription.TabIndex = 12;
-            this.textWorldDescription.Text = "ワールドの説明";
-            // 
-            // textWorldName
-            // 
-            this.textWorldName.BackColor = System.Drawing.SystemColors.Control;
-            this.textWorldName.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textWorldName.Font = new System.Drawing.Font("MS UI Gothic", 16F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
-            this.textWorldName.Location = new System.Drawing.Point(3, 3);
-            this.textWorldName.Name = "textWorldName";
-            this.textWorldName.Size = new System.Drawing.Size(477, 22);
-            this.textWorldName.TabIndex = 16;
-            this.textWorldName.Text = "ワールド名";
-            // 
-            // textAuthorName
-            // 
-            this.textAuthorName.BackColor = System.Drawing.SystemColors.Control;
-            this.textAuthorName.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textAuthorName.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold);
-            this.textAuthorName.Location = new System.Drawing.Point(265, 31);
-            this.textAuthorName.Name = "textAuthorName";
-            this.textAuthorName.Size = new System.Drawing.Size(212, 16);
-            this.textAuthorName.TabIndex = 17;
-            this.textAuthorName.Text = "作者";
+            this.buttonPauseResume.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonPauseResume.Location = new System.Drawing.Point(3, 57);
+            this.buttonPauseResume.Name = "buttonPauseResume";
+            this.buttonPauseResume.Size = new System.Drawing.Size(158, 48);
+            this.buttonPauseResume.TabIndex = 11;
+            this.buttonPauseResume.Text = "一時停止する";
+            this.buttonPauseResume.UseVisualStyleBackColor = true;
+            this.buttonPauseResume.Click += new System.EventHandler(this.buttonPauseResume_Click);
             // 
             // ControlPanelForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1376, 671);
+            this.ClientSize = new System.Drawing.Size(917, 646);
             this.Controls.Add(this.flowLayoutPanel2);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.groupBox2);
@@ -272,6 +285,8 @@
             this.Text = "VRChatOpenBrowser - Control Panel";
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.flowLayoutPanel3.ResumeLayout(false);
+            this.flowLayoutPanel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.worldImageBox)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
@@ -279,8 +294,6 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
-            this.flowLayoutPanel3.ResumeLayout(false);
-            this.flowLayoutPanel3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -305,5 +318,6 @@
         private System.Windows.Forms.TextBox textWorldDescription;
         private System.Windows.Forms.TextBox textWorldName;
         private System.Windows.Forms.TextBox textAuthorName;
+        private System.Windows.Forms.Button buttonPauseResume;
     }
 }

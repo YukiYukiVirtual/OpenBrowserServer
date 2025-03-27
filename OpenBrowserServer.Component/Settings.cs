@@ -34,6 +34,8 @@ namespace OpenBrowserServer.Component
         public int HttpRequestPeriod { get; private set; }
         public List<string> Protocol { get; private set; }
         public List<string> Domain { get; private set; }
+        public List<string> BannedUser { get; private set; }
+        public bool PauseSystem { get; set; }
         public Settings(FileVersionInfo fileVersionInfo)
         {
             this.fileVersionInfo = fileVersionInfo;
@@ -51,6 +53,7 @@ namespace OpenBrowserServer.Component
             HttpRequestPeriod = 5000;
             Protocol = new List<string>();
             Domain = new List<string>();
+            BannedUser = new List<string>();
         }
         public void Update()
         {
@@ -132,13 +135,9 @@ namespace OpenBrowserServer.Component
                 }
                 try
                 {
-                    var protocols = (YamlSequenceNode)root.Children[new YamlScalarNode("Protocol")];
-                    foreach (var value in from YamlScalarNode item in protocols
-                                          let value = item.Value
-                                          select value)
-                    {
-                        Protocol.Add(value);
-                    }
+                    Protocol.AddRange(from YamlScalarNode item in (YamlSequenceNode)root.Children[new YamlScalarNode("Protocol")]
+                                      let value = item.Value
+                                      select value);
                 }
                 catch (Exception e)
                 {
@@ -147,18 +146,25 @@ namespace OpenBrowserServer.Component
                 }
                 try
                 {
-                    var domains = (YamlSequenceNode)root.Children[new YamlScalarNode("Domain")];
-                    foreach (var value in from YamlScalarNode item in domains
-                                          let value = item.Value
-                                          select value)
-                    {
-                        Domain.Add(value);
-                    }
+                    Domain.AddRange(from YamlScalarNode item in (YamlSequenceNode)root.Children[new YamlScalarNode("Domain")]
+                                    let value = item.Value
+                                    select value);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
                     Console.WriteLine("Domainキーのパースに失敗");
+                }
+                try
+                {
+                    BannedUser.AddRange(from YamlScalarNode item in (YamlSequenceNode)root.Children[new YamlScalarNode("BannedUser")]
+                                    let value = item.Value
+                                    select value);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("BannedUserキーのパースに失敗");
                 }
                 //Console.WriteLine(this.ToString());
             }

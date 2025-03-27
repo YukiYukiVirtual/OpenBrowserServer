@@ -92,5 +92,21 @@ namespace OpenBrowserServer
         {
             URLOpener.StaticOpen(history.LogFileName);
         }
+
+        private void buttonPauseResume_Click(object sender, EventArgs e)
+        {
+            if(settings.PauseSystem)
+            {
+                // 再開する
+                settings.PauseSystem = false;
+                this.buttonPauseResume.Text = "一時停止する";
+            }
+            else
+            {
+                // 一時停止する
+                settings.PauseSystem = true;
+                this.buttonPauseResume.Text = "再開する";
+            }
+        }
     }
 }

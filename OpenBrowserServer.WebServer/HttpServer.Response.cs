@@ -20,6 +20,13 @@ namespace OpenBrowserServer.WebServer
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
+            if (settings.PauseSystem)
+            {
+                response.KeepAlive = false;
+                response.StatusCode = 403;
+                response.ContentLength64 = 0;
+                return WebRequest.OK;
+            }
             //Console.WriteLine("OnRequested");
             try
             {
