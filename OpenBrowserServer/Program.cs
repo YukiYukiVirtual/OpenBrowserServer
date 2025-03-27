@@ -15,6 +15,14 @@ namespace OpenBrowserServer
         [STAThread]
         static void Main()
         {
+            // 多重起動抑止処理
+            System.Threading.Mutex mutex = new System.Threading.Mutex(false, "VRChatOpenBrowser");
+            if (!mutex.WaitOne(0, false))
+            {
+                MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "VRChatOpenBrowser");
+                return;
+            }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Initialize();
