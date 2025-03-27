@@ -140,6 +140,7 @@
             // 
             // worldImageBox
             // 
+            this.worldImageBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.worldImageBox.Location = new System.Drawing.Point(3, 31);
             this.worldImageBox.Name = "worldImageBox";
             this.worldImageBox.Size = new System.Drawing.Size(256, 192);

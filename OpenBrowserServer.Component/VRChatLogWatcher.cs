@@ -14,6 +14,9 @@ namespace OpenBrowserServer.Component
         readonly URLOpener opener; // URLを開くやつ
         readonly FileSystemWatcher fswatcher; // ログファイルが作成されたことを監視するやーつ
         readonly History history; // 履歴ログ
+        
+        readonly System.Timers.Timer watchdogTimer;
+        readonly object watchdogLockObject = new object();
 
         Process observerProcess; // ログを監視するプロセス
         public string NowWorldId { get; private set; }
@@ -22,6 +25,10 @@ namespace OpenBrowserServer.Component
             this.settings = settings;
             this.opener = new URLOpener(settings);
             this.history = history;
+
+            watchdogTimer = new System.Timers.Timer(1000*60*30); // ミリ秒→秒→分→30分
+            watchdogTimer.Elapsed += WatchdogTimer_Elapsed;
+            watchdogTimer.AutoReset = false;
 
             NowWorldId = null;
 
@@ -53,6 +60,7 @@ namespace OpenBrowserServer.Component
 
             this.history = history;
         }
+
         ~VRChatLogWatcher()
         {
             Console.WriteLine("VRChatLogWatcher destructor");
@@ -150,6 +158,21 @@ namespace OpenBrowserServer.Component
                     }
                 }
                 finally { }
+            }
+
+            // watchdog更新
+            lock(watchdogLockObject)
+            {
+                watchdogTimer.Stop();
+                watchdogTimer.Start();
+            }
+        }
+        private void WatchdogTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            lock(watchdogLockObject)
+            {
+                NowWorldId = null;
+                history.WriteLine(" VRChatLogWatcher is bored...");
             }
         }
     }

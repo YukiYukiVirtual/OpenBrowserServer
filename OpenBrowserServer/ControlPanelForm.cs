@@ -25,7 +25,16 @@ namespace OpenBrowserServer
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
         {
-            if (string.IsNullOrEmpty(vrchatLogWatcher.NowWorldId)) return;
+            // worldIDがnullの時は何も表示しない
+            if (string.IsNullOrEmpty(vrchatLogWatcher.NowWorldId))
+            {
+                this.textWorldName.Text = "ワールド名";
+                this.textWorldDescription.Text = "ワールドの説明";
+                this.textAuthorName.Text = "作者";
+                this.worldImageBox.Image = null;
+                this.linkLabelOfWorld.Text = "URL";
+                return;
+            }
             string url = $"https://vrchat.com/home/world/{vrchatLogWatcher.NowWorldId}";
             if (linkLabelOfWorld.Text == url) return; // ワールドIDが変わってなければ何もしない
 
