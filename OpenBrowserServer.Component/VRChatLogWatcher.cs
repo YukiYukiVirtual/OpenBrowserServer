@@ -27,7 +27,7 @@ namespace OpenBrowserServer.Component
             opener = new URLOpener(config);
             this.history = history;
 
-            watchdogTimer = new System.Timers.Timer(1000*60*config.Setting.WatchdogTime); // ミリ秒→秒→分
+            watchdogTimer = new System.Timers.Timer(1000*60*config.Setting.WatchdogTime); // 分単位
             watchdogTimer.Elapsed += WatchdogTimer_Elapsed;
             watchdogTimer.AutoReset = false;
 
