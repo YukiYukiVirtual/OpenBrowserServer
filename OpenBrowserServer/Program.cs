@@ -34,8 +34,7 @@ namespace OpenBrowserServer
         }
         static void Initialize()
         {
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location); // プログラムファイルのバージョン情報取得
-            Config config = new Config(fileVersionInfo);
+            Config config = new Config();
             if(config.NeedUpgrade())
             {
                 if(DialogWrapper.UpdateConfirm())

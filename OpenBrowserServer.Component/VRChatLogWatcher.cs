@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using OpenBrowserServer.Logger;
+using static OpenBrowserServer.Component.Setting;
 
 namespace OpenBrowserServer.Component
 {
@@ -148,12 +149,13 @@ namespace OpenBrowserServer.Component
                     // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
                     if(JsonDownloader.CacheWorldInformation(NowWorldId))
                     {
-                        if(config.BannedUser.Contains(JsonDownloader.CachedAuthorId))
+                        BannedUserInfo bannedUserInfo = config.Setting.BannedUser.Find(x => x.Id == JsonDownloader.CachedAuthorId);
+                        if (bannedUserInfo != null)
                         {
                             config.PauseSystem = true;
-                            history.WriteLine($"▲BannedUser: {JsonDownloader.CachedAuthorName}({JsonDownloader.CachedAuthorId})");
+                            history.WriteLine($"▲BannedUser: {JsonDownloader.CachedAuthorName}({JsonDownloader.CachedAuthorId}) Reason: {bannedUserInfo.Reason}");
                             history.WriteLine($" System paused.");
-                            MessageBox.Show("今Joinしたワールドの作者はBANしています。\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBox.Show($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                     }
                 }

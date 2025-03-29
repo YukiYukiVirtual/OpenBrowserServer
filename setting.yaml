@@ -1,5 +1,5 @@
 ﻿Version: v6.0.0
-IdlePeriod: 500
+IdlePeriod: 400
 HttpRequestPeriod: 5000
 Protocol:
   - https
@@ -65,4 +65,5 @@ Domain:
   - yukiyukivirtual.github.io
   - yukiyukivirtual.net
 BannedUser:
-  - usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # 2025/03/28 xxxの理由により
+  - Id: usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    Reason: xxx の理由により

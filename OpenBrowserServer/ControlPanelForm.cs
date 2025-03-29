@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 using OpenBrowserServer.Component;
 using OpenBrowserServer.Logger;
@@ -19,8 +18,8 @@ namespace OpenBrowserServer
 
             InitializeComponent();
 
-            textBoxAllowedDomainList.Text = string.Join("\r\n", config.Domain);
-            textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Protocol);
+            textBoxAllowedDomainList.Text = string.Join("\r\n", config.Setting.Domain);
+            textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Setting.Protocol);
         }
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)

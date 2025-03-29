@@ -32,7 +32,7 @@ namespace OpenBrowserServer.WebServer
             {
                 DateTime now = DateTime.Now;
                 TimeSpan timeSpan = now - lastRequestTime;
-                if (timeSpan.TotalMilliseconds >= config.HttpRequestPeriod)
+                if (timeSpan.TotalMilliseconds >= config.Setting.HttpRequestPeriod)
                 {
                     //Console.WriteLine($"RawUrl:{request.RawUrl}");
                     switch (request.RawUrl)
@@ -89,13 +89,18 @@ namespace OpenBrowserServer.WebServer
             HttpListenerResponse response = context.Response;
 
             // レスポンスデータを匿名型で作成
+            string[] versionParts = config.FileVersion.Replace("v","").Split('.');
+            if(versionParts.Length != 3)
+            {
+                versionParts = new string[] { "0", "0", "0" };
+            }
             var obj = new
             {
                 version = new
                 {
-                    major = config.fileVersionInfo.ProductMajorPart,
-                    minor = config.fileVersionInfo.ProductMinorPart,
-                    build = config.fileVersionInfo.ProductBuildPart,
+                    major = versionParts[0],
+                    minor = versionParts[1],
+                    build = versionParts[2],
                     full  = config.FileVersion,
                 },
                 edition = config.Edition,

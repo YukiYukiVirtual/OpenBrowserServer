@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Media;
+using System.Linq;
 
 namespace OpenBrowserServer.Component
 {
@@ -39,7 +40,7 @@ namespace OpenBrowserServer.Component
             // 前に開いた時間との差が規定以上であればURLを開く
             DateTime now = DateTime.Now;
             TimeSpan timeSpan = now - lastOpenTime;
-            if (timeSpan.TotalMilliseconds < config.IdlePeriod)
+            if (timeSpan.TotalMilliseconds < config.Setting.IdlePeriod)
             {
                 return URLOpenResult.TimeSpanError;
             }
@@ -50,8 +51,6 @@ namespace OpenBrowserServer.Component
         }
         private URLOpenResult CheckURL(string url)
         {
-            bool result; // ループチェック用一時変数
-
             // Uriオブジェクトを作成
             Uri uri;
             try
@@ -65,24 +64,14 @@ namespace OpenBrowserServer.Component
                 return URLOpenResult.FormatError;
             }
 
-            result = config.Protocol.Contains(uri.Scheme);
-            if (!result)
+            if (!config.Setting.Protocol.Any(x => x == uri.Scheme))
             {
                 Console.WriteLine($"{uri.Scheme}を開くことはできません。'{url}'");
                 return URLOpenResult.ProtocolError;
             }
 
             // ドメインチェック
-            result = false;
-            foreach (string host in config.Domain)
-            {
-                if(uri.Host == host || uri.Host.EndsWith("."+host))
-                {
-                    result= true;
-                    break;
-                }
-            }
-            if(!result)
+            if (!config.Setting.Domain.Any(x => x == uri.Host || uri.Host.EndsWith("." + x)))
             {
                 Console.WriteLine($"{uri.Host}を開くことはできません。'{url}'");
                 return URLOpenResult.DomainError;

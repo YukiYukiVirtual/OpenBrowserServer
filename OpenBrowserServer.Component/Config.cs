@@ -1,46 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
-using System.Net.Http;
-using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
-using System.Linq;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace OpenBrowserServer.Component
 {
     public class Config
     {
+#if DEBUG
+        private const string DefaultPath = "../../../setting.yaml";
+#else
         private const string DefaultPath = "setting.yaml";
+#endif
         public string Edition {
             get =>
-#if   BOOTH
+#if BOOTH
                 "Booth"
 #else
                 "Free"
 #endif
                 ; 
         }
-
-        public readonly FileVersionInfo fileVersionInfo;
+        public Setting Setting { get; private set; }
+        private readonly FileVersionInfo fileVersionInfo;
         public string FileVersion { get
             {
                 return $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
             }
         }
-        public string Version { get; private set; }
-        public int IdlePeriod { get; private set; }
-        public int HttpRequestPeriod { get; private set; }
-        public List<string> Protocol { get; private set; }
-        public List<string> Domain { get; private set; }
-        public List<string> BannedUser { get; private set; }
         public bool PauseSystem { get; set; }
-        public Config(FileVersionInfo fileVersionInfo)
+        public Config()
         {
-            this.fileVersionInfo = fileVersionInfo;
+            this.fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location); // プログラムファイルのバージョン情報取得
             Update();
-            //Console.WriteLine(ToString());
         }
         ~Config()
         {
@@ -48,12 +41,6 @@ namespace OpenBrowserServer.Component
         }
         public void Clear()
         {
-            Version = FileVersion;
-            IdlePeriod = 500;
-            HttpRequestPeriod = 5000;
-            Protocol = new List<string>();
-            Domain = new List<string>();
-            BannedUser = new List<string>();
         }
         public void Update()
         {
@@ -63,10 +50,13 @@ namespace OpenBrowserServer.Component
         }
         public bool NeedUpgrade()
         {
-            return !FileVersion.Equals(Version);
+            return !FileVersion.Equals(Setting.Version);
         }
         public static void Download()
         {
+#if DEBUG
+
+#else
             string url = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();
             // ダウンロード
             using(HttpClient client = new HttpClient())
@@ -82,98 +72,33 @@ namespace OpenBrowserServer.Component
                     Console.WriteLine(e.ToString());
                     Console.WriteLine("設定ファイルのダウンロードが失敗しました。過去にダウンロードしたものがあればそれを使います。");
                 }
-
             }
+#endif
         }
         private void ImportYaml()
         {
-            if(!File.Exists(DefaultPath))
+            if (File.Exists(DefaultPath))
+            {
+                string content = File.ReadAllText(DefaultPath);
+                var deserializer = new DeserializerBuilder()
+                    .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                    .IgnoreUnmatchedProperties()
+                    .Build();
+                Setting = deserializer.Deserialize<Setting>(content);
+            }
+            else
             {
                 Console.WriteLine($"{DefaultPath}が存在しないため、設定ファイルのインポートを中止します。デフォルト設定が使用されます。");
+                Setting = new Setting();
 
-                Protocol.Add("https");
+                Setting.Protocol.Add("https");
 
-                Domain.Add("booth.pm");
-                Domain.Add("yukiyukivirtual.github.io");
-                Domain.Add("yukiyukivirtual.net");
-                return;
+                Setting.Domain.Add("booth.pm");
+                Setting.Domain.Add("yukiyukivirtual.github.io");
+                Setting.Domain.Add("yukiyukivirtual.net");
             }
-            using (var streamReader = new StreamReader(DefaultPath))
-            {
-                YamlStream yamlStream = new YamlStream();
-                yamlStream.Load(streamReader);
-                var root = (YamlMappingNode)yamlStream.Documents[0].RootNode;
-                try
-                {
-                    var item = (YamlScalarNode)root.Children[new YamlScalarNode("Version")];
-                    Version = item.Value;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("Versionキーのパースに失敗");
-                }
-                try
-                {
-                    var item = (YamlScalarNode)root.Children[new YamlScalarNode("IdlePeriod")];
-                    IdlePeriod = int.Parse(item.Value); ;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("IdlePeriodキーのパースに失敗");
-                }
-                try
-                {
-                    var item = (YamlScalarNode)root.Children[new YamlScalarNode("HttpRequestPeriod")];
-                    HttpRequestPeriod = int.Parse(item.Value); ;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("HttpRequestPeriodキーのパースに失敗");
-                }
-                try
-                {
-                    Protocol.AddRange(from YamlScalarNode item in (YamlSequenceNode)root.Children[new YamlScalarNode("Protocol")]
-                                      let value = item.Value
-                                      select value);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("Protocolキーのパースに失敗");
-                }
-                try
-                {
-                    Domain.AddRange(from YamlScalarNode item in (YamlSequenceNode)root.Children[new YamlScalarNode("Domain")]
-                                    let value = item.Value
-                                    select value);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("Domainキーのパースに失敗");
-                }
-                try
-                {
-                    BannedUser.AddRange(from YamlScalarNode item in (YamlSequenceNode)root.Children[new YamlScalarNode("BannedUser")]
-                                    let value = item.Value
-                                    select value);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("BannedUserキーのパースに失敗");
-                }
-                //Console.WriteLine(this.ToString());
-            }
-        }
-        public override string ToString()
-        {
-
-            var serializer = new Serializer();
-            return serializer.Serialize(this).Trim();
+            Console.WriteLine("ImportYaml");
+            Console.WriteLine(Setting.ToString());
         }
     }
 }
