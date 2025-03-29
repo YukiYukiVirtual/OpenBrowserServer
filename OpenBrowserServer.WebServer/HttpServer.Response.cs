@@ -20,7 +20,7 @@ namespace OpenBrowserServer.WebServer
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
-            if (settings.PauseSystem)
+            if (config.PauseSystem)
             {
                 response.KeepAlive = false;
                 response.StatusCode = 403;
@@ -32,7 +32,7 @@ namespace OpenBrowserServer.WebServer
             {
                 DateTime now = DateTime.Now;
                 TimeSpan timeSpan = now - lastRequestTime;
-                if (timeSpan.TotalMilliseconds >= settings.HttpRequestPeriod)
+                if (timeSpan.TotalMilliseconds >= config.HttpRequestPeriod)
                 {
                     //Console.WriteLine($"RawUrl:{request.RawUrl}");
                     switch (request.RawUrl)
@@ -93,12 +93,12 @@ namespace OpenBrowserServer.WebServer
             {
                 version = new
                 {
-                    major = settings.fileVersionInfo.ProductMajorPart,
-                    minor = settings.fileVersionInfo.ProductMinorPart,
-                    build = settings.fileVersionInfo.ProductBuildPart,
-                    full  = settings.FileVersion,
+                    major = config.fileVersionInfo.ProductMajorPart,
+                    minor = config.fileVersionInfo.ProductMinorPart,
+                    build = config.fileVersionInfo.ProductBuildPart,
+                    full  = config.FileVersion,
                 },
-                edition = settings.Edition,
+                edition = config.Edition,
             };
             // データをJSONにシリアライズ
             string content = System.Text.Json.JsonSerializer.Serialize(obj);

@@ -8,19 +8,19 @@ namespace OpenBrowserServer
 {
     public partial class ControlPanelForm : Form
     {
-        readonly Settings settings;
+        readonly Config config;
         readonly History history;
         readonly VRChatLogWatcher vrchatLogWatcher;
-        public ControlPanelForm(Settings settings, History history, VRChatLogWatcher vrchatLogWatcher)
+        public ControlPanelForm(Config config, History history, VRChatLogWatcher vrchatLogWatcher)
         {
-            this.settings = settings;
+            this.config = config;
             this.history = history;
             this.vrchatLogWatcher = vrchatLogWatcher;
 
             InitializeComponent();
 
-            textBoxAllowedDomainList.Text = string.Join("\r\n", settings.Domain);
-            textBoxAllowedProtocolList.Text = string.Join("\r\n", settings.Protocol);
+            textBoxAllowedDomainList.Text = string.Join("\r\n", config.Domain);
+            textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Protocol);
         }
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
@@ -75,8 +75,8 @@ namespace OpenBrowserServer
         {
             if (DialogWrapper.DownloadConfirm())
             {
-                settings.Update();
-                if (settings.NeedUpgrade())
+                config.Update();
+                if (config.NeedUpgrade())
                 {
                     if (DialogWrapper.UpdateConfirm())
                     {
@@ -104,16 +104,16 @@ namespace OpenBrowserServer
 
         private void buttonPauseResume_Click(object sender, EventArgs e)
         {
-            if(settings.PauseSystem)
+            if(config.PauseSystem)
             {
                 // 再開する
-                settings.PauseSystem = false;
+                config.PauseSystem = false;
                 this.buttonPauseResume.Text = "一時停止する";
             }
             else
             {
                 // 一時停止する
-                settings.PauseSystem = true;
+                config.PauseSystem = true;
                 this.buttonPauseResume.Text = "再開する";
             }
         }

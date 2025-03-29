@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace OpenBrowserServer.Component
 {
-    public class Settings
+    public class Config
     {
         private const string DefaultPath = "setting.yaml";
         public string Edition {
@@ -36,15 +36,15 @@ namespace OpenBrowserServer.Component
         public List<string> Domain { get; private set; }
         public List<string> BannedUser { get; private set; }
         public bool PauseSystem { get; set; }
-        public Settings(FileVersionInfo fileVersionInfo)
+        public Config(FileVersionInfo fileVersionInfo)
         {
             this.fileVersionInfo = fileVersionInfo;
             Update();
             //Console.WriteLine(ToString());
         }
-        ~Settings()
+        ~Config()
         {
-            Console.WriteLine("Settings destructor");
+            Console.WriteLine("Config destructor");
         }
         public void Clear()
         {

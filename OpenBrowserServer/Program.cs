@@ -35,8 +35,8 @@ namespace OpenBrowserServer
         static void Initialize()
         {
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location); // プログラムファイルのバージョン情報取得
-            Settings settings = new Settings(fileVersionInfo);
-            if(settings.NeedUpgrade())
+            Config config = new Config(fileVersionInfo);
+            if(config.NeedUpgrade())
             {
                 if(DialogWrapper.UpdateConfirm())
                 {
@@ -45,10 +45,10 @@ namespace OpenBrowserServer
                 }
             }
             History history = new History();
-            history.WriteLine($"■起動時のバージョン {settings.FileVersion}");
-            VRChatLogWatcher vrchatLogWatcher = new VRChatLogWatcher(settings, history);
-            new HttpServer(settings, history);
-            new NotifyIconForm(settings, history, vrchatLogWatcher);
+            history.WriteLine($"■起動時のバージョン {config.FileVersion}");
+            VRChatLogWatcher vrchatLogWatcher = new VRChatLogWatcher(config, history);
+            new HttpServer(config, history);
+            new NotifyIconForm(config, history, vrchatLogWatcher);
         }
     }
 }

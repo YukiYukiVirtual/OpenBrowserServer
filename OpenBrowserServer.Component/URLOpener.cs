@@ -14,13 +14,13 @@ namespace OpenBrowserServer.Component
     }
     public class URLOpener
     {
-        readonly Settings settings;
+        readonly Config config;
         static readonly SoundPlayer openSoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
         DateTime lastOpenTime;
-        public URLOpener(Settings settings)
+        public URLOpener(Config config)
         {
             // 設定ファイルのインスタンスを保持
-            this.settings = settings;
+            this.config = config;
             // 最初は必ず開けるようにするために、最小の有効時間で初期化する
             lastOpenTime = DateTime.MinValue;
         }
@@ -39,7 +39,7 @@ namespace OpenBrowserServer.Component
             // 前に開いた時間との差が規定以上であればURLを開く
             DateTime now = DateTime.Now;
             TimeSpan timeSpan = now - lastOpenTime;
-            if (timeSpan.TotalMilliseconds < settings.IdlePeriod)
+            if (timeSpan.TotalMilliseconds < config.IdlePeriod)
             {
                 return URLOpenResult.TimeSpanError;
             }
@@ -65,7 +65,7 @@ namespace OpenBrowserServer.Component
                 return URLOpenResult.FormatError;
             }
 
-            result = settings.Protocol.Contains(uri.Scheme);
+            result = config.Protocol.Contains(uri.Scheme);
             if (!result)
             {
                 Console.WriteLine($"{uri.Scheme}を開くことはできません。'{url}'");
@@ -74,7 +74,7 @@ namespace OpenBrowserServer.Component
 
             // ドメインチェック
             result = false;
-            foreach (string host in settings.Domain)
+            foreach (string host in config.Domain)
             {
                 if(uri.Host == host || uri.Host.EndsWith("."+host))
                 {

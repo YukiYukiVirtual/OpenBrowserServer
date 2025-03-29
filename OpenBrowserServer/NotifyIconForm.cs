@@ -7,14 +7,14 @@ namespace OpenBrowserServer
 {
     public partial class NotifyIconForm : Form
     {
-        readonly Settings settings;
+        readonly Config config;
         readonly History history;
         readonly VRChatLogWatcher vrchatLogWatcher;
 
         ControlPanelForm controlPanelForm = null;
-        public NotifyIconForm(Settings settings, History history, VRChatLogWatcher vrchatLogWatcher)
+        public NotifyIconForm(Config config, History history, VRChatLogWatcher vrchatLogWatcher)
         {
-            this.settings = settings;
+            this.config = config;
             this.history = history;
             this.vrchatLogWatcher = vrchatLogWatcher;
 
@@ -28,7 +28,7 @@ namespace OpenBrowserServer
             if(controlPanelForm == null || controlPanelForm.IsDisposed)
             {
                 Console.WriteLine("OpenControlPanel open");
-                controlPanelForm = new ControlPanelForm(settings, history, vrchatLogWatcher)
+                controlPanelForm = new ControlPanelForm(config, history, vrchatLogWatcher)
                 {
                     Visible = true
                 };
@@ -66,8 +66,8 @@ namespace OpenBrowserServer
         {
             if (DialogWrapper.DownloadConfirm())
             { 
-                settings.Update();
-                if (settings.NeedUpgrade())
+                config.Update();
+                if (config.NeedUpgrade())
                 {
                     if (DialogWrapper.UpdateConfirm())
                     {

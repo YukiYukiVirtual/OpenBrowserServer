@@ -8,12 +8,12 @@ namespace OpenBrowserServer.WebServer
     public partial class HttpServer
     {
         readonly HttpListener listener;
-        readonly Settings settings;
+        readonly Config config;
         readonly History history;
         DateTime lastRequestTime;
-        public HttpServer(Settings settings, History history)
+        public HttpServer(Config config, History history)
         {
-            this.settings = settings;
+            this.config = config;
             this.history = history;
 
             lastRequestTime = DateTime.MinValue;
