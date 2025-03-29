@@ -23,16 +23,13 @@ namespace OpenBrowserServer.Component
                 ; 
         }
         public Setting Setting { get; private set; }
-        private readonly FileVersionInfo fileVersionInfo;
-        public string FileVersion { get
-            {
-                return $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
-            }
-        }
+        public string FileVersion { get; private set; }
         public bool PauseSystem { get; set; }
         public Config()
         {
-            this.fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location); // プログラムファイルのバージョン情報取得
+            // プログラムファイルのバージョン情報取得
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
             Update();
         }
         ~Config()

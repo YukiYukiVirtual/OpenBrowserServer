@@ -27,7 +27,7 @@ namespace OpenBrowserServer.Component
             opener = new URLOpener(config);
             this.history = history;
 
-            watchdogTimer = new System.Timers.Timer(1000*60*30); // ミリ秒→秒→分→30分
+            watchdogTimer = new System.Timers.Timer(1000*60*config.Setting.WatchdogTime); // ミリ秒→秒→分
             watchdogTimer.Elapsed += WatchdogTimer_Elapsed;
             watchdogTimer.AutoReset = false;
 
@@ -149,6 +149,7 @@ namespace OpenBrowserServer.Component
                     // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
                     if(JsonDownloader.CacheWorldInformation(NowWorldId))
                     {
+                        // BANリストから検索する
                         BannedUserInfo bannedUserInfo = config.Setting.BannedUser.Find(x => x.Id == JsonDownloader.CachedAuthorId);
                         if (bannedUserInfo != null)
                         {

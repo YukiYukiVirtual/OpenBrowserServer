@@ -1,6 +1,7 @@
 ﻿Version: v6.0.0
-IdlePeriod: 400
-HttpRequestPeriod: 5000
+IdlePeriod: 500 # ms
+HttpRequestPeriod: 5000 # ms
+WatchdogTime: 30 # min
 Protocol:
   - https
 Domain:

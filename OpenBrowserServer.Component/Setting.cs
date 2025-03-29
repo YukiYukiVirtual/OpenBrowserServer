@@ -8,6 +8,7 @@ namespace OpenBrowserServer.Component
         public string Version = "";
         public int IdlePeriod = 500;
         public int HttpRequestPeriod = 5000;
+        public int WatchdogTime = 30;
         public List<string> Protocol = new List<string>();
         public List<string> Domain = new List<string>();
         public List<BannedUserInfo> BannedUser = new List<BannedUserInfo>();
