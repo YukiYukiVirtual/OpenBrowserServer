@@ -23,7 +23,7 @@ namespace OpenBrowserServer.WebServer
             if (config.PauseSystem)
             {
                 response.KeepAlive = false;
-                response.StatusCode = 403;
+                response.StatusCode = 425;
                 response.ContentLength64 = 0;
                 return WebRequest.OK;
             }
