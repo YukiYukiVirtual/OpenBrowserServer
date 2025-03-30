@@ -60,7 +60,7 @@ Global
 		{C909570F-7BBB-4208-ADC8-D3417B001664}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Booth|Any CPU.ActiveCfg = Booth
 		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Debug|Any CPU.ActiveCfg = Debug
-		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Free|Any CPU.ActiveCfg = Debug
+		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Free|Any CPU.ActiveCfg = Free
 		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
