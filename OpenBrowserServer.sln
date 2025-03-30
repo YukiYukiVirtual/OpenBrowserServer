@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目
 		UpdateVersion.ps1 = UpdateVersion.ps1
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OpenBrowserServer_Installer", "OpenBrowserServer_Installer\OpenBrowserServer_Installer.vdproj", "{F6D35A24-F169-3CA7-C6FD-970340555FEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Booth|Any CPU = Booth|Any CPU
@@ -30,7 +32,6 @@ Global
 		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Free|Any CPU.ActiveCfg = Free|Any CPU
-		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Free|Any CPU.Build.0 = Free|Any CPU
 		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FC24151-AFB4-428C-899D-55F130774E33}.Booth|Any CPU.ActiveCfg = Booth|Any CPU
@@ -57,6 +58,10 @@ Global
 		{C909570F-7BBB-4208-ADC8-D3417B001664}.Free|Any CPU.Build.0 = Free|Any CPU
 		{C909570F-7BBB-4208-ADC8-D3417B001664}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C909570F-7BBB-4208-ADC8-D3417B001664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Booth|Any CPU.ActiveCfg = Booth
+		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Debug|Any CPU.ActiveCfg = Debug
+		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Free|Any CPU.ActiveCfg = Debug
+		{F6D35A24-F169-3CA7-C6FD-970340555FEA}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
