@@ -46,26 +46,37 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.buttonOpenLogFile = new System.Windows.Forms.Button();
             this.buttonPauseResume = new System.Windows.Forms.Button();
+            this.buttonReload = new System.Windows.Forms.Button();
+            this.toolTipUpdate = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipReload = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipOpenFolder = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipOpenLogFile = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipPauseResume = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipExit = new System.Windows.Forms.ToolTip(this.components);
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox2.SuspendLayout();
             this.flowLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.worldImageBox)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            this.flowLayoutPanel2.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOpenDirectory
             // 
+            this.buttonOpenDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOpenDirectory.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonOpenDirectory.Location = new System.Drawing.Point(167, 3);
+            this.buttonOpenDirectory.Location = new System.Drawing.Point(198, 3);
             this.buttonOpenDirectory.Name = "buttonOpenDirectory";
-            this.buttonOpenDirectory.Size = new System.Drawing.Size(158, 48);
+            this.buttonOpenDirectory.Size = new System.Drawing.Size(189, 60);
             this.buttonOpenDirectory.TabIndex = 0;
             this.buttonOpenDirectory.Text = "フォルダを開く";
+            this.toolTipOpenFolder.SetToolTip(this.buttonOpenDirectory, "実行ファイルのフォルダを開きます");
             this.buttonOpenDirectory.UseVisualStyleBackColor = true;
             this.buttonOpenDirectory.Click += new System.EventHandler(this.buttonOpenDirectory_Click);
             // 
@@ -187,23 +198,31 @@
             // 
             // buttonUpdate
             // 
+            this.buttonUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonUpdate.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.buttonUpdate.Location = new System.Drawing.Point(3, 3);
             this.buttonUpdate.Name = "buttonUpdate";
-            this.buttonUpdate.Size = new System.Drawing.Size(158, 48);
+            this.buttonUpdate.Size = new System.Drawing.Size(189, 60);
             this.buttonUpdate.TabIndex = 8;
-            this.buttonUpdate.Text = "設定ファイル更新";
+            this.buttonUpdate.Text = "設定ファイル\r\nダウンロード";
+            this.toolTipUpdate.SetToolTip(this.buttonUpdate, "設定ファイルをダウンロードして適用します。");
             this.buttonUpdate.UseVisualStyleBackColor = true;
             this.buttonUpdate.Click += new System.EventHandler(this.buttonUpdate_Click);
             // 
             // buttonExit
             // 
+            this.buttonExit.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonExit.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonExit.Location = new System.Drawing.Point(495, 3);
+            this.buttonExit.Location = new System.Drawing.Point(588, 69);
             this.buttonExit.Name = "buttonExit";
-            this.buttonExit.Size = new System.Drawing.Size(158, 48);
+            this.buttonExit.Size = new System.Drawing.Size(190, 61);
             this.buttonExit.TabIndex = 9;
             this.buttonExit.Text = "終了";
+            this.toolTipExit.SetToolTip(this.buttonExit, "プログラムを終了します。");
             this.buttonExit.UseVisualStyleBackColor = true;
             this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
             // 
@@ -238,39 +257,71 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "許可プロトコル一覧";
             // 
-            // flowLayoutPanel2
-            // 
-            this.flowLayoutPanel2.Controls.Add(this.buttonUpdate);
-            this.flowLayoutPanel2.Controls.Add(this.buttonOpenDirectory);
-            this.flowLayoutPanel2.Controls.Add(this.buttonOpenLogFile);
-            this.flowLayoutPanel2.Controls.Add(this.buttonExit);
-            this.flowLayoutPanel2.Controls.Add(this.buttonPauseResume);
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(12, 413);
-            this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(781, 134);
-            this.flowLayoutPanel2.TabIndex = 11;
-            // 
             // buttonOpenLogFile
             // 
+            this.buttonOpenLogFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOpenLogFile.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonOpenLogFile.Location = new System.Drawing.Point(331, 3);
+            this.buttonOpenLogFile.Location = new System.Drawing.Point(198, 69);
             this.buttonOpenLogFile.Name = "buttonOpenLogFile";
-            this.buttonOpenLogFile.Size = new System.Drawing.Size(158, 48);
+            this.buttonOpenLogFile.Size = new System.Drawing.Size(189, 61);
             this.buttonOpenLogFile.TabIndex = 10;
             this.buttonOpenLogFile.Text = "ログファイルを開く";
+            this.toolTipOpenLogFile.SetToolTip(this.buttonOpenLogFile, "ログファイルを開きます。");
             this.buttonOpenLogFile.UseVisualStyleBackColor = true;
             this.buttonOpenLogFile.Click += new System.EventHandler(this.buttonOpenLogFile_Click);
             // 
             // buttonPauseResume
             // 
+            this.buttonPauseResume.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonPauseResume.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonPauseResume.Location = new System.Drawing.Point(3, 57);
+            this.buttonPauseResume.Location = new System.Drawing.Point(588, 3);
             this.buttonPauseResume.Name = "buttonPauseResume";
-            this.buttonPauseResume.Size = new System.Drawing.Size(158, 48);
+            this.buttonPauseResume.Size = new System.Drawing.Size(190, 60);
             this.buttonPauseResume.TabIndex = 11;
             this.buttonPauseResume.Text = "一時停止する";
+            this.toolTipPauseResume.SetToolTip(this.buttonPauseResume, "VRChatからの要求を一時停止、または、再開します。");
             this.buttonPauseResume.UseVisualStyleBackColor = true;
             this.buttonPauseResume.Click += new System.EventHandler(this.buttonPauseResume_Click);
+            // 
+            // buttonReload
+            // 
+            this.buttonReload.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonReload.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonReload.Location = new System.Drawing.Point(3, 69);
+            this.buttonReload.Name = "buttonReload";
+            this.buttonReload.Size = new System.Drawing.Size(189, 61);
+            this.buttonReload.TabIndex = 12;
+            this.buttonReload.Text = "ローカル設定\r\nファイル読み込み";
+            this.toolTipReload.SetToolTip(this.buttonReload, "ローカルの設定ファイルを読み込みます。一時的に設定を確認したいときなどに使います。");
+            this.buttonReload.UseVisualStyleBackColor = true;
+            this.buttonReload.Click += new System.EventHandler(this.buttonReload_Click);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 4;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.buttonOpenLogFile, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.buttonUpdate, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.buttonReload, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.buttonOpenDirectory, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.buttonExit, 3, 1);
+            this.tableLayoutPanel1.Controls.Add(this.buttonPauseResume, 3, 0);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 413);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(781, 133);
+            this.tableLayoutPanel1.TabIndex = 12;
             // 
             // ControlPanelForm
             // 
@@ -278,7 +329,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(917, 646);
-            this.Controls.Add(this.flowLayoutPanel2);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.groupBox2);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -294,7 +345,7 @@
             this.groupBox3.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.flowLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -311,7 +362,6 @@
         private System.Windows.Forms.Button buttonUpdate;
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Button buttonOpenLogFile;
@@ -320,5 +370,13 @@
         private System.Windows.Forms.TextBox textWorldName;
         private System.Windows.Forms.TextBox textAuthorName;
         private System.Windows.Forms.Button buttonPauseResume;
+        private System.Windows.Forms.Button buttonReload;
+        private System.Windows.Forms.ToolTip toolTipUpdate;
+        private System.Windows.Forms.ToolTip toolTipReload;
+        private System.Windows.Forms.ToolTip toolTipOpenFolder;
+        private System.Windows.Forms.ToolTip toolTipExit;
+        private System.Windows.Forms.ToolTip toolTipPauseResume;
+        private System.Windows.Forms.ToolTip toolTipOpenLogFile;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }

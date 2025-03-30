@@ -40,6 +40,7 @@ namespace OpenBrowserServer.WebServer
                         case "/":
                             //Console.WriteLine("Root");
                             webRequestResult = ProcessRoot(context);
+                            lastRequestTime = now;
                             break;
                         case "/favicon.ico":
                             //Console.WriteLine("favicon");
@@ -62,9 +63,9 @@ namespace OpenBrowserServer.WebServer
                                     webRequestResult = WebRequest.NotImplemented;
                                     break;
                             }
+                            lastRequestTime = now;
                             break;
                     }
-                    lastRequestTime = now;
                 }
                 else
                 {

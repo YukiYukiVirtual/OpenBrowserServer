@@ -209,6 +209,7 @@
   <Import Project="..\packages\Costura.Fody.6.0.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.6.0.0\build\Costura.Fody.targets')" />
   <Import Project="..\packages\Fody.6.9.2\build\Fody.targets" Condition="Exists('..\packages\Fody.6.9.2\build\Fody.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)UpdateVersion.ps1" "$(TargetPath)" "$(SolutionDir)setting.yaml"</PostBuildEvent>
+    <PostBuildEvent>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)UpdateVersion.ps1" "$(TargetPath)" "$(SolutionDir)setting.yaml"
+del $(TargetDir)*.xml $(TargetDir)*.config $(TargetDir)*.pdb $(TargetDir)*.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>

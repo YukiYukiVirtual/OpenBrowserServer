@@ -116,5 +116,24 @@ namespace OpenBrowserServer
                 this.buttonPauseResume.Text = "再開する";
             }
         }
+
+        private void buttonReload_Click(object sender, EventArgs e)
+        {
+            config.Reload();
+            if (config.NeedUpgrade())
+            {
+                if (DialogWrapper.UpdateConfirm())
+                {
+                    this.Close();
+                    Application.Exit();
+                }
+            }
+            DialogWrapper.Completed();
+        }
+
+        private void buttonOpenGitHub_Click(object sender, EventArgs e)
+        {
+            URLOpener.StaticOpen("https://github.com/YukiYukiVirtual/OpenBrowserServer");
+        }
     }
 }

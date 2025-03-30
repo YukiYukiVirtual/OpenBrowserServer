@@ -25,10 +25,8 @@ namespace OpenBrowserServer.Component
         public Setting Setting { get; private set; }
         public string FileVersion { get; private set; }
         public bool PauseSystem { get; set; }
-        public Config()
+        public Config(FileVersionInfo fileVersionInfo)
         {
-            // プログラムファイルのバージョン情報取得
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
             FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
             Update();
         }
@@ -43,6 +41,11 @@ namespace OpenBrowserServer.Component
         {
             Clear();
             Download();
+            ImportYaml();
+        }
+        public void Reload()
+        {
+            Clear();
             ImportYaml();
         }
         public bool NeedUpgrade()
