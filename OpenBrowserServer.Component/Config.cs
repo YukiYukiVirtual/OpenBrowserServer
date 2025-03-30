@@ -10,11 +10,7 @@ namespace OpenBrowserServer.Component
 {
     public class Config
     {
-#if DEBUG
-        private const string DefaultPath = "../../../setting.yaml";
-#else
-        private const string DefaultPath = "setting.yaml";
-#endif
+        private readonly string SettingFilePath = "";
         public string Edition {
             get =>
 #if BOOTH
@@ -27,8 +23,17 @@ namespace OpenBrowserServer.Component
         public Setting Setting { get; private set; }
         public string FileVersion { get; private set; }
         public bool PauseSystem { get; set; }
-        public Config(FileVersionInfo fileVersionInfo)
+        public string WorkingPath { get; private set; }
+        public Config(string workingPath, FileVersionInfo fileVersionInfo)
         {
+            this.WorkingPath = workingPath;
+            SettingFilePath =
+#if DEBUG
+                "../../../setting.yaml";
+#else
+                Path.Combine(workingPath, "setting.yaml");
+#endif
+            Console.WriteLine($"SettingFilePath: {SettingFilePath}");
             FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
             Update();
         }
@@ -54,7 +59,7 @@ namespace OpenBrowserServer.Component
         {
             return !FileVersion.Equals(Setting.Version);
         }
-        public static void Download()
+        public void Download()
         {
 #if DEBUG
 
@@ -67,7 +72,7 @@ namespace OpenBrowserServer.Component
                 try
                 {
                     string responseBody = client.GetStringAsync(url).Result;
-                    File.WriteAllText(DefaultPath, responseBody);
+                    File.WriteAllText(SettingFilePath, responseBody);
                 }
                 catch(Exception e)
                 {
@@ -79,9 +84,9 @@ namespace OpenBrowserServer.Component
         }
         private void ImportYaml()
         {
-            if (File.Exists(DefaultPath))
+            if (File.Exists(SettingFilePath))
             {
-                string content = File.ReadAllText(DefaultPath);
+                string content = File.ReadAllText(SettingFilePath);
                 var deserializer = new DeserializerBuilder()
                     .WithNamingConvention(PascalCaseNamingConvention.Instance)
                     .IgnoreUnmatchedProperties()
@@ -90,7 +95,7 @@ namespace OpenBrowserServer.Component
             }
             else
             {
-                Console.WriteLine($"{DefaultPath}が存在しないため、設定ファイルのインポートを中止します。デフォルト設定が使用されます。");
+                Console.WriteLine($"{SettingFilePath}が存在しないため、設定ファイルのインポートを中止します。デフォルト設定が使用されます。");
                 Setting = new Setting();
 
                 Setting.Protocol.Add("https");

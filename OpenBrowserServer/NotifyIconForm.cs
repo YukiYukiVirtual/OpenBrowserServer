@@ -85,7 +85,7 @@ namespace OpenBrowserServer
         /// <param name="e"></param>
         private void folderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            URLOpener.StaticOpen(".");
+            URLOpener.StaticOpen(config.WorkingPath);
         }
         /// <summary>
         /// 終了

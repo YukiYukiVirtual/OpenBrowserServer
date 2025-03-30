@@ -5,11 +5,18 @@ namespace OpenBrowserServer.Logger
 {
     public class History
     {
-        const string directoryName = "Log";
+        private readonly string directoryName = "Log";
         const string filePrefix = "History_";
         public string LogFileName { get; private set; }
-        public History()
+        public History(string workingPath)
         {
+            directoryName = 
+#if DEBUG
+                "Log";
+#else
+                Path.Combine(workingPath, "Log");
+#endif
+            Console.WriteLine($"directoryName: {directoryName}");
             // 起動時の日付でログファイル名を作成する
             LogFileName = $"{directoryName}\\{filePrefix}{DateTime.Today:yyyy-MM-dd}.log";
             // ログ用ディレクトリを作成する(無ければ)

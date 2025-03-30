@@ -34,9 +34,10 @@ namespace OpenBrowserServer
         }
         static void Initialize()
         {
+            string workingPath = Environment.ExpandEnvironmentVariables(@"%AppData%\YukiYukiVirtual\OpenBrowserServer"); // ログや設定ファイルなどを置いておくフォルダ(Roaming)
             // プログラムファイルのバージョン情報取得
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            Config config = new Config(fileVersionInfo);
+            Config config = new Config(workingPath, fileVersionInfo);
             if(config.NeedUpgrade())
             {
                 if(DialogWrapper.UpdateConfirm())
@@ -45,8 +46,8 @@ namespace OpenBrowserServer
                     return;
                 }
             }
-            History history = new History();
-            history.WriteLine($"■起動時のバージョン {config.FileVersion}");
+            History history = new History(workingPath);
+            history.WriteLine($"■起動時のバージョン {config.FileVersion}_{config.Edition}");
             VRChatLogWatcher vrchatLogWatcher = new VRChatLogWatcher(config, history);
             new HttpServer(config, history);
             new NotifyIconForm(config, history, vrchatLogWatcher);

@@ -67,7 +67,7 @@ namespace OpenBrowserServer
 
         private void buttonOpenDirectory_Click(object sender, EventArgs e)
         {
-            URLOpener.StaticOpen(".");
+            URLOpener.StaticOpen(config.WorkingPath);
         }
 
         private void buttonUpdate_Click(object sender, EventArgs e)
