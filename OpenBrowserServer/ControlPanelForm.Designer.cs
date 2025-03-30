@@ -145,7 +145,7 @@
             this.textWorldName.Font = new System.Drawing.Font("MS UI Gothic", 16F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
             this.textWorldName.Location = new System.Drawing.Point(3, 3);
             this.textWorldName.Name = "textWorldName";
-            this.textWorldName.Size = new System.Drawing.Size(477, 22);
+            this.textWorldName.Size = new System.Drawing.Size(474, 22);
             this.textWorldName.TabIndex = 16;
             this.textWorldName.Text = "ワールド名";
             // 
@@ -217,9 +217,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonExit.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonExit.Location = new System.Drawing.Point(588, 69);
+            this.buttonExit.Location = new System.Drawing.Point(588, 3);
             this.buttonExit.Name = "buttonExit";
-            this.buttonExit.Size = new System.Drawing.Size(190, 61);
+            this.buttonExit.Size = new System.Drawing.Size(190, 60);
             this.buttonExit.TabIndex = 9;
             this.buttonExit.Text = "終了";
             this.toolTipExit.SetToolTip(this.buttonExit, "プログラムを終了します。");
@@ -278,9 +278,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonPauseResume.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonPauseResume.Location = new System.Drawing.Point(588, 3);
+            this.buttonPauseResume.Location = new System.Drawing.Point(393, 3);
             this.buttonPauseResume.Name = "buttonPauseResume";
-            this.buttonPauseResume.Size = new System.Drawing.Size(190, 60);
+            this.buttonPauseResume.Size = new System.Drawing.Size(189, 60);
             this.buttonPauseResume.TabIndex = 11;
             this.buttonPauseResume.Text = "一時停止する";
             this.toolTipPauseResume.SetToolTip(this.buttonPauseResume, "VRChatからの要求を一時停止、または、再開します。");
@@ -313,8 +313,8 @@
             this.tableLayoutPanel1.Controls.Add(this.buttonUpdate, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.buttonReload, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.buttonOpenDirectory, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.buttonExit, 3, 1);
-            this.tableLayoutPanel1.Controls.Add(this.buttonPauseResume, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.buttonPauseResume, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.buttonExit, 3, 0);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 413);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
