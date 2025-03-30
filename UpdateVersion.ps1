@@ -33,7 +33,7 @@ if ($rawContent -match "\r\n") {
 
 # Versions‚ğXV
 $updatedLines = $yamlLines | ForEach-Object {
-    if ($_ -match "Version:\s*v\d+\.\d+\.\d+") {
+    if ($_ -match "Version:.+") {
         "Version: $newVersion"
     } else {
         $_
