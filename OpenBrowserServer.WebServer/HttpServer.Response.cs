@@ -177,7 +177,7 @@ namespace OpenBrowserServer.WebServer
                 response.ContentLength64 = 0;
 
                 history.WriteLine($"▲ProcessKeys 何らかの例外発生 {filepath}");
-                Console.WriteLine(e.ToString());
+                history.WriteLine(e.ToString());
                 webRequestResult = WebRequest.Exception;
             }
             return webRequestResult;
