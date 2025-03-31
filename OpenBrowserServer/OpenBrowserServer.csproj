@@ -215,7 +215,6 @@
   </PropertyGroup>
   <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
   <PropertyGroup>
-    <PreBuildEvent>git branch --show-current
-powershell -ExecutionPolicy Bypass -File "$(SolutionDir)UpdateVersion.ps1" $(SolutionDir)</PreBuildEvent>
+    <PreBuildEvent>rem powershell -ExecutionPolicy Bypass -File "$(SolutionDir)UpdateVersion.ps1" $(SolutionDir)</PreBuildEvent>
   </PropertyGroup>
 </Project>
