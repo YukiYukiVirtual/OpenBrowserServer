@@ -64,7 +64,7 @@ namespace OpenBrowserServer.Component
 #if DEBUG
 
 #else
-            string url = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();
+            string url = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/visualstudio_beta/setting.yaml#" + DateTime.Now.ToString();
             // ダウンロード
             using(HttpClient client = new HttpClient())
             {
