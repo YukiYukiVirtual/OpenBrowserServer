@@ -282,7 +282,7 @@
             this.buttonPauseResume.Name = "buttonPauseResume";
             this.buttonPauseResume.Size = new System.Drawing.Size(189, 60);
             this.buttonPauseResume.TabIndex = 11;
-            this.buttonPauseResume.Text = "一時停止する";
+            this.buttonPauseResume.Text = "一時停止/再開ボタン";
             this.toolTipPauseResume.SetToolTip(this.buttonPauseResume, "VRChatからの要求を一時停止、または、再開します。");
             this.buttonPauseResume.UseVisualStyleBackColor = true;
             this.buttonPauseResume.Click += new System.EventHandler(this.buttonPauseResume_Click);

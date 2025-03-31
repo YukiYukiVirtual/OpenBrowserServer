@@ -20,6 +20,8 @@ namespace OpenBrowserServer
 
             textBoxAllowedDomainList.Text = string.Join("\r\n", config.Setting.Domain);
             textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Setting.Protocol);
+            
+            this.buttonPauseResume.Text = (config.PauseSystem? "再開する":"一時停止する");
         }
 
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
