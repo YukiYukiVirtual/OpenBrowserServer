@@ -17,7 +17,10 @@ echo "バージョンは$newVersion"
 $replacements = @(
     @{ FilePath = "setting.yaml"; RegexPattern = "^Version: v`\d+`\.`\d+`\.`\d+"; Replacement = "Version: v$newVersion" }
 )
-
+# setting.yaml
+# OpenBrowserServer 公開
+# AssemblyInfo.cs
+# OpenBrowserServer_Installer
 
 # 各置換情報をループで処理
 
