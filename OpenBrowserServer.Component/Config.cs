@@ -12,13 +12,7 @@ namespace OpenBrowserServer.Component
     {
         private readonly string SettingFilePath = "";
         public string Edition {
-            get =>
-#if BOOTH
-                "Booth"
-#else
-                "Free"
-#endif
-                ; 
+            get => "Beta"; 
         }
         public Setting Setting { get; private set; }
         public string FileVersion { get; private set; }
