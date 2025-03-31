@@ -1,49 +1,68 @@
 param (
-    [string]$exePath,   # .exeのフルパス
-    [string]$yamlPath   # setting.yamlのフルパス
+    [Parameter(Mandatory=$true)][string]$solutionDir
+)
+$solutionDir = $solutionDir.TrimEnd('\')
+$VersionMasterPath = Join-Path -Path $solutionDir -ChildPath "VersionMaster.txt"
+
+# バージョン番号をファイルから変数に入れる
+try {
+    $newVersion = Get-Content -Path "$VersionMasterPath" -Raw
+}
+catch {
+    Write-Error "エラーが発生しました（ファイル: $VersionMasterPath）: $_"
+}
+echo "バージョンは$newVersion"
+
+# 置換情報を配列として定義
+$replacements = @(
+    @{ FilePath = "setting.yaml"; RegexPattern = "^Version: v`\d+`\.`\d+`\.`\d+"; Replacement = "Version: v$newVersion" }
 )
 
-# .exeが存在するか確認
-if (-not (Test-Path $exePath)) {
-    Write-Error "EXE file not found: $exePath"
-    exit 1
-}
 
-# setting.yamlが存在するか確認
-if (-not (Test-Path $yamlPath)) {
-    Write-Error "setting.yaml not found: $yamlPath"
-    exit 1
-}
+# 各置換情報をループで処理
 
-# バージョン取得
-$assembly = [System.Reflection.Assembly]::LoadFrom($exePath)
-$version = $assembly.GetName().Version
-$newVersion = "v$($version.Major).$($version.Minor).$($version.Build)"
+foreach ($item in $replacements) {
+    $filePath = Join-Path -Path $solutionDir -ChildPath $item.FilePath
+    $regexPattern = $item.RegexPattern
+    $replacement = $item.Replacement
 
-# YAMLを読み込み（行ごとに取得）
-$yamlLines = Get-Content -Path $yamlPath
+    try {
+        # ファイルの内容を読み込み
+        $contentBytes = [System.IO.File]::ReadAllBytes($filePath)
+        $content = [System.Text.Encoding]::UTF8.GetString($contentBytes)
+        
+        # BOMがあれば除去
+        if ($content.StartsWith([char]0xFEFF)) {
+            $content = $content.Substring(1)
+        }
 
-# 元の改行コードを検出
-$rawContent = [System.IO.File]::ReadAllText($yamlPath)
-if ($rawContent -match "\r\n") {
-    $newline = "`r`n"  # CRLF
-} else {
-    $newline = "`n"    # LF
-}
+        # デバッグ用: ファイル内容を表示
+        # Write-Host "ファイル内容: '$content'"
 
-# Version行を更新
-$updatedLines = $yamlLines | ForEach-Object {
-    if ($_ -match "Version:.+") {
-        "Version: $newVersion"
-    } else {
-        $_
+        # 元の改行コードを検出
+        $lineEnding = if ($content -match "`r`n") { "`r`n" } elseif ($content -match "`n") { "`n" } else { "`r" }
+        
+        # 正規表現がマッチするか確認
+        if ($content -match $regexPattern) {
+            Write-Host "正規表現にマッチしました: $regexPattern"
+            $resolvedReplacement = $ExecutionContext.InvokeCommand.ExpandString($replacement)
+            Write-Host "置換文字列: '$resolvedReplacement'"
+            $modifiedContent = [regex]::Replace($content, $regexPattern, $resolvedReplacement)
+        }
+        else {
+            Write-Host "正規表現にマッチしませんでした: $regexPattern"
+            $modifiedContent = $content  # マッチしない場合は変更なし
+        }
+        
+        # デバッグ用: 置換後の内容を表示
+        # Write-Host "置換後: '$modifiedContent'"
+        
+        # ファイルに書き込み
+        [System.IO.File]::WriteAllText($filePath, $modifiedContent, [System.Text.Encoding]::UTF8)
+        
+        Write-Host "ファイルの置換が完了しました: $filePath"
+    }
+    catch {
+        Write-Error "エラーが発生しました（ファイル: $filePath）: $_"
     }
 }
-
-# 改行コードを統一して書き込み
-[System.IO.File]::WriteAllLines($yamlPath, $updatedLines, [System.Text.UTF8Encoding]::new($false)) # BOMなしUTF-8
-# 改行コードを手動で適用する場合
-$updatedContent = $updatedLines -join $newline
-$updatedContent | Set-Content -Path $yamlPath -Encoding UTF8 -NoNewline
-
-Write-Output "Updated Version to: $newVersion with consistent newline"

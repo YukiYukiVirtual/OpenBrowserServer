@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目
 		README.md = README.md
 		setting.yaml = setting.yaml
 		UpdateVersion.ps1 = UpdateVersion.ps1
+		VersionMaster.txt = VersionMaster.txt
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OpenBrowserServer_Installer", "OpenBrowserServer_Installer\OpenBrowserServer_Installer.vdproj", "{F6D35A24-F169-3CA7-C6FD-970340555FEA}"
