@@ -132,7 +132,7 @@ namespace OpenBrowserServer.WebServer
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
             string filename = Path.GetFileName(request.RawUrl);
-            string filepath = "keys/" + filename;
+            string filepath = Path.Combine(config.WorkingPath, "keys", filename);
             string mimetype = System.Web.MimeMapping.GetMimeMapping(filename);
 
             try

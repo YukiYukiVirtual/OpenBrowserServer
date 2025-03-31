@@ -133,9 +133,9 @@ namespace OpenBrowserServer
             DialogWrapper.Completed();
         }
 
-        private void buttonOpenGitHub_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            URLOpener.StaticOpen("https://github.com/YukiYukiVirtual/OpenBrowserServer");
+            URLOpener.StaticOpen("https://github.com/YukiYukiVirtual/OpenBrowserServer/blob/master/README.md");
         }
     }
 }
