@@ -36,7 +36,7 @@ namespace OpenBrowserServer
         }
         public static void Completed()
         {
-            MessageBox.Show("完了しました");
+            MessageBox.Show("完了しました", "完了");
         }
     }
 }

@@ -17,13 +17,15 @@ namespace OpenBrowserServer
             this.vrchatLogWatcher = vrchatLogWatcher;
 
             InitializeComponent();
+            LoadSettingTexts();
 
-            textBoxAllowedDomainList.Text = string.Join("\r\n", config.Setting.Domain);
-            textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Setting.Protocol);
-            
             this.buttonPauseResume.Text = (config.PauseSystem? "再開する":"一時停止する");
         }
-
+        private void LoadSettingTexts()
+        {
+            textBoxAllowedDomainList.Text = string.Join("\r\n", config.Setting.Domain);
+            textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Setting.Protocol);
+        }
         private void timerOfUpdate_Tick(object sender, System.EventArgs e)
         {
             // worldIDがnullの時は何も表示しない
@@ -77,6 +79,7 @@ namespace OpenBrowserServer
             if (DialogWrapper.DownloadConfirm())
             {
                 config.Update();
+                LoadSettingTexts();
                 if (config.NeedUpgrade())
                 {
                     if (DialogWrapper.UpdateConfirm())
@@ -122,6 +125,7 @@ namespace OpenBrowserServer
         private void buttonReload_Click(object sender, EventArgs e)
         {
             config.Reload();
+            LoadSettingTexts();
             if (config.NeedUpgrade())
             {
                 if (DialogWrapper.UpdateConfirm())
