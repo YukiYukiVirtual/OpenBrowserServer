@@ -33,13 +33,13 @@ namespace OpenBrowserServer.Component
 #else
                 Path.Combine(workingPath, "setting.yaml");
 #endif
-            Console.WriteLine($"SettingFilePath: {SettingFilePath}");
+            //Console.WriteLine($"SettingFilePath: {SettingFilePath}");
             FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
             Update();
         }
         ~Config()
         {
-            Console.WriteLine("Config destructor");
+            //Console.WriteLine("Config destructor");
         }
         public void Clear()
         {
@@ -104,8 +104,8 @@ namespace OpenBrowserServer.Component
                 Setting.Domain.Add("yukiyukivirtual.github.io");
                 Setting.Domain.Add("yukiyukivirtual.net");
             }
-            Console.WriteLine("ImportYaml");
-            Console.WriteLine(Setting.ToString());
+            //Console.WriteLine("ImportYaml");
+            //Console.WriteLine(Setting.ToString());
         }
     }
 }
