@@ -1,1 +1,15 @@
 6.0.0
+
+変更すべきファイル
+setting.yaml
+Version: va.b.c
+
+OpenBrowserServer
+右クリックプロパティ→公開
+
+AssemblyInfo.cs
+[assembly: AssemblyVersion("a.b.c.0")]
+[assembly: AssemblyFileVersion("a.b.c.0")]
+
+OpenBrowserServer_Installer
+クリックしてVersion
