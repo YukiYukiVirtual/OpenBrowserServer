@@ -56,7 +56,7 @@
             this.toolTipPauseResume = new System.Windows.Forms.ToolTip(this.components);
             this.toolTipExit = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.button1 = new System.Windows.Forms.Button();
+            this.buttonReadme = new System.Windows.Forms.Button();
             this.toolTipReadme = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox2.SuspendLayout();
             this.flowLayoutPanel3.SuspendLayout();
@@ -317,7 +317,7 @@
             this.tableLayoutPanel1.Controls.Add(this.buttonOpenDirectory, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.buttonExit, 3, 0);
             this.tableLayoutPanel1.Controls.Add(this.buttonPauseResume, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.button1, 3, 1);
+            this.tableLayoutPanel1.Controls.Add(this.buttonReadme, 3, 1);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 413);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
@@ -326,20 +326,20 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(781, 133);
             this.tableLayoutPanel1.TabIndex = 12;
             // 
-            // button1
+            // buttonReadme
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.buttonReadme.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.button1.Location = new System.Drawing.Point(588, 69);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(190, 61);
-            this.button1.TabIndex = 13;
-            this.button1.Text = "Readmeを開く";
-            this.toolTipReadme.SetToolTip(this.button1, "Readmeのページを開きます。");
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.buttonReadme.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonReadme.Location = new System.Drawing.Point(588, 69);
+            this.buttonReadme.Name = "buttonReadme";
+            this.buttonReadme.Size = new System.Drawing.Size(190, 61);
+            this.buttonReadme.TabIndex = 13;
+            this.buttonReadme.Text = "Readmeを開く";
+            this.toolTipReadme.SetToolTip(this.buttonReadme, "Readmeのページを開きます。");
+            this.buttonReadme.UseVisualStyleBackColor = true;
+            this.buttonReadme.Click += new System.EventHandler(this.buttonReadme_Click);
             // 
             // ControlPanelForm
             // 
@@ -396,7 +396,7 @@
         private System.Windows.Forms.ToolTip toolTipPauseResume;
         private System.Windows.Forms.ToolTip toolTipOpenLogFile;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonReadme;
         private System.Windows.Forms.ToolTip toolTipReadme;
     }
 }
