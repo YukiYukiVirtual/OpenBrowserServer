@@ -16,7 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 		setting.yaml = setting.yaml
-		UpdateVersion.ps1 = UpdateVersion.ps1
 		VersionMaster.txt = VersionMaster.txt
 	EndProjectSection
 EndProject
