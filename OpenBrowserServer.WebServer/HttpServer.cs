@@ -46,7 +46,7 @@ namespace OpenBrowserServer.WebServer
         {
             string[] str = rawUrl.Split('/');
             //Console.WriteLine(str);
-            foreach (string s in str) Console.WriteLine(s);
+            //foreach (string s in str) Console.WriteLine(s);
             //Console.WriteLine(str.Length - 1);
             if (rawUrl.IndexOf("Temporary_Listen_Addresses") != -1)
             {
