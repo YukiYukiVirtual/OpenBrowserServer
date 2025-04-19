@@ -1,91 +1,98 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 
 namespace OpenBrowserServer.WebServer
 {
-    public enum WebRequest
+    public enum StatusCode
     {
-        OK,
-        TimeSpanError,
-        Exception,
-        NotImplemented,
+        OK = 200, // コンテンツ設定完了
+        Forbidden = 403,
+        NotFound = 404,
+        TooEarly = 425,
+        InternalServerError = 500,
+        ServiceUnavailable = 503,
     }
     public partial class HttpServer
     {
-        private WebRequest RequestHandler(HttpListenerContext context)
+        private StatusCode RequestHandler(HttpListenerContext context)
         {
-            WebRequest webRequestResult;
+            StatusCode statusCode;
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
-            if (config.PauseSystem)
+            // faviconだけ例外的に処理する
+            if (request.RawUrl == "/favicon.ico")
             {
-                response.KeepAlive = false;
-                response.StatusCode = 425;
-                response.ContentLength64 = 0;
-                return WebRequest.OK;
+                statusCode = StatusCode.NotFound;
             }
-            //Console.WriteLine("OnRequested");
-            try
+            else if (config.PauseSystem)
             {
-                DateTime now = DateTime.Now;
-                TimeSpan timeSpan = now - lastRequestTime;
-                if (timeSpan.TotalMilliseconds >= config.Setting.HttpRequestPeriod)
+                statusCode = StatusCode.ServiceUnavailable;
+            }
+            else
+            {
+                try
                 {
-                    //Console.WriteLine($"RawUrl:{request.RawUrl}");
-                    switch (request.RawUrl)
+                    DateTime now = DateTime.Now;
+                    TimeSpan timeSpan = now - lastRequestTime;
+                    if (timeSpan.TotalMilliseconds >= config.Setting.HttpRequestPeriod)
                     {
-                        case "/":
-                            //Console.WriteLine("Root");
-                            webRequestResult = ProcessRoot(context);
-                            lastRequestTime = now;
-                            break;
-                        case "/favicon.ico":
-                            //Console.WriteLine("favicon");
-                            response.KeepAlive = false;
-                            response.StatusCode = 404;
-                            response.ContentLength64 = 0;
-                            webRequestResult = WebRequest.OK;
-                            break;
-                        default:
+                        // アプリ情報表示
+                        if (request.RawUrl == "/")
+                        {
+                            statusCode = ProcessRoot(context);
+                        }
+                        else
+                        {
                             string apiPath = GetApiPath(request.RawUrl);
-                            //Console.WriteLine($"API:{apiPath}.");
                             switch (apiPath)
                             {
                                 case "keys":
-                                    //Console.WriteLine($"/keysは廃止の可能性があります");
-                                    webRequestResult = ProcessKeys(context);
+                                    statusCode = ProcessKeys(context);
                                     break;
                                 default:
                                     history.WriteLine($"▲未実装のAPIまたは不正なリクエスト {apiPath}");
-                                    webRequestResult = WebRequest.NotImplemented;
+                                    statusCode = StatusCode.NotFound;
                                     break;
                             }
-                            lastRequestTime = now;
-                            break;
+                        }
                     }
+                    else
+                    {
+                        statusCode = StatusCode.TooEarly;
+                    }
+                    lastRequestTime = now;
                 }
-                else
+                catch (Exception e)
                 {
-                    webRequestResult = WebRequest.TimeSpanError;
+                    history.WriteLine($"▲Httpリクエストで予期せぬ例外が発生 {request.RawUrl}");
+                    history.WriteLine(e.ToString());
+                    statusCode = StatusCode.InternalServerError;
                 }
             }
-            catch (Exception e)
+
+            if(statusCode != StatusCode.OK)
             {
-                history.WriteLine($"▲Httpリクエストで予期せぬ例外が発生 {request.RawUrl}");
-                history.WriteLine(e.ToString());
-                webRequestResult = WebRequest.Exception;
+                string str = $"{(int)statusCode} {statusCode.ToString()}";
+                byte[] buffer = Encoding.GetEncoding("UTF-8").GetBytes(str);
+
+                response.KeepAlive = false;
+                response.ContentType = "text/plain";
+                response.ContentLength64 = buffer.Length;
+                response.StatusCode = (int)statusCode;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
             }
+
             response.Close();
-            return webRequestResult;
+            return statusCode;
         }
         /// <summary>
         /// '/'にリクエストが来たときに応答する
         /// </summary>
         /// <param name="context"></param>
-        private WebRequest ProcessRoot(HttpListenerContext context)
+        private StatusCode ProcessRoot(HttpListenerContext context)
         {
             HttpListenerResponse response = context.Response;
 
@@ -120,21 +127,25 @@ namespace OpenBrowserServer.WebServer
             // レスポンスにデータ書き込み
             response.OutputStream.Write(buffer, 0, buffer.Length);
 
-            return WebRequest.OK;
+            return StatusCode.OK;
         }
         /// <summary>
         /// '/keys/xxx'にリクエストが来たときに応答する
         /// </summary>
         /// <param name="context"></param>
-        private WebRequest ProcessKeys(HttpListenerContext context)
+        private StatusCode ProcessKeys(HttpListenerContext context)
         {
-            WebRequest webRequestResult;
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
             string filename = Path.GetFileName(request.RawUrl);
             string filepath = Path.Combine(config.WorkingPath, "keys", filename);
             string mimetype = System.Web.MimeMapping.GetMimeMapping(filename);
 
+            if (!File.Exists(filepath))
+            {
+                history.WriteLine($"▲ProcessKeys 要求されたファイルがありません {filepath}");
+                return StatusCode.NotFound;
+            }
             try
             {
                 using (FileStream filestream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
@@ -157,30 +168,15 @@ namespace OpenBrowserServer.WebServer
                     {
                         // NOP
                     }
-                    webRequestResult = WebRequest.OK;
                 }
-            }
-            catch (FileNotFoundException e)
-            {
-                response.KeepAlive = false;
-                response.StatusCode = 404;
-                response.ContentLength64 = 0;
-
-                history.WriteLine($"▲ProcessKeys 要求されたファイルがありません {filepath}");
-                history.WriteLine(e.ToString());
-                webRequestResult = WebRequest.Exception;
+                return StatusCode.OK;
             }
             catch (Exception e)
             {
-                response.KeepAlive = false;
-                response.StatusCode = 500;
-                response.ContentLength64 = 0;
-
                 history.WriteLine($"▲ProcessKeys 何らかの例外発生 {filepath}");
                 history.WriteLine(e.ToString());
-                webRequestResult = WebRequest.Exception;
+                return StatusCode.InternalServerError;
             }
-            return webRequestResult;
         }
     }
 }

@@ -39,8 +39,8 @@ namespace OpenBrowserServer.WebServer
             }
             listener.BeginGetContext(OnRequested, null);
             HttpListenerContext context = listener.EndGetContext(ar);
-            WebRequest webRequestResult = RequestHandler(context);
-            history.WriteLine($" Web Requested: '{context.Request.Url}' {webRequestResult}");
+            StatusCode statusCode = RequestHandler(context);
+            history.WriteLine($" Web Requested: '{context.Request.Url}' {statusCode}");
         }
         private string GetApiPath(string rawUrl)
         {
