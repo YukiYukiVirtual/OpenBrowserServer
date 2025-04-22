@@ -1,15 +1,20 @@
+
+# バージョン
 6.0.0
 
-変更すべきファイル
+# 変更すべきファイル
 setting.yaml
-Version: va.b.c
+ Version: va.b.c
 
 OpenBrowserServer
-右クリックプロパティ→公開
+ 右クリックプロパティ→公開
 
 AssemblyInfo.cs
-[assembly: AssemblyVersion("a.b.c.0")]
-[assembly: AssemblyFileVersion("a.b.c.0")]
+ [assembly: AssemblyVersion("a.b.c.0")]
+ [assembly: AssemblyFileVersion("a.b.c.0")]
 
 OpenBrowserServer_Installer
-クリックしてVersion
+ クリックしてVersion
+
+インストーラービルド時の注意
+ 依存関係がバグってるので除外設定をしてからやる
