@@ -9,6 +9,7 @@ namespace OpenBrowserServer
 {
     internal static class Program
     {
+        private static System.Threading.Mutex mutex;
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
@@ -16,8 +17,8 @@ namespace OpenBrowserServer
         static void Main()
         {
             // 多重起動抑止処理
-            System.Threading.Mutex mutex = new System.Threading.Mutex(false, "VRChatOpenBrowser");
-            if (!mutex.WaitOne(0, false))
+            mutex = new System.Threading.Mutex(false, "VRChatOpenBrowser", out bool createdNew);
+            if (!createdNew)
             {
                 MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "VRChatOpenBrowser");
                 return;
