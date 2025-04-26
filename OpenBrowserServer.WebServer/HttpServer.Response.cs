@@ -112,6 +112,7 @@ namespace OpenBrowserServer.WebServer
                     full  = config.FileVersion,
                 },
                 edition = config.Edition,
+                token = config.OpenBrowserToken.Token,
             };
             // データをJSONにシリアライズ
             string content = System.Text.Json.JsonSerializer.Serialize(obj);

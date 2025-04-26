@@ -131,7 +131,15 @@ namespace OpenBrowserServer.Component
             }
 
             string LogPrefix;
-            if (line.Contains(LogPrefix = "[YukiYukiVirtual/OpenURL]"))
+            if (line.Contains(LogPrefix = "[YukiYukiVirtual/OpenURL]")) // 旧インターフェイス
+            {
+                int index = line.IndexOf(LogPrefix);
+                string rawurl = line.Substring(index + LogPrefix.Length);
+                string url = rawurl.Trim();
+                URLOpenResult urlOpenResult = opener.Open(url);
+                history.WriteLine($" OpenURL: '{url}' {urlOpenResult} (old interface)");
+            }
+            else if (line.Contains(LogPrefix = $"[YukiYukiVirtual/OpenURL:{config.OpenBrowserToken.Token}]"))
             {
                 int index = line.IndexOf(LogPrefix);
                 string rawurl = line.Substring(index + LogPrefix.Length);
@@ -145,7 +153,8 @@ namespace OpenBrowserServer.Component
                 try
                 {
                     NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
-                    history.WriteLine($" Joining world. '{NowWorldId}'");
+                    config.OpenBrowserToken.NewToken(); // このワールドインスタンス用トークン作成
+                    history.WriteLine($" Joining world. '{NowWorldId}' Token: {config.OpenBrowserToken.Token}");
                     // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
                     if(JsonDownloader.CacheWorldInformation(NowWorldId))
                     {
