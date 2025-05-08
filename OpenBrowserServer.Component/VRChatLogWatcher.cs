@@ -133,17 +133,40 @@ namespace OpenBrowserServer.Component
             string LogPrefix;
             if (line.Contains(LogPrefix = "[YukiYukiVirtual/OpenURL]")) // 旧インターフェイス
             {
-                int index = line.IndexOf(LogPrefix);
-                string rawurl = line.Substring(index + LogPrefix.Length);
-                string url = rawurl.Trim();
-                URLOpenResult urlOpenResult = opener.Open(url);
-                history.WriteLine($" OpenURL: '{url}' {urlOpenResult} (old interface)");
+                if (!config.OpenBrowserToken.OldInterfaceUsedFlag)
+                {
+                    config.OpenBrowserToken.OldInterfaceUsedFlag = true;
+                    MessageBox.Show("このワールドは旧インターフェイスを使用しています。クライアントアプリの設定により使用できますが、ワールド作者さんは新インターフェイス版に更新してください。", "VRChatOpenBrowser");
+                }
+                if (config.OpenBrowserToken.AllowOldInterface)
+                {
+                    // URL取得
+                    int index = line.IndexOf(LogPrefix);
+                    string rawurl = line.Substring(index + LogPrefix.Length);
+                    string url = rawurl.Trim();
+                    // URLを開く
+                    URLOpenResult urlOpenResult = opener.Open(url);
+                    history.WriteLine($" OpenURL: '{url}' {urlOpenResult} (old interface)");
+                }
+                else
+                {
+                    MessageBox.Show("旧インターフェイスを使用しない設定により、ブラウザを開きません。", "VRChatOpenBrowser");
+                }
             }
             else if (line.Contains(LogPrefix = $"[YukiYukiVirtual/OpenURL:{config.OpenBrowserToken.Token}]"))
             {
+                if (config.OpenBrowserToken.Token == "" && !config.OpenBrowserToken.FirstOpenFlag)
+                {
+                    // ワールドに入っている状態でクライアントアプリを起動したときにここに来る
+                    config.OpenBrowserToken.FirstOpenFlag = true;
+                    history.WriteLine(" Requested without Token");
+                    MessageBox.Show("ワールドに入った状態でこのクライアントアプリを起動し、ブラウザを開こうとしました。問題なく使用できますが、念のためお知らせしておきます。", "VRChatOpenBrowser");
+                }
+                // URL取得
                 int index = line.IndexOf(LogPrefix);
                 string rawurl = line.Substring(index + LogPrefix.Length);
                 string url = rawurl.Trim();
+                // URLを開く
                 URLOpenResult urlOpenResult = opener.Open(url);
                 history.WriteLine($" OpenURL: '{url}' {urlOpenResult}");
             }
@@ -152,6 +175,7 @@ namespace OpenBrowserServer.Component
                 int index = line.IndexOf(LogPrefix);
                 try
                 {
+                    // ワールドID取得
                     NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
                     config.OpenBrowserToken.NewToken(); // このワールドインスタンス用トークン作成
                     history.WriteLine($" Joining world. '{NowWorldId}' Token: {config.OpenBrowserToken.Token}");
