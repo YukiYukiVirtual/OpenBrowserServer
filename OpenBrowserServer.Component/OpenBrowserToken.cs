@@ -9,14 +9,11 @@ namespace OpenBrowserServer.Component
     public class OpenBrowserToken
     {
         public string Token { get; private set; }
-        public bool FirstOpenFlag { get; set; }
         public bool OldInterfaceUsedFlag { get; set; }
         public bool AllowOldInterface { get; set; }
         public OpenBrowserToken()
         {
-            Token = "";
-            FirstOpenFlag = false;
-            OldInterfaceUsedFlag = false;
+            NewToken();
             AllowOldInterface = true; // いずれfalseをデフォルトに変える
         }
         public void NewToken()

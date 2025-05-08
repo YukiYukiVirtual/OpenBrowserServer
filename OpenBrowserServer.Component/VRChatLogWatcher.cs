@@ -117,6 +117,7 @@ namespace OpenBrowserServer.Component
             ObserveVRChatLog(e.FullPath); // 作成されたファイルを監視対象にする
         }
         // ファイル書き込みイベントハンドラ
+        // 1行分のログを読み、その行に対して処理する
         void LogOutputDataReceived(Object source, DataReceivedEventArgs e)
         {
             if(config.PauseSystem)
@@ -155,13 +156,6 @@ namespace OpenBrowserServer.Component
             }
             else if (line.Contains(LogPrefix = $"[YukiYukiVirtual/OpenURL:{config.OpenBrowserToken.Token}]"))
             {
-                if (config.OpenBrowserToken.Token == "" && !config.OpenBrowserToken.FirstOpenFlag)
-                {
-                    // ワールドに入っている状態でクライアントアプリを起動したときにここに来る
-                    config.OpenBrowserToken.FirstOpenFlag = true;
-                    history.WriteLine(" Requested without Token");
-                    MessageBox.Show("ワールドに入った状態でこのクライアントアプリを起動し、ブラウザを開こうとしました。問題なく使用できますが、念のためお知らせしておきます。", "VRChatOpenBrowser");
-                }
                 // URL取得
                 int index = line.IndexOf(LogPrefix);
                 string rawurl = line.Substring(index + LogPrefix.Length);
