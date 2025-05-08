@@ -26,7 +26,16 @@ namespace OpenBrowserServer
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Initialize();
+            try
+            {
+                Initialize();
+
+            }
+            catch (System.Net.HttpListenerException)
+            {
+                MessageBox.Show("ポートが使用されています。2つ同時には起動できません。", "VRChatOpenBrowser");
+                return;
+            }
 #if BOOTH
 #else
             URLOpener.StaticOpen("https://yukiyukivirtual.booth.pm/items/2539784");
