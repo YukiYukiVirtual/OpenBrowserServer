@@ -20,7 +20,7 @@ namespace OpenBrowserServer
             mutex = new System.Threading.Mutex(false, "VRChatOpenBrowser", out bool createdNew);
             if (!createdNew)
             {
-                MessageBox.Show("すでに起動しています。2つ同時には起動できません。", "VRChatOpenBrowser");
+                DialogWrapper.ShowStop("すでに起動しています。2つ同時には起動できません。", "VRChatOpenBrowser");
                 return;
             }
 
@@ -33,7 +33,7 @@ namespace OpenBrowserServer
             }
             catch (System.Net.HttpListenerException)
             {
-                MessageBox.Show("ポートが使用されています。2つ同時には起動できません。", "VRChatOpenBrowser");
+                DialogWrapper.ShowStop("ポートが使用されています。2つ同時には起動できません。", "VRChatOpenBrowser");
                 return;
             }
 #if BOOTH
