@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Windows.Forms;
 using OpenBrowserServer.Logger;
 using static OpenBrowserServer.Component.Setting;
@@ -89,13 +90,13 @@ namespace OpenBrowserServer.Component
             catch (System.ComponentModel.Win32Exception e)
             {
                 history.WriteLine(e.ToString());
-                MessageBox.Show("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
+                DialogWrapper.ShowError("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
                 return;
             }
             catch (Exception e)
             {
                 history.WriteLine(e.ToString());
-                MessageBox.Show("起動に失敗しました。", "例外");
+                DialogWrapper.ShowError("起動に失敗しました。", "例外");
                 return;
             }
         }
@@ -117,6 +118,7 @@ namespace OpenBrowserServer.Component
             ObserveVRChatLog(e.FullPath); // 作成されたファイルを監視対象にする
         }
         // ファイル書き込みイベントハンドラ
+        // 1行分のログを読み、その行に対して処理する
         void LogOutputDataReceived(Object source, DataReceivedEventArgs e)
         {
             if(config.PauseSystem)
@@ -131,11 +133,35 @@ namespace OpenBrowserServer.Component
             }
 
             string LogPrefix;
-            if (line.Contains(LogPrefix = "[YukiYukiVirtual/OpenURL]"))
+            if (line.Contains(LogPrefix = "[YukiYukiVirtual/OpenURL]")) // 旧インターフェイス
             {
+                if (!config.OpenBrowserToken.OldInterfaceUsedFlag)
+                {
+                    config.OpenBrowserToken.OldInterfaceUsedFlag = true;
+                    DialogWrapper.ShowWarning("このワールドは旧インターフェイスを使用しています。クライアントアプリの設定により使用できますが、ワールド作者さんは新インターフェイス版に更新してください。", "VRChatOpenBrowser");
+                }
+                if (config.OpenBrowserToken.AllowOldInterface)
+                {
+                    // URL取得
+                    int index = line.IndexOf(LogPrefix);
+                    string rawurl = line.Substring(index + LogPrefix.Length);
+                    string url = rawurl.Trim();
+                    // URLを開く
+                    URLOpenResult urlOpenResult = opener.Open(url);
+                    history.WriteLine($" OpenURL: '{url}' {urlOpenResult} (old interface)");
+                }
+                else
+                {
+                    DialogWrapper.ShowWarning("旧インターフェイスを使用しない設定により、ブラウザを開きません。コントロールパネルから許可することで使用することが出来ます。", "VRChatOpenBrowser");
+                }
+            }
+            else if (line.Contains(LogPrefix = $"[YukiYukiVirtual/OpenURL:{config.OpenBrowserToken.Token}]"))
+            {
+                // URL取得
                 int index = line.IndexOf(LogPrefix);
                 string rawurl = line.Substring(index + LogPrefix.Length);
                 string url = rawurl.Trim();
+                // URLを開く
                 URLOpenResult urlOpenResult = opener.Open(url);
                 history.WriteLine($" OpenURL: '{url}' {urlOpenResult}");
             }
@@ -144,8 +170,10 @@ namespace OpenBrowserServer.Component
                 int index = line.IndexOf(LogPrefix);
                 try
                 {
+                    // ワールドID取得
                     NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
-                    history.WriteLine($" Joining world. '{NowWorldId}'");
+                    config.OpenBrowserToken.NewToken(); // このワールドインスタンス用トークン作成
+                    history.WriteLine($" Joining world. '{NowWorldId}' Token: {config.OpenBrowserToken.Token}");
                     // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
                     if(JsonDownloader.CacheWorldInformation(NowWorldId))
                     {
@@ -156,7 +184,8 @@ namespace OpenBrowserServer.Component
                             config.PauseSystem = true;
                             history.WriteLine($"▲BannedUser: {JsonDownloader.CachedAuthorName}({JsonDownloader.CachedAuthorId}) Reason: {bannedUserInfo.Reason}");
                             history.WriteLine($" System paused.");
-                            MessageBox.Show($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            SystemSounds.Asterisk.Play();
+                            DialogWrapper.ShowWarning($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "警告");
                         }
                     }
                 }

@@ -24,6 +24,7 @@ namespace OpenBrowserServer.Component
         public string FileVersion { get; private set; }
         public bool PauseSystem { get; set; }
         public string WorkingPath { get; private set; }
+        public OpenBrowserToken OpenBrowserToken { get; private set; }
         public Config(string workingPath, FileVersionInfo fileVersionInfo)
         {
             this.WorkingPath = workingPath;
@@ -35,6 +36,7 @@ namespace OpenBrowserServer.Component
 #endif
             //Console.WriteLine($"SettingFilePath: {SettingFilePath}");
             FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
+            OpenBrowserToken = new OpenBrowserToken();
             Update();
         }
         ~Config()

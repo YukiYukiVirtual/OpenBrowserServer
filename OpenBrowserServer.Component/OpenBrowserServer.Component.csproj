@@ -101,7 +101,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DialogWrapper.cs" />
     <Compile Include="JsonDownloader.cs" />
+    <Compile Include="OpenBrowserToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Setting.cs" />

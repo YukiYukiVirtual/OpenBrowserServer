@@ -58,6 +58,8 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.buttonReadme = new System.Windows.Forms.Button();
             this.toolTipReadme = new System.Windows.Forms.ToolTip(this.components);
+            this.buttonAllowOldInterface = new System.Windows.Forms.Button();
+            this.toolTipAllowOldInterface = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox2.SuspendLayout();
             this.flowLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.worldImageBox)).BeginInit();
@@ -311,6 +313,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.buttonAllowOldInterface, 2, 1);
             this.tableLayoutPanel1.Controls.Add(this.buttonOpenLogFile, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.buttonUpdate, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.buttonReload, 0, 1);
@@ -340,6 +343,21 @@
             this.toolTipReadme.SetToolTip(this.buttonReadme, "Readmeのページを開きます。");
             this.buttonReadme.UseVisualStyleBackColor = true;
             this.buttonReadme.Click += new System.EventHandler(this.buttonReadme_Click);
+            // 
+            // buttonAllowOldInterface
+            // 
+            this.buttonAllowOldInterface.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonAllowOldInterface.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonAllowOldInterface.Location = new System.Drawing.Point(393, 69);
+            this.buttonAllowOldInterface.Name = "buttonAllowOldInterface";
+            this.buttonAllowOldInterface.Size = new System.Drawing.Size(189, 61);
+            this.buttonAllowOldInterface.TabIndex = 14;
+            this.buttonAllowOldInterface.Text = "旧バージョンの動作を許可する";
+            this.toolTipAllowOldInterface.SetToolTip(this.buttonAllowOldInterface, "v6.0.0以前に対応したワールドからのリクエストを許可します。");
+            this.buttonAllowOldInterface.UseVisualStyleBackColor = true;
+            this.buttonAllowOldInterface.Click += new System.EventHandler(this.buttonAllowOldInterface_Click);
             // 
             // ControlPanelForm
             // 
@@ -398,5 +416,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button buttonReadme;
         private System.Windows.Forms.ToolTip toolTipReadme;
+        private System.Windows.Forms.Button buttonAllowOldInterface;
+        private System.Windows.Forms.ToolTip toolTipAllowOldInterface;
     }
 }

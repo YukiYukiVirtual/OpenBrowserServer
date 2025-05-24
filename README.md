@@ -8,14 +8,17 @@ VRChat‚Ìƒ[ƒ‹ƒhƒMƒ~ƒbƒN‚É‚æ‚Á‚ÄAƒfƒXƒNƒgƒbƒvã‚Ìƒuƒ‰ƒEƒU‚ÅWebƒy[ƒW‚ðŠJ‚­‚±‚Æ‚
 ### VRChat‚©‚ç‚±‚ÌƒAƒvƒŠ‚Ìî•ñ‚ð“Ç‚Ýž‚Þ
 VRChat‚Ìƒ[ƒ‹ƒhƒMƒ~ƒbƒN‚©‚çStringDownloader‚ðŽg‚Á‚ÄA‚±‚ÌƒAƒvƒŠ‚Ìî•ñ‚ðJSONŒ^Ž®‚ÅŽæ“¾‚·‚é‚±‚Æ‚ªo—ˆ‚Ü‚·BƒAƒvƒŠ‚ð‹N“®‚µ‚½ó‘Ô‚Å[http://localhost:21983/](http://localhost:21983/)‚ÉƒAƒNƒZƒX‚µ‚Ä‚­‚¾‚³‚¢B
 
+¦ƒ[ƒ‹ƒhƒAƒZƒbƒg‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B
+
 ### VRChat‚©‚çƒtƒ@ƒCƒ‹‚ð“Ç‚Ýž‚Þ
 VRChat‚Ìƒ[ƒ‹ƒhƒMƒ~ƒbƒN‚©‚çA‚±‚ÌƒAƒvƒŠ‚ðŒo—R‚µ‚ÄƒeƒLƒXƒgƒtƒ@ƒCƒ‹A‰æ‘œƒtƒ@ƒCƒ‹A“®‰æƒtƒ@ƒCƒ‹‚È‚Ç‚ðŽæ“¾‚·‚é‚±‚Æ‚ªo—ˆ‚Ü‚·BƒAƒvƒŠ‚ð‹N“®‚µ‚½ó‘Ô‚Å[http://localhost:21983/keys/ƒtƒ@ƒCƒ‹–¼](http://localhost:21983/keys/ƒtƒ@ƒCƒ‹–¼)‚ÉƒAƒNƒZƒX‚µ‚Ä‚­‚¾‚³‚¢B  
 ƒtƒ@ƒCƒ‹‚Í`%appdata%\YukiYukiVirtual\OpenBrowserServer\keys`‚É’u‚¢‚Ä‚­‚¾‚³‚¢B  
-“ú–{Œê‚ðŠÜ‚ÞƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚ðŽg‚¢‚½‚¢ê‡‚ÍUTF-16‚É‚µ‚½‚ç•¶Žš‰»‚¯‚µ‚È‚¢‚ÆŽv‚¢‚Ü‚·B  
-‚±‚Ì‹@”\‚ÍŒÃ‚¢‹@”\‚ÌŒÝŠ·«‚Ì‚½‚ß‚É‚ ‚è‚Ü‚·‚ªAŽù—v‚ª–³‚©‚Á‚½‚½‚ß‚Ù‚ÚŽg‚í‚ê‚Ä‚¢‚È‚¢‚ÆŽv‚¢‚Ü‚·B
+“ú–{Œê‚ðŠÜ‚ÞƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚ðŽg‚¢‚½‚¢ê‡‚ÍUTF-16‚É‚µ‚½‚ç•¶Žš‰»‚¯‚µ‚È‚¢‚ÆŽv‚¢‚Ü‚·B
+
+¦‚±‚Ì‹@”\‚ÍŒÃ‚¢‹@”\‚ÌŒÝŠ·«‚Ì‚½‚ß‚É‚ ‚è‚Ü‚·‚ªAŽù—v‚ª–³‚©‚Á‚½‚½‚ß‚Ù‚ÚŽg‚í‚ê‚Ä‚¢‚È‚¢‚ÆŽv‚¢‚Ü‚·B
 
 ## ƒCƒ“ƒXƒg[ƒ‹
-### ‹Œƒo[ƒWƒ‡ƒ“‚ª‚ ‚éê‡
+### ‹Œƒo[ƒWƒ‡ƒ“(v5.x.xˆÈ‘O)‚ª‚ ‚éê‡
 –{ƒo[ƒWƒ‡ƒ“‚ðƒCƒ“ƒXƒg[ƒ‹‚·‚é‘O‚ÉA‹Œƒo[ƒWƒ‡ƒ“‚ª“®‚©‚È‚¢‚æ‚¤‚É‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B
 1. ƒ^ƒXƒNƒgƒŒƒC‚ÌƒAƒCƒRƒ“‚ð‰EƒNƒŠƒbƒN‚µAI—¹‚µ‚Ä‚­‚¾‚³‚¢BI—¹Ï‚Ý‚Å‚ ‚ê‚ÎŒ‹\‚Å‚·B
 2. •K—v‚É‰ž‚¶‚Äi——R‚ª–³‚¯‚ê‚Îj‹Œƒo[ƒWƒ‡ƒ“‚ÌƒtƒHƒ‹ƒ_‚ðíœ‚µ‚Ä‚­‚¾‚³‚¢B
