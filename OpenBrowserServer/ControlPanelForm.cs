@@ -18,15 +18,14 @@ namespace OpenBrowserServer
 
             InitializeComponent();
             LoadSettingTexts();
-
-            this.buttonPauseResume.Text = (config.PauseSystem? "再開する":"一時停止する");
+            updateButton();
         }
         private void LoadSettingTexts()
         {
             textBoxAllowedDomainList.Text = string.Join("\r\n", config.Setting.Domain);
             textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Setting.Protocol);
         }
-        private void timerOfUpdate_Tick(object sender, System.EventArgs e)
+        private void updateWorldInfo()
         {
             // worldIDがnullの時は何も表示しない
             if (string.IsNullOrEmpty(vrchatLogWatcher.NowWorldId))
@@ -59,7 +58,21 @@ namespace OpenBrowserServer
                 this.worldImageBox.Image = null;
                 history.WriteLine($"▲ワールド情報取得失敗 {url} {vrchatLogWatcher.NowWorldId}");
             }
-
+        }
+        private void updateButton()
+        {
+            this.buttonAllowOldInterface.Text = config.OpenBrowserToken.AllowOldInterface ?
+                "旧バージョンの動作を許可済み" :
+                "旧バージョンの動作を許可する";
+     
+            this.buttonPauseResume.Text = config.PauseSystem ?
+                "再開する" :
+                "一時停止する";
+        }
+        private void timerOfUpdate_Tick(object sender, System.EventArgs e)
+        {
+            updateWorldInfo();
+            updateButton();
         }
 
         private void linkLabelOfWorld_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -108,20 +121,9 @@ namespace OpenBrowserServer
 
         private void buttonPauseResume_Click(object sender, EventArgs e)
         {
-            if(config.PauseSystem)
-            {
-                // 再開する
-                config.PauseSystem = false;
-                this.buttonPauseResume.Text = "一時停止する";
-            }
-            else
-            {
-                // 一時停止する
-                config.PauseSystem = true;
-                this.buttonPauseResume.Text = "再開する";
-            }
+            config.PauseSystem = !config.PauseSystem;
+            updateButton();
         }
-
         private void buttonReload_Click(object sender, EventArgs e)
         {
             config.Reload();
@@ -140,6 +142,12 @@ namespace OpenBrowserServer
         private void buttonReadme_Click(object sender, EventArgs e)
         {
             URLOpener.StaticOpen("https://github.com/YukiYukiVirtual/OpenBrowserServer/blob/master/README.md");
+        }
+
+        private void buttonAllowOldInterface_Click(object sender, EventArgs e)
+        {
+            config.OpenBrowserToken.AllowOldInterface = !config.OpenBrowserToken.AllowOldInterface;
+            updateButton();
         }
     }
 }
