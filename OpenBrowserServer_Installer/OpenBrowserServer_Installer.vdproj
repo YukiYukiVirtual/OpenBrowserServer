@@ -106,12 +106,6 @@
         "Entry"
         {
         "MsmKey" = "8:_4DAB6F2F4331968D46CE65B7218C0A49"
-        "OwnerKey" = "8:_13111A9BBB8FD51E06799AF24066E545"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4DAB6F2F4331968D46CE65B7218C0A49"
         "OwnerKey" = "8:_59BB6FB3A9F214AEFA3E9D714003B2E8"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -125,6 +119,12 @@
         {
         "MsmKey" = "8:_4DAB6F2F4331968D46CE65B7218C0A49"
         "OwnerKey" = "8:_26E8FEF285E9429B2980766FE40AC385"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4DAB6F2F4331968D46CE65B7218C0A49"
+        "OwnerKey" = "8:_13111A9BBB8FD51E06799AF24066E545"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -364,6 +364,24 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_59BB6FB3A9F214AEFA3E9D714003B2E8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_26E8FEF285E9429B2980766FE40AC385"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D3A995015AC4A33BC59DF947676B9BC1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_39BAA0D79161B2894006F1DB7B0D4967"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -407,24 +425,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_8651092AACB9377DC93C2B448AA958C5"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_59BB6FB3A9F214AEFA3E9D714003B2E8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_26E8FEF285E9429B2980766FE40AC385"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D3A995015AC4A33BC59DF947676B9BC1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -680,7 +680,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -742,7 +742,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -897,7 +897,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -1341,7 +1341,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VRChatOpenBrowser"
         "ProductCode" = "8:{2CCC91C0-CA10-48EC-AF46-1DD2ADC8BF73}"
-        "PackageCode" = "8:{15CCDD30-A9B6-4E17-9210-0138BC5ABB83}"
+        "PackageCode" = "8:{FD64424D-8D6D-46A2-9E7D-7B93EB77BDF9}"
         "UpgradeCode" = "8:{91E98921-9DEC-4AB5-8993-E12065B939DC}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"

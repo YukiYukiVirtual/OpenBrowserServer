@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{FBE7AEF2-C37E-48F8-B47B-5D6A316EE322}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>OpenBrowserServer</RootNamespace>
     <AssemblyName>VRChatOpenBrowser</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
