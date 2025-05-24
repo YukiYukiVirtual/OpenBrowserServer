@@ -152,7 +152,7 @@ namespace OpenBrowserServer.Component
                 }
                 else
                 {
-                    DialogWrapper.ShowWarning("旧インターフェイスを使用しない設定により、ブラウザを開きません。", "VRChatOpenBrowser");
+                    DialogWrapper.ShowWarning("旧インターフェイスを使用しない設定により、ブラウザを開きません。コントロールパネルから許可することで使用することが出来ます。", "VRChatOpenBrowser");
                 }
             }
             else if (line.Contains(LogPrefix = $"[YukiYukiVirtual/OpenURL:{config.OpenBrowserToken.Token}]"))
