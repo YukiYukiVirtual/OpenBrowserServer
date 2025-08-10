@@ -1,4 +1,4 @@
-﻿Version: v6.1.0
+﻿Version: v6.1.1
 IdlePeriod: 500 # ms
 HttpRequestPeriod: 5000 # ms
 WatchdogTime: 30 # min
