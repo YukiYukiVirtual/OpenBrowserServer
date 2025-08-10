@@ -172,7 +172,6 @@ namespace OpenBrowserServer.Component
                 {
                     // ワールドID取得
                     NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
-                    config.OpenBrowserToken.NewToken(); // このワールドインスタンス用トークン作成
                     history.WriteLine($" Joining world. '{NowWorldId}' Token: {config.OpenBrowserToken.Token}");
                     // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
                     if(JsonDownloader.CacheWorldInformation(NowWorldId))
