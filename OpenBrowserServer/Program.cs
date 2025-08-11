@@ -58,6 +58,7 @@ namespace OpenBrowserServer
             }
             History history = new History(workingPath);
             history.WriteLine($"■起動時のバージョン {config.FileVersion}_{config.Edition}");
+            history.WriteLine($" Token {config.OpenBrowserToken.Token}");
             VRChatLogWatcher vrchatLogWatcher = new VRChatLogWatcher(config, history);
             new HttpServer(config, history);
             new NotifyIconForm(config, history, vrchatLogWatcher);
