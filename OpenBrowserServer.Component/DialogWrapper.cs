@@ -7,7 +7,7 @@ namespace OpenBrowserServer.Component
     {
         public static bool DownloadConfirm()
         {
-            DialogResult dialogResult = MessageBox.Show("設定ファイルをダウンロードして再読み込みしますか？", "更新確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            DialogResult dialogResult = MessageBox.Show("設定ファイルをダウンロードして再読み込みしますか？", "VRChatOpenBrowser", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dialogResult == DialogResult.Yes)
             {
                 return true;
@@ -16,18 +16,18 @@ namespace OpenBrowserServer.Component
         }
         public static bool UpdateConfirm()
         {
-            DialogResult dialogResult = MessageBox.Show("プログラムの更新があります。プログラムを更新するために終了しますか？", "更新確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            DialogResult dialogResult = MessageBox.Show("プログラムの更新があります。プログラムを更新するために終了しますか？", "VRChatOpenBrowser", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dialogResult == DialogResult.Yes)
             {
                 URLOpener.StaticOpen("https://yukiyukivirtual.booth.pm/items/2539784");
-                ShowInformation("配布ページを開いたので、手順に従って更新してください。", "終了します");
+                ShowInformation("配布ページを開いたので、手順に従って更新してください。", "VRChatOpenBrowser");
                 return true;
             }
             return false;
         }
         public static bool ExitConfirm()
         {
-            DialogResult dialogResult = MessageBox.Show("プログラムを終了しますか？", "終了", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            DialogResult dialogResult = MessageBox.Show("プログラムを終了しますか？", "VRChatOpenBrowser", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dialogResult == DialogResult.Yes)
             {
                 return true;
@@ -36,7 +36,7 @@ namespace OpenBrowserServer.Component
         }
         public static void Completed()
         {
-            ShowInformation("完了しました", "完了");
+            ShowInformation("完了しました", "VRChatOpenBrowser");
         }
         public static DialogResult ShowInformation(string text, string caption)
         {
