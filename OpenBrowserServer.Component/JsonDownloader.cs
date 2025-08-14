@@ -10,6 +10,7 @@ namespace OpenBrowserServer.Component
     public class JsonDownloader
     {
         // キャッシュ
+        public static string UserAgent { get; set; }
         public static string CachedWorldId { get; private set; }
         public static string CachedWorldName { get; private set; }
         public static string CachedAuthorId { get; private set; }
@@ -33,7 +34,7 @@ namespace OpenBrowserServer.Component
                     try
                     {
 
-                        client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
+                        client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
 
                         // JSONダウンロード
                         string responseBody = client.GetStringAsync(url).Result;

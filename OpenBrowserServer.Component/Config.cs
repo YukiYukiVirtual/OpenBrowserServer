@@ -35,7 +35,8 @@ namespace OpenBrowserServer.Component
                 Path.Combine(workingPath, "setting.yaml");
 #endif
             //Console.WriteLine($"SettingFilePath: {SettingFilePath}");
-            FileVersion = $"v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
+            FileVersion = $"{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart}";
+            JsonDownloader.UserAgent = $"OpenBrowserServer/{FileVersion}";
             OpenBrowserToken = new OpenBrowserToken();
             Update();
         }

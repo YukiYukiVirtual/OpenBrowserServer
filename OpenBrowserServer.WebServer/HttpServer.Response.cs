@@ -97,7 +97,7 @@ namespace OpenBrowserServer.WebServer
             HttpListenerResponse response = context.Response;
 
             // レスポンスデータを匿名型で作成
-            string[] versionParts = config.FileVersion.Replace("v","").Split('.');
+            string[] versionParts = config.FileVersion.Split('.');
             if(versionParts.Length != 3)
             {
                 versionParts = new string[] { "0", "0", "0" };
