@@ -90,13 +90,13 @@ namespace OpenBrowserServer.Component
             catch (System.ComponentModel.Win32Exception e)
             {
                 history.WriteLine(e.ToString());
-                DialogWrapper.ShowError("起動に失敗しました。\nPowerShellがみつかりません。", "例外");
+                DialogWrapper.ShowError("起動に失敗しました。\nPowerShellがみつかりません。", "VRChatOpenBrowser");
                 return;
             }
             catch (Exception e)
             {
                 history.WriteLine(e.ToString());
-                DialogWrapper.ShowError("起動に失敗しました。", "例外");
+                DialogWrapper.ShowError("起動に失敗しました。", "VRChatOpenBrowser");
                 return;
             }
         }
@@ -184,7 +184,7 @@ namespace OpenBrowserServer.Component
                             history.WriteLine($"▲BannedUser: {JsonDownloader.CachedAuthorName}({JsonDownloader.CachedAuthorId}) Reason: {bannedUserInfo.Reason}");
                             history.WriteLine($" System paused.");
                             SystemSounds.Asterisk.Play();
-                            DialogWrapper.ShowWarning($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "警告");
+                            DialogWrapper.ShowWarning($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "VRChatOpenBrowser");
                         }
                     }
                 }
