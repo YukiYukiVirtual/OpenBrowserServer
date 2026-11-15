@@ -14,6 +14,9 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <!-- .resx 内のバイナリリソースを Windows 以外でも処理できるようにする -->
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <!-- .NET 10 ランタイムは Windows に標準搭載されていないため、自己完結(ランタイム同梱)で配布する -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <!-- 旧来の構成名(Booth/Free)を維持する。Free 以外は BOOTH 版としてビルドする -->

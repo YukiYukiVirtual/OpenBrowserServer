@@ -1,4 +1,4 @@
-# .NET 10 移行メモ(WinForms のまま)
+﻿# .NET 10 移行メモ(WinForms のまま)
 
 ブランチ `feature/net10-winforms` で行った、.NET Framework 4.8 → .NET 10 への移行内容です。
 UI フレームワークは WinForms のまま、プロジェクト形式と土台だけをモダン化しました。
@@ -28,6 +28,11 @@ Visual Studio 2026 でソリューションを開けば、そのままビルド�
 
 ```powershell
 dotnet publish OpenBrowserServer\OpenBrowserServer.csproj -c Free -r win-x64 --self-contained true -p:PublishSingleFile=true
+```
+
+## ランタイム同梱について
+
+.NET 10 のランタイムは Windows に標準搭載されていないため、利用者にランタイムを別途インストールさせないよう、**自己完結(self-contained)で配布する**ことにした。本体プロジェクトに `RuntimeIdentifier=win-x64` と `SelfContained=true` を設定済みで、通常のビルド/発行でもランタイム一式(約119MB・239ファイル)が成果物に含まれる。インストーラー(vdproj)には、この成果物一式を取り込むこと。
 ```
 
 - 自己完結(--self-contained)だと約 116MB、ランタイム同梱なので利用者側に .NET のインストールは不要
