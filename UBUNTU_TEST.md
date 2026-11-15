@@ -5,7 +5,7 @@ Windows 版のコードは無傷で、プラットフォーム依存箇所だけ
 
 ## 構成
 
-- `OpenBrowserServer.Headless/` — SDK 形式(net8.0)のコンソール版プロジェクト
+- `OpenBrowserServer.Headless/` — SDK 形式(net10.0)のコンソール版プロジェクト
   - Component / WebServer / Logger のソースをリンクして共有し、`UBUNTU` シンボルを定義
   - WinForms の画面(トレイ/コントロールパネル)は含まない
   - `Shims.cs` — .NET Framework にしか無い `System.Web.MimeMapping` の最小シム
@@ -33,7 +33,7 @@ mkdir -p /tmp/obs-test/work/keys /tmp/obs-test/fakelogs
 OPENBROWSER_WORKING_DIR=/tmp/obs-test/work \
 OPENBROWSER_SETTING_FILE=$PWD/setting.yaml \
 OPENBROWSER_VRCHAT_LOG_DIR=/tmp/obs-test/fakelogs \
-dotnet OpenBrowserServer.Headless/bin/Release/net8.0/OpenBrowserServer.Headless.dll
+dotnet OpenBrowserServer.Headless/bin/Release/net10.0/OpenBrowserServer.Headless.dll
 ```
 
 環境変数:
