@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -56,6 +57,12 @@ namespace OpenBrowserServer.Component
             Download();
             ImportYaml();
         }
+        public async Task UpdateAsync()
+        {
+            Clear();
+            await DownloadAsync();
+            ImportYaml();
+        }
         public void Reload()
         {
             Clear();
@@ -83,13 +90,39 @@ namespace OpenBrowserServer.Component
             // ダウンロード
             using(HttpClient client = new HttpClient())
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
                 try
                 {
                     string responseBody = client.GetStringAsync(url).Result;
                     File.WriteAllText(SettingFilePath, responseBody);
                 }
                 catch(Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.WriteLine("設定ファイルのダウンロードが失敗しました。過去にダウンロードしたものがあればそれを使います。");
+                }
+            }
+#endif
+        }
+        public async Task DownloadAsync()
+        {
+#if UBUNTU
+            // Ubuntu(ヘッドレス)ビルド用: ネットワークから取得せず、配置済みの設定ファイルをそのまま使う
+            Console.WriteLine("設定ファイルのダウンロードはスキップしました(UBUNTUビルド)。");
+            await Task.CompletedTask;
+            return;
+#elif DEBUG
+
+#else
+            string url = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();
+            // ダウンロード
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string responseBody = await client.GetStringAsync(url);
+                    File.WriteAllText(SettingFilePath, responseBody);
+                }
+                catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
                     Console.WriteLine("設定ファイルのダウンロードが失敗しました。過去にダウンロードしたものがあればそれを使います。");

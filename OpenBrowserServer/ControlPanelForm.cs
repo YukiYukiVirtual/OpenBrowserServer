@@ -25,7 +25,10 @@ namespace OpenBrowserServer
             textBoxAllowedDomainList.Text = string.Join("\r\n", config.Setting.Domain);
             textBoxAllowedProtocolList.Text = string.Join("\r\n", config.Setting.Protocol);
         }
-        private void updateWorldInfo()
+        bool updatingWorldInfo = false;
+        string worldInfoLoadedWorldId = null; // 取得に成功したワールドID(同じワールドを取り直さないため)
+        DateTime worldInfoRetryAfter = DateTime.MinValue; // 取得失敗後、取り直しを始める時刻
+        private async void updateWorldInfo()
         {
             // worldIDがnullの時は何も表示しない
             if (string.IsNullOrEmpty(vrchatLogWatcher.NowWorldId))
@@ -35,28 +38,43 @@ namespace OpenBrowserServer
                 this.textAuthorName.Text = "作者";
                 this.worldImageBox.Image = null;
                 this.linkLabelOfWorld.Text = "URL";
+                worldInfoLoadedWorldId = null;
                 return;
             }
-            string url = $"https://vrchat.com/home/world/{vrchatLogWatcher.NowWorldId}";
-            if (linkLabelOfWorld.Text == url) return; // ワールドIDが変わってなければ何もしない
+            string worldId = vrchatLogWatcher.NowWorldId;
+            string url = $"https://vrchat.com/home/world/{worldId}";
+            if (worldInfoLoadedWorldId == worldId) return; // このワールドは取得済み
+            if (updatingWorldInfo) return; // 取得中は重ねて取得しない
+            if (DateTime.Now < worldInfoRetryAfter) return; // 失敗直後は少し間隔を空ける
 
             this.linkLabelOfWorld.Text = url;
 
-            // JSONを取ってきてワールド情報を書く
-            if(JsonDownloader.CacheWorldInformation(vrchatLogWatcher.NowWorldId))
+            // JSONを取ってきてワールド情報を書く(UIスレッドを止めないよう非同期で取得する)
+            updatingWorldInfo = true;
+            try
             {
-                this.textWorldName.Text = JsonDownloader.CachedWorldName;
-                this.textWorldDescription.Text = JsonDownloader.CachedDescription;
-                this.textAuthorName.Text = $"by {JsonDownloader.CachedAuthorName}";
-                this.worldImageBox.Image = JsonDownloader.CachedThumbnailImage;
+                if (await JsonDownloader.CacheWorldInformationAsync(worldId))
+                {
+                    worldInfoLoadedWorldId = worldId;
+                    this.textWorldName.Text = JsonDownloader.CachedWorldName;
+                    this.textWorldDescription.Text = JsonDownloader.CachedDescription;
+                    this.textAuthorName.Text = $"by {JsonDownloader.CachedAuthorName}";
+                    this.worldImageBox.Image = JsonDownloader.CachedThumbnailImage;
+                }
+                else
+                {
+                    // 失敗したら、少し間隔を空けて次のタイマーで取り直す
+                    worldInfoRetryAfter = DateTime.Now.AddSeconds(10);
+                    this.textWorldName.Text = "読み込みエラー";
+                    this.textWorldDescription.Text = "読み込みエラー";
+                    this.textAuthorName.Text = "";
+                    this.worldImageBox.Image = null;
+                    history.WriteLine($"▲ワールド情報取得失敗 {url} {worldId}");
+                }
             }
-            else
+            finally
             {
-                this.textWorldName.Text = "読み込みエラー";
-                this.textWorldDescription.Text = "読み込みエラー";
-                this.textAuthorName.Text = "";
-                this.worldImageBox.Image = null;
-                history.WriteLine($"▲ワールド情報取得失敗 {url} {vrchatLogWatcher.NowWorldId}");
+                updatingWorldInfo = false;
             }
         }
         private void updateButton()
@@ -87,11 +105,11 @@ namespace OpenBrowserServer
             URLOpener.StaticOpen(config.WorkingPath);
         }
 
-        private void buttonUpdate_Click(object sender, EventArgs e)
+        private async void buttonUpdate_Click(object sender, EventArgs e)
         {
             if (DialogWrapper.DownloadConfirm())
             {
-                config.Update();
+                await config.UpdateAsync();
                 LoadSettingTexts();
                 if (config.NeedUpgrade())
                 {

@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace OpenBrowserServer.Component
 {
@@ -19,6 +20,12 @@ namespace OpenBrowserServer.Component
         public static Image  CachedThumbnailImage { get; private set; }
 
         public static bool CacheWorldInformation(
+            string worldId)
+        {
+            // ログ監視スレッドなど、同期的に呼びたい場所向けのラッパー
+            return CacheWorldInformationAsync(worldId).GetAwaiter().GetResult();
+        }
+        public static async Task<bool> CacheWorldInformationAsync(
             string worldId)
         {
 #if UBUNTU
@@ -40,32 +47,41 @@ namespace OpenBrowserServer.Component
                 string url = $"https://api.vrchat.cloud/api/1/worlds/{worldId}";
                 using (HttpClient client = new HttpClient())
                 {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
                     try
                     {
 
                         client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
 
                         // JSONダウンロード
-                        string responseBody = client.GetStringAsync(url).Result;
+                        string responseBody = await client.GetStringAsync(url);
                         JsonElement jsonDocument = JsonDocument.Parse(responseBody).RootElement;
 
+                        // 取得した値はまずローカル変数に受け、全部そろってからキャッシュへ反映する
+                        // (途中で失敗した時に、キャッシュが中途半端な状態にならないようにするため。
+                        //  失敗時は false を返し、呼び出し側が取り直せるようにする)
                         // サムネイル
                         string imageUrl = jsonDocument.GetProperty("thumbnailImageUrl").GetString();
 #if !UBUNTU
-                        Stream stream = client.GetStreamAsync(imageUrl).Result;
-                        CachedThumbnailImage = Image.FromStream(stream);
+                        Stream stream = await client.GetStreamAsync(imageUrl);
+                        Image thumbnailImage = Image.FromStream(stream);
 #else
                         // Ubuntu(ヘッドレス)ビルド用: System.Drawing は使えないためサムネイル取得を省略する
                         _ = imageUrl;
 #endif
 
-                        CachedWorldName = jsonDocument.GetProperty("name").GetString();
-                        CachedDescription = jsonDocument.GetProperty("description").GetString();
-                        CachedAuthorId = jsonDocument.GetProperty("authorId").GetString();
-                        CachedAuthorName = jsonDocument.GetProperty("authorName").GetString();
+                        string worldName = jsonDocument.GetProperty("name").GetString();
+                        string description = jsonDocument.GetProperty("description").GetString();
+                        string authorId = jsonDocument.GetProperty("authorId").GetString();
+                        string authorName = jsonDocument.GetProperty("authorName").GetString();
 
-                        // 最後まで設定が完了してからキャッシュする
+                        // 最後まで取得が完了してからキャッシュする
+#if !UBUNTU
+                        CachedThumbnailImage = thumbnailImage;
+#endif
+                        CachedWorldName = worldName;
+                        CachedDescription = description;
+                        CachedAuthorId = authorId;
+                        CachedAuthorName = authorName;
                         CachedWorldId = worldId;
                     }
                     catch (Exception ex)

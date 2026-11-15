@@ -62,11 +62,11 @@ namespace OpenBrowserServer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (DialogWrapper.DownloadConfirm())
             { 
-                config.Update();
+                await config.UpdateAsync();
                 if (config.NeedUpgrade())
                 {
                     if (DialogWrapper.UpdateConfirm())

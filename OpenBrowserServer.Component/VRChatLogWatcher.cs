@@ -109,7 +109,14 @@ namespace OpenBrowserServer.Component
                             string line = reader.ReadLine();
                             if (line != null)
                             {
-                                ProcessLogLine(line);
+                                try
+                                {
+                                    ProcessLogLine(line);
+                                }
+                                catch (Exception le)
+                                {
+                                    history.WriteLine($"▲ログ行の処理で例外が発生しました: {le.Message}");
+                                }
                             }
                             else
                             {
@@ -179,13 +186,32 @@ namespace OpenBrowserServer.Component
         void StopObserver()
         {
             //Console.WriteLine("Observing stop.");
-            if (!this.observerProcess.HasExited)
+            if (this.observerProcess == null)
             {
-                this.observerProcess.Kill();
+                return;
             }
-            this.observerProcess.Close();
+            try
+            {
+                if (!this.observerProcess.HasExited)
+                {
+                    this.observerProcess.Kill();
+                }
+            }
+            catch (Exception)
+            {
+                // 未開始・終了済みなどで例外になる場合は、処分だけ続行する
+            }
+            this.observerProcess.Dispose();
+            this.observerProcess = null;
         }
 #endif
+        // アプリ終了時に、監視プロセスやタイマーなどを確実に片付ける
+        public void Shutdown()
+        {
+            StopObserver();
+            fswatcher.Dispose();
+            watchdogTimer.Dispose();
+        }
         // ログファイルが新しく作成されたことを監視するイベントハンドラ
         void LogFileCreated(Object source, FileSystemEventArgs e)
         {
@@ -252,8 +278,16 @@ namespace OpenBrowserServer.Component
                 int index = line.IndexOf(LogPrefix);
                 try
                 {
-                    // ワールドID取得
-                    NowWorldId = line.Substring(index + LogPrefix.Length - "wrld_".Length, "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length).Trim();
+                    // ワールドID取得(行が想定より短い場合は、例外にせず読み飛ばす)
+                    int idStartIndex = index + LogPrefix.Length - "wrld_".Length;
+                    int idLength = "wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".Length;
+                    if (line.Length < idStartIndex + idLength)
+                    {
+                        history.WriteLine($"▲Joining行が短く、ワールドIDを取得できませんでした: '{line}'");
+                    }
+                    else
+                    {
+                    NowWorldId = line.Substring(idStartIndex, idLength).Trim();
                     history.WriteLine($" Joining world. '{NowWorldId}'");
                     // 入ったワールドの作者がBANリストに入っているときはシステムを一時停止する
                     if(JsonDownloader.CacheWorldInformation(NowWorldId))
@@ -271,8 +305,13 @@ namespace OpenBrowserServer.Component
                             DialogWrapper.ShowWarning($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "VRChatOpenBrowser");
                         }
                     }
+                    }
                 }
-                finally { }
+                catch (Exception e)
+                {
+                    // 1行の処理で例外が出ても、ログ監視自体は継続する
+                    history.WriteLine($"▲ワールド参加行の処理で例外が発生しました: {e.Message}");
+                }
             }
 
             // watchdog更新

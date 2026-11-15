@@ -5,6 +5,7 @@ namespace OpenBrowserServer.Logger
 {
     public class History
     {
+        private readonly object writeLock = new object();
         private readonly string directoryName = "Log";
         const string filePrefix = "History_";
         public string LogFileName { get; private set; }
@@ -41,10 +42,14 @@ namespace OpenBrowserServer.Logger
         public void WriteLine(string str)
         {
             string log = $"{DateTime.Now:[yyyy-MM-dd HH:mm:ss.ffff]} {str}";
-            Console.WriteLine(log);
-            using (var writer = new StreamWriter(LogFileName, true))
+            // HTTP応答・ログ監視・UIなど複数スレッドから同時に呼ばれるため、書き込みを直列化する
+            lock (writeLock)
             {
-                writer.WriteLine(log);
+                Console.WriteLine(log);
+                using (var writer = new StreamWriter(LogFileName, true))
+                {
+                    writer.WriteLine(log);
+                }
             }
         }
     }

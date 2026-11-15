@@ -10,6 +10,7 @@ namespace OpenBrowserServer
     internal static class Program
     {
         private static System.Threading.Mutex mutex;
+        private static VRChatLogWatcher vrchatLogWatcher;
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
@@ -34,6 +35,7 @@ namespace OpenBrowserServer
             catch (System.Net.HttpListenerException)
             {
                 DialogWrapper.ShowStop("ポートが使用されています。2つ同時には起動できません。", "VRChatOpenBrowser");
+                vrchatLogWatcher?.Shutdown();
                 return;
             }
 #if BOOTH
@@ -41,6 +43,7 @@ namespace OpenBrowserServer
             URLOpener.StaticOpen("https://yukiyukivirtual.booth.pm/items/2539784");
 #endif
             Application.Run();
+            vrchatLogWatcher?.Shutdown();
         }
         static void Initialize()
         {
@@ -59,7 +62,7 @@ namespace OpenBrowserServer
             History history = new History(workingPath);
             history.WriteLine($"■起動時のバージョン {config.FileVersion}_{config.Edition}");
             history.WriteLine($" Token {config.OpenBrowserToken.Token}");
-            VRChatLogWatcher vrchatLogWatcher = new VRChatLogWatcher(config, history);
+            vrchatLogWatcher = new VRChatLogWatcher(config, history);
             new HttpServer(config, history);
             new NotifyIconForm(config, history, vrchatLogWatcher);
         }
