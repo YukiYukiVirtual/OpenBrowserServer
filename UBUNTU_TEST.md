@@ -8,7 +8,7 @@ Windows 版のコードは無傷で、プラットフォーム依存箇所だけ
 - `OpenBrowserServer.Headless/` — SDK 形式(net10.0)のコンソール版プロジェクト
   - Component / WebServer / Logger のソースをリンクして共有し、`UBUNTU` シンボルを定義
   - WinForms の画面(トレイ/コントロールパネル)は含まない
-  - `Shims.cs` — .NET Framework にしか無い `System.Web.MimeMapping` の最小シム
+  - `System.Web.MimeMapping` は WebServer プロジェクト側に最小シム(MimeMapping.cs)があるので、それを一緒にコンパイルする
 - `tools/fake_vrchat_log.py` — VRChat の output_log を模倣するスクリプト
 
 ## UBUNTU ビルドでの差し替え内容

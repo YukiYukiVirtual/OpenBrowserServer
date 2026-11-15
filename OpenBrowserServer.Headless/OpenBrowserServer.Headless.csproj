@@ -32,6 +32,7 @@
     <!-- OpenBrowserServer.WebServer -->
     <Compile Include="..\OpenBrowserServer.WebServer\HttpServer.cs" Link="WebServer\HttpServer.cs" />
     <Compile Include="..\OpenBrowserServer.WebServer\HttpServer.Response.cs" Link="WebServer\HttpServer.Response.cs" />
+    <Compile Include="..\OpenBrowserServer.WebServer\MimeMapping.cs" Link="WebServer\MimeMapping.cs" />
     <!-- OpenBrowserServer.Logger -->
     <Compile Include="..\OpenBrowserServer.Logger\History.cs" Link="Logger\History.cs" />
   </ItemGroup>
