@@ -64,7 +64,11 @@ namespace OpenBrowserServer.Component
         }
         public void Download()
         {
-#if DEBUG
+#if UBUNTU
+            // Ubuntu(ヘッドレス)ビルド用: ネットワークから取得せず、配置済みの設定ファイルをそのまま使う
+            Console.WriteLine("設定ファイルのダウンロードはスキップしました(UBUNTUビルド)。");
+            return;
+#elif DEBUG
 
 #else
             string url = "https://raw.githubusercontent.com/YukiYukiVirtual/OpenBrowserServer/master/setting.yaml#" + DateTime.Now.ToString();

@@ -42,8 +42,13 @@ namespace OpenBrowserServer.Component
 
                         // サムネイル
                         string imageUrl = jsonDocument.GetProperty("thumbnailImageUrl").GetString();
+#if !UBUNTU
                         Stream stream = client.GetStreamAsync(imageUrl).Result;
                         CachedThumbnailImage = Image.FromStream(stream);
+#else
+                        // Ubuntu(ヘッドレス)ビルド用: System.Drawing は使えないためサムネイル取得を省略する
+                        _ = imageUrl;
+#endif
 
                         CachedWorldName = jsonDocument.GetProperty("name").GetString();
                         CachedDescription = jsonDocument.GetProperty("description").GetString();

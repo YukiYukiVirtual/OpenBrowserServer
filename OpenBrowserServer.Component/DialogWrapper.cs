@@ -1,8 +1,12 @@
-﻿using System.Media;
+﻿using System;
+#if !UBUNTU
+using System.Media;
 using System.Windows.Forms;
+#endif
 
 namespace OpenBrowserServer.Component
 {
+#if !UBUNTU
     public class DialogWrapper
     {
         public static bool DownloadConfirm()
@@ -55,4 +59,46 @@ namespace OpenBrowserServer.Component
             return MessageBox.Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
         }
     }
+#else
+    // Ubuntu(ヘッドレス)ビルド用: ダイアログの代わりにコンソールへ出力する。
+    // 確認ダイアログはテストが止まらないよう既定の応答を返す。
+    public class DialogWrapper
+    {
+        public static bool DownloadConfirm()
+        {
+            Console.WriteLine("[Dialog] 設定ファイルをダウンロードして再読み込みしますか？ -> Yes(自動応答)");
+            return true;
+        }
+        public static bool UpdateConfirm()
+        {
+            Console.WriteLine("[Dialog] プログラムの更新があります(ヘッドレス版では終了しません)");
+            return false;
+        }
+        public static bool ExitConfirm()
+        {
+            Console.WriteLine("[Dialog] プログラムを終了しますか？ -> Yes(自動応答)");
+            return true;
+        }
+        public static void Completed()
+        {
+            ShowInformation("完了しました", "VRChatOpenBrowser");
+        }
+        public static void ShowInformation(string text, string caption)
+        {
+            Console.WriteLine($"[Dialog:Information][{caption}] {text}");
+        }
+        public static void ShowWarning(string text, string caption)
+        {
+            Console.WriteLine($"[Dialog:Warning][{caption}] {text}");
+        }
+        public static void ShowError(string text, string caption)
+        {
+            Console.WriteLine($"[Dialog:Error][{caption}] {text}");
+        }
+        public static void ShowStop(string text, string caption)
+        {
+            Console.WriteLine($"[Dialog:Stop][{caption}] {text}");
+        }
+    }
+#endif
 }

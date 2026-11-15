@@ -2,8 +2,13 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+#if !UBUNTU
 using System.Media;
 using System.Windows.Forms;
+#endif
+#if UBUNTU
+using System.Threading;
+#endif
 using OpenBrowserServer.Logger;
 using static OpenBrowserServer.Component.Setting;
 
@@ -21,6 +26,10 @@ namespace OpenBrowserServer.Component
         readonly object watchdogLockObject = new object();
 
         Process observerProcess; // ログを監視するプロセス
+#if UBUNTU
+        CancellationTokenSource tailCts; // ログ追尾スレッドの停止用
+        Thread tailThread; // ログ追尾スレッド
+#endif
         public string NowWorldId { get; private set; }
         public VRChatLogWatcher(Config config, History history)
         {
@@ -34,7 +43,13 @@ namespace OpenBrowserServer.Component
 
             NowWorldId = null;
 
+#if UBUNTU
+            // Ubuntu(ヘッドレス)ビルド用: 環境変数で指定された偽ログフォルダを使う
+            string targetDirectoryName = Environment.GetEnvironmentVariable("OPENBROWSER_VRCHAT_LOG_DIR") ?? Path.Combine(config.WorkingPath, "FakeVRChat");
+            Directory.CreateDirectory(targetDirectoryName);
+#else
             string targetDirectoryName = Environment.ExpandEnvironmentVariables(@"%AppData%\..\LocalLow\VRChat\VRChat");
+#endif
             string targetFileName = "output_log_*.txt";
 
             // VRChat起動時のログファイルの作成を監視するために、FileSystemWatcherの初期化
@@ -57,7 +72,11 @@ namespace OpenBrowserServer.Component
             else
             {
                 FileInfo fi = fis.OrderByDescending(p => p.LastWriteTime).ToArray()[0];
+#if UBUNTU
+                ObserveVRChatLog(fi.FullName); // 最新のログファイルのログ監視をスタートする
+#else
                 ObserveVRChatLog(fi.DirectoryName + "\\" + fi.Name); // 最新のログファイルのログ監視をスタートする
+#endif
             }
 
             this.history = history;
@@ -69,6 +88,45 @@ namespace OpenBrowserServer.Component
             StopObserver();
         }
         // VRChatのログ監視をスタートする
+#if UBUNTU
+        void ObserveVRChatLog(String fullpath)
+        {
+            // Ubuntu(ヘッドレス)ビルド用: PowerShell の代わりにプロセス内でファイルを追尾する
+            StopObserver();
+            tailCts = new CancellationTokenSource();
+            CancellationToken token = tailCts.Token;
+            tailThread = new Thread(() =>
+            {
+                try
+                {
+                    using (FileStream fs = new FileStream(fullpath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (StreamReader reader = new StreamReader(fs, System.Text.Encoding.UTF8))
+                    {
+                        fs.Seek(0, SeekOrigin.End);
+                        reader.DiscardBufferedData();
+                        while (!token.IsCancellationRequested)
+                        {
+                            string line = reader.ReadLine();
+                            if (line != null)
+                            {
+                                ProcessLogLine(line);
+                            }
+                            else
+                            {
+                                Thread.Sleep(100);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    history.WriteLine(e.ToString());
+                }
+            });
+            tailThread.IsBackground = true;
+            tailThread.Start();
+        }
+#else
         void ObserveVRChatLog(String fullpath)
         {
             // ログファイルに書き込まれた行を監視するプロセスを起動する
@@ -100,7 +158,24 @@ namespace OpenBrowserServer.Component
                 return;
             }
         }
+#endif
         // 監視プロセスを停止する
+#if UBUNTU
+        void StopObserver()
+        {
+            if (tailCts != null)
+            {
+                tailCts.Cancel();
+                if (tailThread != null)
+                {
+                    tailThread.Join(1000);
+                }
+                tailCts.Dispose();
+                tailCts = null;
+                tailThread = null;
+            }
+        }
+#else
         void StopObserver()
         {
             //Console.WriteLine("Observing stop.");
@@ -110,6 +185,7 @@ namespace OpenBrowserServer.Component
             }
             this.observerProcess.Close();
         }
+#endif
         // ログファイルが新しく作成されたことを監視するイベントハンドラ
         void LogFileCreated(Object source, FileSystemEventArgs e)
         {
@@ -117,15 +193,21 @@ namespace OpenBrowserServer.Component
             StopObserver(); // 監視プロセスを停止する
             ObserveVRChatLog(e.FullPath); // 作成されたファイルを監視対象にする
         }
+#if !UBUNTU
         // ファイル書き込みイベントハンドラ
         // 1行分のログを読み、その行に対して処理する
         void LogOutputDataReceived(Object source, DataReceivedEventArgs e)
+        {
+            ProcessLogLine(e.Data);
+        }
+#endif
+        // 1行分のログに対して処理する
+        void ProcessLogLine(string line)
         {
             if(config.PauseSystem)
             {
                 return;
             }
-            string line = e.Data;
             if (String.IsNullOrEmpty(line))
             {
                 // NOP
@@ -183,7 +265,9 @@ namespace OpenBrowserServer.Component
                             config.PauseSystem = true;
                             history.WriteLine($"▲BannedUser: {JsonDownloader.CachedAuthorName}({JsonDownloader.CachedAuthorId}) Reason: {bannedUserInfo.Reason}");
                             history.WriteLine($" System paused.");
+#if !UBUNTU
                             SystemSounds.Asterisk.Play();
+#endif
                             DialogWrapper.ShowWarning($"今Joinしたワールドの作者は、以下の理由によりBANしています。\n理由:{bannedUserInfo.Reason}\n一時的に機能を停止しています。再開するには、コントロールパネルの「再開する」ボタンを押して一時停止を解除してください。", "VRChatOpenBrowser");
                         }
                     }

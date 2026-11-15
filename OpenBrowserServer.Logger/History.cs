@@ -18,7 +18,11 @@ namespace OpenBrowserServer.Logger
 #endif
             Console.WriteLine($"directoryName: {directoryName}");
             // 起動時の日付でログファイル名を作成する
+#if UBUNTU
+            LogFileName = Path.Combine(directoryName, $"{filePrefix}{DateTime.Today:yyyy-MM-dd}.log");
+#else
             LogFileName = $"{directoryName}\\{filePrefix}{DateTime.Today:yyyy-MM-dd}.log";
+#endif
             // ログ用ディレクトリを作成する(無ければ)
             Directory.CreateDirectory(directoryName);
 

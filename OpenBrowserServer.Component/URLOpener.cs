@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+#if !UBUNTU
 using System.Media;
+#endif
 using System.Linq;
 
 namespace OpenBrowserServer.Component
@@ -16,7 +18,12 @@ namespace OpenBrowserServer.Component
     public class URLOpener
     {
         readonly Config config;
+#if !UBUNTU
         static readonly SoundPlayer openSoundPlayer = new SoundPlayer("C:\\Windows\\Media\\Windows Navigation Start.wav");
+#else
+        // Ubuntu(ヘッドレス)ビルド用: 最後に「開くはずだった」URLを記録する
+        public static string LastOpenedUrl { get; private set; }
+#endif
         DateTime lastOpenTime;
         public URLOpener(Config config)
         {
@@ -82,6 +89,11 @@ namespace OpenBrowserServer.Component
         }
         public static void StaticOpen(string url)
         {
+#if UBUNTU
+            // Ubuntu(ヘッドレス)ビルド用: 実際には開かず、開くはずだったURLを記録だけする
+            LastOpenedUrl = url;
+            Console.WriteLine($"[URLOpener] would open: {url}");
+#else
             try
             {
                 openSoundPlayer.Play(); // TODO オリジナルの音にする
@@ -90,7 +102,9 @@ namespace OpenBrowserServer.Component
             {
                 CmdStartProcess(url);
             }
+#endif
         }
+#if !UBUNTU
         private static void CmdStartProcess(string arg)
         {
             ProcessStartInfo psi = new ProcessStartInfo(arg)
@@ -107,5 +121,6 @@ namespace OpenBrowserServer.Component
                 Console.WriteLine($"CmdStartProcess: {arg} {e}");
             }
         }
+#endif
     }
 }
