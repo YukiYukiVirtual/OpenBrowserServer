@@ -15,9 +15,9 @@
     <AssemblyName>OpenBrowserServer.Headless</AssemblyName>
     <RootNamespace>OpenBrowserServer.Headless</RootNamespace>
     <!-- バージョンは VersionMaster.txt の手順に合わせて手でそろえる -->
-    <Version>6.1.1</Version>
-    <FileVersion>6.1.1.0</FileVersion>
-    <AssemblyVersion>6.1.1.0</AssemblyVersion>
+    <Version>6.2.0</Version>
+    <FileVersion>6.2.0.0</FileVersion>
+    <AssemblyVersion>6.2.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,7 +10,7 @@ UI フレームワークは WinForms のまま、プロジェクト形式と土�
   - `OpenBrowserServer.Component` / `OpenBrowserServer.WebServer` → `net10.0-windows`(Component が MessageBox / SoundPlayer を使うため)
   - `OpenBrowserServer.Logger` → `net10.0`
   - ヘッドレス版 `OpenBrowserServer.Headless` → `net10.0`(変更なし、今回の変換に合わせて追随)
-- バージョン情報は従来どおり `Properties\AssemblyInfo.cs` を正とした(自動生成はオフ)。本体は 6.1.1.0 のまま
+- バージョン情報は従来どおり `Properties\AssemblyInfo.cs` を正とした(自動生成はオフ)。本体は 6.2.0.0(今回マイナーバージョンを上げた)
 - 構成(Booth / Free / Debug / Release)はソリューションに残した。Free 以外では `BOOTH` シンボルが定義される(従来の定義どおり)
 - NuGet は packages.config から PackageReference へ。モダン.NET に同梱されるもの(System.Text.Json など)は参照自体を削除
 - `System.Web.MimeMapping` はモダン.NET に無いため、WebServer プロジェクトに最小シム `MimeMapping.cs` を追加
