@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- Windows 版は MessageBox や SoundPlayer を使うため -windows とする。
          UBUNTU(ヘッドレス)ビルドはこのプロジェクトを参照せず、ソースを直接コンパイルする -->
     <TargetFramework>net10.0-windows</TargetFramework>
+    <Configurations>Debug;Release;Booth;Free</Configurations>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RootNamespace>OpenBrowserServer.Component</RootNamespace>

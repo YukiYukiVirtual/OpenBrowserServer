@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- Component(net10.0-windows)を参照するため -windows に合わせる -->
     <TargetFramework>net10.0-windows</TargetFramework>
+    <Configurations>Debug;Release;Booth;Free</Configurations>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RootNamespace>OpenBrowserServer.WebServer</RootNamespace>
     <AssemblyName>OpenBrowserServer.WebServer</AssemblyName>
