@@ -28,6 +28,9 @@ namespace OpenBrowserServer.Component
         public Config(string workingPath, FileVersionInfo fileVersionInfo)
         {
             this.WorkingPath = workingPath;
+            // 初回起動時は作業フォルダがまだ無いため、先に作っておく。
+            // 無いと設定ファイルのダウンロード保存が失敗し、デフォルト設定(Version="")で更新チェックが誤検知する。
+            Directory.CreateDirectory(workingPath);
             SettingFilePath =
 #if DEBUG
                 "../../../setting.yaml";
@@ -60,6 +63,11 @@ namespace OpenBrowserServer.Component
         }
         public bool NeedUpgrade()
         {
+            // 設定ファイルが読み込めなかった場合(Version が空)は更新の有無を判断できないため、更新ありとはしない
+            if (string.IsNullOrEmpty(Setting.Version))
+            {
+                return false;
+            }
             return !FileVersion.Equals(Setting.Version);
         }
         public void Download()
