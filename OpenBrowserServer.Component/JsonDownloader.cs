@@ -21,6 +21,16 @@ namespace OpenBrowserServer.Component
         public static bool CacheWorldInformation(
             string worldId)
         {
+#if UBUNTU
+            // Ubuntu(ヘッドレス)ビルド用: VRChat API は叩かず、ダミーのワールド情報を返す。
+            // BAN判定のテストができるよう、作者ID/名前は環境変数で差し替え可能。
+            CachedWorldName = "Dummy World";
+            CachedDescription = "Dummy world information for Ubuntu headless test.";
+            CachedAuthorId = Environment.GetEnvironmentVariable("OPENBROWSER_DUMMY_AUTHOR_ID") ?? "usr_00000000-0000-0000-0000-000000000000";
+            CachedAuthorName = Environment.GetEnvironmentVariable("OPENBROWSER_DUMMY_AUTHOR_NAME") ?? "DummyAuthor";
+            CachedWorldId = worldId;
+            return true;
+#else
             if (worldId == CachedWorldId)
             {
                 Console.WriteLine($"Cached {CachedWorldId}");
@@ -67,6 +77,7 @@ namespace OpenBrowserServer.Component
                 }
             }
             return true;
+#endif
         }
     }
 }
