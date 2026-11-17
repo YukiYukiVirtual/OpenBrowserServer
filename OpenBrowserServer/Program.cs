@@ -38,6 +38,26 @@ namespace OpenBrowserServer
                 vrchatLogWatcher?.Shutdown();
                 return;
             }
+            catch (Exception ex)
+            {
+                // 起動時の例外はここで受け止める。握りつぶさず、記録して知らせて終了する。
+                // History の生成前でも起こりうるため、通常ログではなく crash.log に直接書く。
+                string crashLogPath = null;
+                try
+                {
+                    string workingPath = Environment.ExpandEnvironmentVariables(@"%AppData%\YukiYukiVirtual\OpenBrowserServer\");
+                    System.IO.Directory.CreateDirectory(workingPath);
+                    crashLogPath = System.IO.Path.Combine(workingPath, "crash.log");
+                    System.IO.File.AppendAllText(crashLogPath, $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}] 起動時に例外が発生しました{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}");
+                }
+                catch
+                {
+                    // ログ書き込み自体の失敗では落とさない(ダイアログ表示を優先する)
+                }
+                DialogWrapper.ShowStop($"起動に失敗しました。{(crashLogPath != null ? $"詳細は crash.log に記録しました。{Environment.NewLine}{crashLogPath}{Environment.NewLine}" : "")}{ex.Message}", "VRChatOpenBrowser");
+                vrchatLogWatcher?.Shutdown();
+                return;
+            }
 #if BOOTH
 #else
             URLOpener.StaticOpen("https://yukiyukivirtual.booth.pm/items/2539784");

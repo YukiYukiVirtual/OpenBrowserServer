@@ -30,7 +30,9 @@ namespace OpenBrowserServer.Headless
                 Console.WriteLine($"[Headless] setting.yaml をコピーしました: {seedSetting}");
             }
 
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+            // 単一ファイル発行では Assembly.Location が空文字になるため、その場合は実行ファイル自身から取得する(本体 Program.cs と同じ対策)
+            string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(string.IsNullOrEmpty(assemblyLocation) ? Environment.ProcessPath : assemblyLocation);
             Config config = new Config(workingPath, fileVersionInfo);
             if (config.NeedUpgrade())
             {
