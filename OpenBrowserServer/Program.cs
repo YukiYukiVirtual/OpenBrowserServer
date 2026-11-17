@@ -49,7 +49,9 @@ namespace OpenBrowserServer
         {
             string workingPath = Environment.ExpandEnvironmentVariables(@"%AppData%\YukiYukiVirtual\OpenBrowserServer"); // ログや設定ファイルなどを置いておくフォルダ(Roaming)
             // プログラムファイルのバージョン情報取得
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            // 単一ファイル発行では Assembly.Location が空文字になるため、その場合は実行ファイル自身から取得する
+            string assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(string.IsNullOrEmpty(assemblyLocation) ? Environment.ProcessPath : assemblyLocation);
             Config config = new Config(workingPath, fileVersionInfo);
             if(config.NeedUpgrade())
             {
