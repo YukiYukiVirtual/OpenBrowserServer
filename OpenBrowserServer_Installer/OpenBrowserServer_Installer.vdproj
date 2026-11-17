@@ -63,6 +63,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_FE07E518BE4D4DD09EA675E570654ADB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A777F20CAFA67FC085C54D7E17F4A163"
         "OwnerKey" = "8:_99573A0941564D13BA0273712C7F97C6"
         "MsmSig" = "8:_UNDEFINED"
@@ -354,27 +360,7 @@
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FE07E518BE4D4DD09EA675E570654ADB"
             {
-            "SourcePath" = "8:..\\OpenBrowserServer\\bin\\Free\\net10.0-windows\\win-x64\\VRChatOpenBrowser.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_4262A5547D564724AFB311468E9E1041"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7D0B7B08446B41AF8C6208FE6FDDC5AB"
-            {
-            "SourcePath" = "8:..\\OpenBrowserServer\\bin\\Free\\net10.0-windows\\win-x64\\VRChatOpenBrowser.deps.json"
+            "SourcePath" = "8:..\\publish\\VRChatOpenBrowser.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4262A5547D564724AFB311468E9E1041"
@@ -1023,7 +1009,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
