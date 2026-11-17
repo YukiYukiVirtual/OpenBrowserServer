@@ -26,7 +26,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Properties\Settings.Designer.cs (ApplicationSettingsBase) のため -->
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.0" />
     <!-- GenerateResourceUsePreserializedResources の実行時サポート -->
     <PackageReference Include="System.Resources.Extensions" Version="10.0.0" />
   </ItemGroup>
