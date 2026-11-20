@@ -67,8 +67,9 @@ dotnet publish OpenBrowserServer\OpenBrowserServer.csproj -c Free -r win-x64 --s
 発行 → インストーラービルド → 配布 zip 作成まで一括で行う。
 
 - バージョンは `VersionMaster.txt` から読む
-- 成果物: `OpenBrowserServer_Installer\VRChatOpenBrowser_v<Version>B.zip`（Booth）と
+- 成果物: リポジトリ直下に `VRChatOpenBrowser_v<Version>B.zip`（Booth）と
   `VRChatOpenBrowser_v<Version>G.zip`（Free）。zip の中身は setup.exe / .msi / README.md / LICENSE.md
+- 実行開始時に、直下の古い `VRChatOpenBrowser_*.zip` は削除される（今回分だけが残る）
 - 発行は `-c <構成> /p:PublishProfile=<構成>` の両方を指定する。CLI の dotnet publish は
   .pubxml 内の Configuration を適用せず Release でビルドしてしまうため（Release は BOOTH を
   定義するので、Free 版が Booth 寄りの挙動で出来てしまう）。VS の発行は .pubxml を正しく適用する

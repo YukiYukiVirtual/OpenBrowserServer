@@ -5,12 +5,16 @@ cd /d "%~dp0"
 rem ============================================================
 rem  VRChatOpenBrowser release builder
 rem
-rem  Builds BOTH editions and packs each installer into a zip:
-rem    Booth -> OpenBrowserServer_Installer\VRChatOpenBrowser_v<Version>B.zip
-rem    Free  -> OpenBrowserServer_Installer\VRChatOpenBrowser_v<Version>G.zip
+rem  Builds BOTH editions and packs each installer into a zip.
+rem  The zips are created next to this .bat file (repository root):
+rem    Booth -> VRChatOpenBrowser_v<Version>B.zip
+rem    Free  -> VRChatOpenBrowser_v<Version>G.zip
 rem
 rem  <Version> is read from VersionMaster.txt
 rem  (first line that is neither empty nor a "#" comment).
+rem
+rem  Old VRChatOpenBrowser_*.zip files are deleted at the start,
+rem  so only the zips from this run remain.
 rem
 rem  Each zip contains:
 rem    setup.exe, OpenBrowserServer_Installer.msi, README.md, LICENSE.md
@@ -45,6 +49,13 @@ if not defined VERSION (
 )
 echo Version: %VERSION%
 echo.
+
+rem ---- Delete old distribution zips ----
+if exist "VRChatOpenBrowser_*.zip" (
+    echo Deleting old zips: VRChatOpenBrowser_*.zip
+    del /f /q "VRChatOpenBrowser_*.zip"
+    echo.
+)
 
 rem ---- Check dotnet ----
 where dotnet >nul 2>&1
@@ -82,8 +93,8 @@ if errorlevel 1 goto :Fail
 echo.
 echo ============================================================
 echo  All done:
-echo    OpenBrowserServer_Installer\VRChatOpenBrowser_v%VERSION%B.zip
-echo    OpenBrowserServer_Installer\VRChatOpenBrowser_v%VERSION%G.zip
+echo    VRChatOpenBrowser_v%VERSION%B.zip
+echo    VRChatOpenBrowser_v%VERSION%G.zip
 echo ============================================================
 pause
 exit /b 0
@@ -104,7 +115,7 @@ set "CONFIG=%~1"
 set "SUFFIX=%~2"
 set "OUTDIR=OpenBrowserServer_Installer\%CONFIG%"
 set "ZIPNAME=VRChatOpenBrowser_v%VERSION%%SUFFIX%.zip"
-set "ZIPPATH=OpenBrowserServer_Installer\%ZIPNAME%"
+set "ZIPPATH=%ZIPNAME%"
 
 echo ------------------------------------------------------------
 echo  [%CONFIG%] Step 1/3: publish

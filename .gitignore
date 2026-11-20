@@ -5,6 +5,7 @@
 
 OpenBrowserServer_Installer/*/*.exe
 OpenBrowserServer_Installer/*.zip
+/VRChatOpenBrowser_*.zip
 
 # dotenv files
 .env
